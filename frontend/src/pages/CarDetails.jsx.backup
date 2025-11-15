@@ -1,0 +1,396 @@
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useParams, Link } from 'react-router-dom';
+import { dummyCarData } from '../assets/assets';
+import { assets } from '../assets/assets';
+import { scrollToTop } from '../utils/scrollToTop';
+import {
+  containerVariants,
+  itemVariants,
+  cardVariants,
+  buttonVariants,
+  hoverLiftVariants,
+  fadeInVariants,
+  slideInBottomVariants,
+  getButtonHoverProps
+} from '../utils/animations';
+
+const CarDetails = () => {
+    const { id } = useParams();
+    const [selectedImage, setSelectedImage] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
+    const [imageLoaded, setImageLoaded] = useState(false);
+
+    useEffect(() => {
+        // Simulate loading time
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+        }, 800);
+        return () => clearTimeout(timer);
+    }, []);
+
+    useEffect(() => {
+        if (!isLoading) {
+            setImageLoaded(true);
+        }
+    }, [isLoading]);
+    
+    // Find the car by ID
+    const car = dummyCarData.find(car => car._id === id);
+    const currency = import.meta.env.VITE_CURRENCY || 'KSh';
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <motion.div
+                    className="text-center"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <motion.div
+                        className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    />
+                    <motion.p
+                        className="text-gray-600"
+                        animate={{ opacity: [0.5, 1, 0.5] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                    >
+                        Loading car details...
+                    </motion.p>
+                </motion.div>
+            </div>
+        );
+    }
+
+    if (!car) {
+        return (
+            <motion.div
+                className="min-h-screen bg-gray-50 flex items-center justify-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+            >
+                <motion.div
+                    className="text-center"
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.6, type: "spring" }}
+                >
+                    <motion.div
+                        className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6"
+                        animate={{ scale: [1, 1.1, 1] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                    >
+                        <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.291-1.007-5.692-2.565M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </motion.div>
+                    <motion.h2
+                        className="text-2xl font-bold text-gray-900 mb-4"
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                    >
+                        Car Not Found
+                    </motion.h2>
+                    <motion.p
+                        className="text-gray-600 mb-6"
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.3 }}
+                    >
+                        The car you're looking for doesn't exist.
+                    </motion.p>
+                    <motion.div
+                        {...getButtonHoverProps()}
+                    >
+                        <Link
+                            to="/"
+                            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold"
+                            onClick={() => scrollToTop()}
+                        >
+                            Back to Home
+                        </Link>
+                    </motion.div>
+                </motion.div>
+            </motion.div>
+        );
+    }
+
+    // Multiple images for the car (using same image for demo)
+    const carImages = [car.image, car.image, car.image];
+
+    const getCategoryColor = (category) => {
+        const colors = {
+            'SUV': 'bg-blue-100 text-blue-800',
+            'Sedan': 'bg-green-100 text-green-800',
+            'Hatchback': 'bg-purple-100 text-purple-800',
+            'Luxury': 'bg-yellow-100 text-yellow-800',
+            'Sports': 'bg-red-100 text-red-800',
+            'Electric': 'bg-emerald-100 text-emerald-800',
+            'Van': 'bg-orange-100 text-orange-800'
+        };
+        return colors[category] || 'bg-gray-100 text-gray-800';
+    };
+
+    const getFuelTypeIcon = (fuelType) => {
+        const icons = {
+            'Petrol': '⛽',
+            'Diesel': '🛢️',
+            'Electric': '⚡',
+            'Hybrid': '🔋',
+            'CNG': '💨'
+        };
+        return icons[fuelType] || '⛽';
+    };
+
+    return (
+        <motion.div
+            className="min-h-screen bg-gray-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+        >
+            {/* Breadcrumb */}
+            <motion.div
+                className="bg-white border-b"
+                initial={{ y: -30, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.6 }}
+            >
+                <div className="container mx-auto px-4 py-3">
+                    <nav className="flex items-center space-x-2 text-sm">
+                        <motion.div
+                            whileHover={{ scale: 1.05 }}
+                        >
+                            <Link to="/" className="text-blue-600 hover:text-blue-800 transition-colors" onClick={() => scrollToTop()}>Home</Link>
+                        </motion.div>
+                        <motion.span
+                            className="text-gray-400"
+                            animate={{ opacity: [0.4, 1, 0.4] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                        >
+                            /
+                        </motion.span>
+                        <motion.div
+                            whileHover={{ scale: 1.05 }}
+                        >
+                            <Link to="/" className="text-blue-600 hover:text-blue-800 transition-colors" onClick={() => scrollToTop()}>Cars</Link>
+                        </motion.div>
+                        <motion.span
+                            className="text-gray-400"
+                            animate={{ opacity: [0.4, 1, 0.4] }}
+                            transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+                        >
+                            /
+                        </motion.span>
+                        <motion.span
+                            className="text-gray-600"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.5 }}
+                        >
+                            {car.brand} {car.model}
+                        </motion.span>
+                    </nav>
+                </div>
+            </motion.div>
+
+            <div className="container mx-auto px-4 py-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Left Column - Images and Description */}
+                    <div className="lg:col-span-2">
+                        {/* Image Gallery */}
+                        <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
+                            <div className="relative">
+                                <img 
+                                    src={carImages[selectedImage]} 
+                                    alt={`${car.brand} ${car.model}`}
+                                    className="w-full h-96 object-cover"
+                                />
+                                <div className="absolute top-4 left-4">
+                                    <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                                        car.isAvaliable 
+                                            ? 'bg-green-500 text-white' 
+                                            : 'bg-red-500 text-white'
+                                    }`}>
+                                        {car.isAvaliable ? 'Available' : 'Not Available'}
+                                    </span>
+                                </div>
+                                <div className="absolute top-4 right-4">
+                                    <span className={`px-3 py-1 rounded-md text-sm font-medium ${getCategoryColor(car.category)}`}>
+                                        {car.category}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            {/* Thumbnail Images */}
+                            <div className="p-4 border-t">
+                                <div className="flex space-x-2">
+                                    {carImages.map((image, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => setSelectedImage(index)}
+                                            className={`flex-shrink-0 w-20 h-16 rounded-lg overflow-hidden border-2 ${
+                                                selectedImage === index ? 'border-blue-500' : 'border-gray-200'
+                                            }`}
+                                        >
+                                            <img 
+                                                src={image} 
+                                                alt={`${car.brand} ${car.model} view ${index + 1}`}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Car Description */}
+                        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                            <h3 className="text-xl font-bold mb-4">Description</h3>
+                            <p className="text-gray-600 leading-relaxed">
+                                {car.description || `The ${car.brand} ${car.model} is a ${car.category.toLowerCase()} vehicle that offers excellent performance and comfort. With ${car.seating_capacity} seats and ${car.fuel_type.toLowerCase()} engine, it's perfect for both city driving and long trips.`}
+                            </p>
+                        </div>
+
+                        {/* Features */}
+                        <div className="bg-white rounded-2xl shadow-lg p-6">
+                            <h3 className="text-xl font-bold mb-4">Features & Specifications</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 className="font-semibold mb-3 text-gray-900">Basic Info</h4>
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">Brand:</span>
+                                            <span className="font-medium">{car.brand}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">Model:</span>
+                                            <span className="font-medium">{car.model}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">Year:</span>
+                                            <span className="font-medium">{car.year}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">Location:</span>
+                                            <span className="font-medium">{car.location}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 className="font-semibold mb-3 text-gray-900">Specifications</h4>
+                                    <div className="space-y-2">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center space-x-2">
+                                                <span className="text-lg">{getFuelTypeIcon(car.fuel_type)}</span>
+                                                <span className="text-gray-600">Fuel Type:</span>
+                                            </div>
+                                            <span className="font-medium">{car.fuel_type}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">Transmission:</span>
+                                            <span className="font-medium">{car.transmission}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">Seating:</span>
+                                            <span className="font-medium">{car.seating_capacity} seats</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">Category:</span>
+                                            <span className="font-medium">{car.category}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Right Column - Booking Card */}
+                    <div className="lg:col-span-1">
+                        <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-6">
+                            <div className="text-center mb-6">
+                                <h2 className="text-2xl font-bold mb-2">{car.brand} {car.model}</h2>
+                                <p className="text-gray-600">{car.year} • {car.location}</p>
+                            </div>
+
+                            <div className="text-center mb-6">
+                                <span className="text-4xl font-bold text-[var(--color-primary)]">
+                                    {currency}{car.pricePerDay}
+                                </span>
+                                <span className="text-gray-500 text-lg"> / day</span>
+                            </div>
+
+                            <div className="space-y-4 mb-6">
+                                <div className="flex items-center justify-center space-x-4 text-sm">
+                                    <div className="flex items-center space-x-1">
+                                        <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                        </svg>
+                                        <span>Insurance Included</span>
+                                    </div>
+                                    <div className="flex items-center space-x-1">
+                                        <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                        </svg>
+                                        <span>AC Included</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-3">
+                                <button
+                                    className={`w-full py-3 px-6 rounded-lg font-semibold transition-colors ${
+                                        car.isAvaliable
+                                            ? 'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-dark)]'
+                                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    }`}
+                                    disabled={!car.isAvaliable}
+                                    onClick={() => {
+                                        if (car.isAvaliable) {
+                                            // Open WhatsApp with pre-filled message
+                                            const phoneNumber = '0706667129';
+                                            const message = `Hi! I'm interested in renting the ${car.brand} ${car.model} (${car.year}) for ${currency}${car.pricePerDay}/day. Is it still available?`;
+                                            const whatsappUrl = `https://wa.me/${phoneNumber.replace(/^0/, '254')}?text=${encodeURIComponent(message)}`;
+                                            window.open(whatsappUrl, '_blank');
+                                        }
+                                    }}
+                                >
+                                    {car.isAvaliable ? 'Rent Now' : 'Not Available'}
+                                </button>
+                                <button
+                                    className="w-full py-3 px-6 border-2 border-gray-300 rounded-lg font-semibold text-gray-700 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
+                                    onClick={() => {
+                                        // Make a phone call
+                                        window.location.href = 'tel:0706667129';
+                                    }}
+                                >
+                                    Contact Owner
+                                </button>
+                            </div>
+
+                            <div className="mt-6 pt-6 border-t border-gray-200">
+                                <div className="text-center text-sm text-gray-600 mb-2">
+                                    Need help booking?
+                                </div>
+                                <Link
+                                    to="/faq"
+                                    className="block w-full py-2 text-[var(--color-primary)] hover:text-[var(--color-primary-dark)] transition-colors text-sm text-center"
+                                    onClick={() => scrollToTop()}
+                                >
+                                    View FAQ
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </motion.div>
+    );
+};
+
+export default CarDetails;
