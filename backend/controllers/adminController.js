@@ -392,6 +392,169 @@ export const updateSettings = async (req, res, next) => {
   }
 };
 
+// @desc    Get performance data for charts
+// @route   GET /api/admin/performance
+// @access  Private (Admin)
+export const getPerformanceData = async (req, res, next) => {
+  try {
+    const period = req.query.period || '30d';
+    const days = period === '7d' ? 7 : period === '30d' ? 30 : 90;
+
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    // Get daily booking and revenue data
+    const dailyData = await Booking.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: startDate }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: '%Y-%m-%d',
+              date: '$createdAt'
+            }
+          },
+          bookings: { $sum: 1 },
+          revenue: { $sum: '$pricing.totalAmount' },
+          completedBookings: {
+            $sum: {
+              $cond: [{ $eq: ['$status', 'Completed'] }, 1, 0]
+            }
+          },
+          activeBookings: {
+            $sum: {
+              $cond: [{ $eq: ['$status', 'Active'] }, 1, 0]
+            }
+          },
+          pendingBookings: {
+            $sum: {
+              $cond: [{ $eq: ['$status', 'Pending'] }, 1, 0]
+            }
+          }
+        }
+      },
+      {
+        $sort: { '_id': 1 }
+      }
+    ]);
+
+    // Fill in missing dates with zero values
+    const performanceData = [];
+    const now = new Date();
+
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date(now);
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0];
+
+      const dayData = dailyData.find(d => d._id === dateStr) || {
+        _id: dateStr,
+        bookings: 0,
+        revenue: 0,
+        completedBookings: 0,
+        activeBookings: 0,
+        pendingBookings: 0
+      };
+
+      performanceData.push({
+        date: dateStr,
+        bookings: dayData.bookings,
+        revenue: dayData.revenue,
+        completedBookings: dayData.completedBookings,
+        activeBookings: dayData.activeBookings,
+        pendingBookings: dayData.pendingBookings
+      });
+    }
+
+    // Get top performing cars
+    const topCars = await Booking.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: startDate },
+          status: 'Completed'
+        }
+      },
+      {
+        $group: {
+          _id: '$car',
+          totalBookings: { $sum: 1 },
+          totalRevenue: { $sum: '$pricing.totalAmount' }
+        }
+      },
+      {
+        $lookup: {
+          from: 'cars',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'carInfo'
+        }
+      },
+      {
+        $unwind: '$carInfo'
+      },
+      {
+        $project: {
+          car: { $concat: ['$carInfo.brand', ' ', '$carInfo.model'] },
+          bookings: '$totalBookings',
+          revenue: '$totalRevenue',
+          image: '$carInfo.primaryImage'
+        }
+      },
+      {
+        $sort: { revenue: -1 }
+      },
+      {
+        $limit: 5
+      }
+    ]);
+
+    // Get booking status distribution
+    const statusDistribution = await Booking.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: startDate }
+        }
+      },
+      {
+        $group: {
+          _id: '$status',
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    const bookingStatusData = {
+      completed: 0,
+      active: 0,
+      pending: 0,
+      cancelled: 0
+    };
+
+    statusDistribution.forEach(status => {
+      bookingStatusData[status._id.toLowerCase()] = status.count;
+    });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        timeSeries: performanceData,
+        topCars,
+        bookingStatus: bookingStatusData
+      }
+    });
+  } catch (error) {
+    console.error('Performance data error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error fetching performance data'
+    });
+  }
+};
+
 // @desc    Update admin profile
 // @route   PUT /api/admin/profile
 // @access  Private (Admin)

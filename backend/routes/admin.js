@@ -13,13 +13,17 @@ import {
   getSystemHealth,
   getSettings,
   updateSettings,
-  updateAdminProfile
+  updateAdminProfile,
+  getPerformanceData
 } from '../controllers/adminController.js';
 
 const router = express.Router();
 
 // Dashboard Statistics
 router.get('/dashboard', authenticateAdmin, getDashboardStats);
+
+// Performance Data for Charts
+router.get('/performance', authenticateAdmin, getPerformanceData);
 
 // User Management Routes
 router.get('/users', authenticateAdmin, getUsers);

@@ -287,7 +287,15 @@ export const adminAPI = {
       headers: getAuthHeaders(),
       body: JSON.stringify(profileData)
     });
-    
+
+    return handleResponse(response);
+  },
+
+  getPerformanceData: async (period = '30d') => {
+    const response = await fetch(`${API_BASE_URL}/admin/performance?period=${period}`, {
+      headers: getAuthHeaders()
+    });
+
     return handleResponse(response);
   }
 };

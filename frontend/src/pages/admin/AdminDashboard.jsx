@@ -1,6 +1,31 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { adminAPI } from '../../utils/api'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+} from 'chart.js'
+import { Line, Bar, Doughnut } from 'react-chartjs-2'
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement
+)
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
@@ -9,6 +34,11 @@ const AdminDashboard = () => {
     bookings: { total: 0, active: 0, completed: 0, pending: 0 },
     revenue: { total: 0, average: 0 },
     recentBookings: []
+  })
+  const [performanceData, setPerformanceData] = useState({
+    timeSeries: [],
+    topCars: [],
+    bookingStatus: { completed: 0, active: 0, pending: 0, cancelled: 0 }
   })
   const [isLoading, setIsLoading] = useState(true)
   const [timeRange, setTimeRange] = useState('month')
@@ -82,17 +112,31 @@ const AdminDashboard = () => {
     try {
       setIsLoading(true)
       console.log('Fetching dashboard data...')
-      
-      const response = await adminAPI.getDashboardStats(timeRange)
-      console.log('Dashboard response:', response)
-      
-      if (response.success) {
-        setStats(response.data || {
+
+      // Fetch dashboard stats and performance data in parallel
+      const [dashboardResponse, performanceResponse] = await Promise.all([
+        adminAPI.getDashboardStats(timeRange),
+        adminAPI.getPerformanceData(timeRange)
+      ])
+
+      console.log('Dashboard response:', dashboardResponse)
+      console.log('Performance response:', performanceResponse)
+
+      if (dashboardResponse.success) {
+        setStats(dashboardResponse.data || {
           users: { total: 0, active: 0 },
           cars: { total: 0, available: 0, unavailable: 0 },
           bookings: { total: 0, active: 0, completed: 0, pending: 0 },
           revenue: { total: 0, average: 0 },
           recentBookings: []
+        })
+      }
+
+      if (performanceResponse.success) {
+        setPerformanceData(performanceResponse.data || {
+          timeSeries: [],
+          topCars: [],
+          bookingStatus: { completed: 0, active: 0, pending: 0, cancelled: 0 }
         })
       }
     } catch (error) {
@@ -386,7 +430,7 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Performance Chart Placeholder */}
+      {/* Performance Overview */}
       <div className="bg-[var(--bg-primary)] rounded-2xl shadow-sm border border-[var(--border-color)] overflow-hidden">
         <div className="p-6 border-b border-[var(--border-color)]">
           <div className="flex items-center justify-between">
@@ -401,39 +445,222 @@ const AdminDashboard = () => {
           </div>
         </div>
         <div className="p-6">
-          <div className="h-64 bg-gradient-to-br from-[var(--bg-secondary)] to-[var(--bg-primary)] rounded-xl flex items-center justify-center relative overflow-hidden">
-            {/* Subtle grid pattern */}
-            <div className="absolute inset-0 opacity-10">
-              <div className="h-full w-full" style={{
-                backgroundImage: `linear-gradient(to right, var(--border-color) 1px, transparent 1px),
-                               linear-gradient(to bottom, var(--border-color) 1px, transparent 1px)`,
-                backgroundSize: '20px 20px'
-              }}></div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Revenue & Bookings Trend */}
+            <div className="bg-[var(--bg-secondary)] rounded-xl p-4">
+              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4">Revenue & Bookings Trend</h3>
+              <div className="h-64">
+                {performanceData.timeSeries.length > 0 ? (
+                  <Line
+                    data={{
+                      labels: performanceData.timeSeries.map(item =>
+                        new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                      ),
+                      datasets: [
+                        {
+                          label: 'Revenue (KES)',
+                          data: performanceData.timeSeries.map(item => item.revenue),
+                          borderColor: 'rgb(147, 51, 234)',
+                          backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                          yAxisID: 'y',
+                          tension: 0.4,
+                          fill: true
+                        },
+                        {
+                          label: 'Bookings',
+                          data: performanceData.timeSeries.map(item => item.bookings),
+                          borderColor: 'rgb(34, 197, 94)',
+                          backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                          yAxisID: 'y1',
+                          tension: 0.4
+                        }
+                      ]
+                    }}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      interaction: {
+                        mode: 'index',
+                        intersect: false,
+                      },
+                      plugins: {
+                        legend: {
+                          position: 'top',
+                        },
+                        tooltip: {
+                          callbacks: {
+                            label: function(context) {
+                              if (context.datasetIndex === 0) {
+                                return `Revenue: ${formatCurrency(context.parsed.y)}`;
+                              }
+                              return `Bookings: ${context.parsed.y}`;
+                            }
+                          }
+                        }
+                      },
+                      scales: {
+                        x: {
+                          display: true,
+                          title: {
+                            display: true,
+                            text: 'Date'
+                          }
+                        },
+                        y: {
+                          type: 'linear',
+                          display: true,
+                          position: 'left',
+                          title: {
+                            display: true,
+                            text: 'Revenue (KES)'
+                          },
+                          ticks: {
+                            callback: function(value) {
+                              return formatCurrency(value);
+                            }
+                          }
+                        },
+                        y1: {
+                          type: 'linear',
+                          display: true,
+                          position: 'right',
+                          title: {
+                            display: true,
+                            text: 'Bookings'
+                          },
+                          grid: {
+                            drawOnChartArea: false,
+                          },
+                        }
+                      }
+                    }}
+                  />
+                ) : (
+                  <div className="h-full flex items-center justify-center text-[var(--text-secondary)]">
+                    <div className="text-center">
+                      <ChartIcon />
+                      <p className="mt-2">No data available</p>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="text-center relative z-10">
-              <div className="bg-[var(--bg-primary)] rounded-full p-4 shadow-lg mb-4 inline-block">
-                <div className="w-10 h-10 text-primary">
-                  <ChartIcon />
-                </div>
+
+            {/* Booking Status Distribution */}
+            <div className="bg-[var(--bg-secondary)] rounded-xl p-4">
+              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4">Booking Status Distribution</h3>
+              <div className="h-64 flex items-center justify-center">
+                <Doughnut
+                  data={{
+                    labels: ['Completed', 'Active', 'Pending', 'Cancelled'],
+                    datasets: [{
+                      data: [
+                        performanceData.bookingStatus.completed,
+                        performanceData.bookingStatus.active,
+                        performanceData.bookingStatus.pending,
+                        performanceData.bookingStatus.cancelled
+                      ],
+                      backgroundColor: [
+                        'rgba(34, 197, 94, 0.8)',
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(245, 158, 11, 0.8)',
+                        'rgba(239, 68, 68, 0.8)'
+                      ],
+                      borderColor: [
+                        'rgb(34, 197, 94)',
+                        'rgb(59, 130, 246)',
+                        'rgb(245, 158, 11)',
+                        'rgb(239, 68, 68)'
+                      ],
+                      borderWidth: 2
+                    }]
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                      legend: {
+                        position: 'bottom',
+                        labels: {
+                          padding: 20,
+                          usePointStyle: true
+                        }
+                      },
+                      tooltip: {
+                        callbacks: {
+                          label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((context.parsed / total) * 100).toFixed(1);
+                            return `${context.label}: ${context.parsed} (${percentage}%)`;
+                          }
+                        }
+                      }
+                    }
+                  }}
+                />
               </div>
-              <p className="text-[var(--text-primary)] font-semibold text-lg mb-2">Analytics Dashboard</p>
-              <p className="text-[var(--text-secondary)] text-sm max-w-md">
-                Interactive charts showing booking trends, revenue growth, and key performance metrics will be displayed here
-              </p>
-              <div className="flex items-center justify-center mt-4 space-x-4 text-xs text-[var(--text-secondary)]">
-                <div className="flex items-center">
-                  <div className="w-2 h-2 bg-blue-400 rounded-full mr-2"></div>
-                  <span>Revenue</span>
+            </div>
+          </div>
+
+          {/* Top Performing Cars */}
+          <div className="mt-6 bg-[var(--bg-secondary)] rounded-xl p-4">
+            <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4">Top Performing Cars</h3>
+            <div className="h-64">
+              {performanceData.topCars.length > 0 ? (
+                <Bar
+                  data={{
+                    labels: performanceData.topCars.map(car => car.car),
+                    datasets: [{
+                      label: 'Revenue (KES)',
+                      data: performanceData.topCars.map(car => car.revenue),
+                      backgroundColor: 'rgba(147, 51, 234, 0.8)',
+                      borderColor: 'rgb(147, 51, 234)',
+                      borderWidth: 1,
+                      borderRadius: 4,
+                      borderSkipped: false
+                    }]
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                      legend: {
+                        position: 'top',
+                      },
+                      tooltip: {
+                        callbacks: {
+                          label: function(context) {
+                            return `Revenue: ${formatCurrency(context.parsed.y)}`;
+                          }
+                        }
+                      }
+                    },
+                    scales: {
+                      y: {
+                        beginAtZero: true,
+                        ticks: {
+                          callback: function(value) {
+                            return formatCurrency(value);
+                          }
+                        }
+                      },
+                      x: {
+                        ticks: {
+                          maxRotation: 45,
+                          minRotation: 45
+                        }
+                      }
+                    }
+                  }}
+                />
+              ) : (
+                <div className="h-full flex items-center justify-center text-[var(--text-secondary)]">
+                  <div className="text-center">
+                    <CarIcon />
+                    <p className="mt-2">No car performance data available</p>
+                  </div>
                 </div>
-                <div className="flex items-center">
-                  <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
-                  <span>Bookings</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-2 h-2 bg-purple-400 rounded-full mr-2"></div>
-                  <span>Growth</span>
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
