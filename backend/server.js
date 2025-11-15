@@ -83,6 +83,11 @@ if (process.env.NODE_ENV === 'development') {
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Serve favicon
+app.get('/favicon.ico', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/public/auto.png'));
+});
+
 // Serve uploaded files with comprehensive CORS headers
 app.use('/uploads', (req, res, next) => {
   // Remove COEP/COOP headers if helmet added them upstream to avoid OpaqueResponseBlocking
