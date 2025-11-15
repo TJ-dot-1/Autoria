@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'https://autoria-p4ax.onrender.com';
 
 // Helper function to get auth headers
 const getAuthHeaders = () => {
