@@ -180,7 +180,7 @@ app.get('/api', (req, res) => {
       admin: '/api/admin',
       upload: '/api/upload'
     },
-    documentation: 'https://github.com/your-repo/autoria-api-docs'
+    documentation: 'https://github.com/Autoria/autoria-api-docs'
   });
 });
 
