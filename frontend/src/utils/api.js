@@ -11,12 +11,27 @@ const getAuthHeaders = () => {
 
 // Helper function to handle API responses
 const handleResponse = async (response) => {
-  const data = await response.json();
-  
+  const contentType = response.headers.get('content-type');
+  let data;
+
+  if (contentType && contentType.includes('application/json')) {
+    try {
+      data = await response.json();
+    } catch (parseError) {
+      console.error('Failed to parse JSON response:', parseError);
+      throw new Error(`Invalid JSON response from server: ${response.status} ${response.statusText}`);
+    }
+  } else {
+    // Handle non-JSON responses (e.g., HTML error pages)
+    const text = await response.text();
+    console.error('Non-JSON response received:', text.substring(0, 200));
+    throw new Error(`Unexpected response format: ${response.status} ${response.statusText}`);
+  }
+
   if (!response.ok) {
     throw new Error(data.message || `HTTP error! status: ${response.status}`);
   }
-  
+
   return data;
 };
 

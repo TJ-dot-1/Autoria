@@ -25,6 +25,9 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Trust proxy for rate limiting behind reverse proxies (like Render)
+app.set('trust proxy', 1);
+
 // Connect to the database
 connectDatabase();
 

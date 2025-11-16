@@ -43,19 +43,46 @@ export const AuthProvider = ({ children }) => {
           });
           
           if (response.ok) {
-            const data = await response.json();
-            setUser(data.data);
-            setToken(savedToken);
+            try {
+              const data = await response.json();
+              setUser(data.data);
+              setToken(savedToken);
+            } catch (parseError) {
+              console.error('Error parsing user data from backend:', parseError);
+              // Clear corrupted data
+              localStorage.removeItem('autoria_token');
+              localStorage.removeItem('autoria_user');
+              setToken(null);
+              setUser(null);
+            }
           } else {
             // If backend fetch fails, use saved user data
-            setUser(JSON.parse(savedUser));
-            setToken(savedToken);
+            try {
+              setUser(JSON.parse(savedUser));
+              setToken(savedToken);
+            } catch (parseError) {
+              console.error('Error parsing saved user data:', parseError);
+              // Clear corrupted data
+              localStorage.removeItem('autoria_token');
+              localStorage.removeItem('autoria_user');
+              setToken(null);
+              setUser(null);
+            }
           }
         } catch (error) {
           console.error('Error fetching user data:', error);
           // Fall back to saved user data
-          setUser(JSON.parse(savedUser));
-          setToken(savedToken);
+          try {
+            setUser(JSON.parse(savedUser));
+            setToken(savedToken);
+          } catch (parseError) {
+            console.error('Error parsing saved user data:', parseError);
+            // Clear corrupted data
+            localStorage.removeItem('autoria_token');
+            localStorage.removeItem('autoria_user');
+            setToken(null);
+            setUser(null);
+          }
         }
       }
       setIsLoading(false);
@@ -83,13 +110,22 @@ export const AuthProvider = ({ children }) => {
           });
           
           if (response.ok) {
-            const data = await response.json();
-            const userData = data.data;
-            setUser(userData);
-            // Persist user data to localStorage
-            localStorage.setItem('autoria_user', JSON.stringify(userData));
-            toast.success(`Welcome to Autoria Dashboard, ${userData.firstName}!`);
-            return { success: true, user: userData, role: userData.role };
+            try {
+              const data = await response.json();
+              const userData = data.data;
+              setUser(userData);
+              // Persist user data to localStorage
+              localStorage.setItem('autoria_user', JSON.stringify(userData));
+              toast.success(`Welcome to Autoria Dashboard, ${userData.firstName}!`);
+              return { success: true, user: userData, role: userData.role };
+            } catch (parseError) {
+              console.error('Error parsing user data on login:', parseError);
+              // Fallback to SINGLE_USER if parsing fails
+              setUser(SINGLE_USER);
+              localStorage.setItem('autoria_user', JSON.stringify(SINGLE_USER));
+              toast.success(`Welcome to Autoria Dashboard, ${SINGLE_USER.firstName}!`);
+              return { success: true, user: SINGLE_USER, role: SINGLE_USER.role };
+            }
           } else {
             // Fallback to SINGLE_USER if backend fails
             setUser(SINGLE_USER);
