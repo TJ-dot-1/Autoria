@@ -255,6 +255,7 @@ const Banner = () => {
               className="relative"
               variants={pulseVariants}
               animate="animate"
+              style={{ transform: 'translateZ(0)' }}
             >
               <img
                 src={'/banner_car_image.png'}
@@ -267,12 +268,14 @@ const Banner = () => {
                 className="absolute -top-3 -right-3 w-16 h-16 bg-primary/30 rounded-full blur-xl"
                 variants={floatingVariants}
                 animate="animate"
+                style={{ transform: 'translateZ(0)' }}
               />
               <motion.div
                 className="absolute -bottom-3 -left-3 w-20 h-20 bg-blue-500/30 rounded-full blur-xl"
                 variants={floatingVariants}
                 animate="animate"
                 transition={{ delay: 1.5 }}
+                style={{ transform: 'translateZ(0)' }}
               />
               
               {/* Feature Badges */}
@@ -282,6 +285,7 @@ const Banner = () => {
                 animate={{ scale: 1, opacity: 1, rotate: 0 }}
                 transition={{ delay: 1.2, type: "spring", stiffness: 200 }}
                 whileHover={{ scale: 1.1, rotate: 2 }}
+                style={{ transform: 'translateZ(0)' }}
               >
                 <motion.div
                   className="text-white text-center"
@@ -299,6 +303,7 @@ const Banner = () => {
                 animate={{ scale: 1, opacity: 1, rotate: 0 }}
                 transition={{ delay: 1.4, type: "spring", stiffness: 200 }}
                 whileHover={{ scale: 1.1, rotate: -2 }}
+                style={{ transform: 'translateZ(0)' }}
               >
                 <motion.div
                   className="text-white text-center"
@@ -345,6 +350,7 @@ const Banner = () => {
           repeat: Infinity,
           ease: "linear"
         }}
+        style={{ transform: 'translateZ(0)' }}
       />
     </motion.div>
 
