@@ -75,10 +75,8 @@ const Navbar = () => {
 
     // Close mobile menu when route changes
     useEffect(() => {
-        if (open) {
-            setOpen(false);
-        }
-    }, [location.pathname, open]);
+        setOpen(false);
+    }, [location.pathname]);
 
     // Close mobile menu when clicking outside
     useEffect(() => {
@@ -239,14 +237,16 @@ const Navbar = () => {
                         </div>
 
                         {/* Mobile Menu Button */}
-                        <button 
+                        <button
                             className={`lg:hidden p-2 rounded-md transition-all duration-300 z-50 ${
-                                scrolled || !isHomePage 
-                                    ? 'hover:bg-gray-100 text-gray-700' 
+                                scrolled || !isHomePage
+                                    ? 'hover:bg-gray-100 text-gray-700'
                                     : 'hover:bg-white/20 text-white'
                             }`}
                             onClick={(e) => {
+                                console.log('Hamburger menu clicked');
                                 e.stopPropagation();
+                                console.log('Setting open to', !open);
                                 setOpen(!open);
                             }}
                         >
@@ -255,7 +255,7 @@ const Navbar = () => {
                     </div>
 
                     {/* Mobile Menu */}
-                    <div className={`lg:hidden absolute left-0 right-0 bg-[var(--bg-primary)] shadow-xl transform transition-all duration-300 ease-in-out overflow-hidden ${
+                    <div className={`lg:hidden absolute left-0 right-0 bg-[var(--bg-primary)] shadow-xl transform transition-all duration-300 ease-in-out overflow-hidden z-50 ${
                         open ? 'translate-y-0 opacity-100 max-h-screen' : '-translate-y-4 opacity-0 max-h-0'
                     }`} style={{ borderTop: '1px solid var(--border-color)' }}>
                         <div className="py-6 px-4 space-y-4">
