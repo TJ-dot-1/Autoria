@@ -1,8 +1,18 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 
 const Banner = () => {
   const [showRequirementsModal, setShowRequirementsModal] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -254,7 +264,7 @@ const Banner = () => {
             <motion.div
               className="relative"
               variants={pulseVariants}
-              animate="animate"
+              animate={isMobile ? undefined : "animate"}
               style={{ transform: 'translateZ(0)' }}
             >
               <img
@@ -267,13 +277,13 @@ const Banner = () => {
               <motion.div
                 className="absolute -top-3 -right-3 w-16 h-16 bg-primary/30 rounded-full blur-xl"
                 variants={floatingVariants}
-                animate="animate"
+                animate={isMobile ? undefined : "animate"}
                 style={{ transform: 'translateZ(0)' }}
               />
               <motion.div
                 className="absolute -bottom-3 -left-3 w-20 h-20 bg-blue-500/30 rounded-full blur-xl"
                 variants={floatingVariants}
-                animate="animate"
+                animate={isMobile ? undefined : "animate"}
                 transition={{ delay: 1.5 }}
                 style={{ transform: 'translateZ(0)' }}
               />
@@ -342,7 +352,7 @@ const Banner = () => {
       {/* Animated Gradient Overlay */}
       <motion.div
         className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent"
-        animate={{
+        animate={isMobile ? {} : {
           x: ["-100%", "200%", "-100%"],
         }}
         transition={{
