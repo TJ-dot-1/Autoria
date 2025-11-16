@@ -1,7 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 
 const Banner = () => {
+  const [showRequirementsModal, setShowRequirementsModal] = useState(false)
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -85,13 +87,14 @@ const Banner = () => {
   };
 
   return (
-    <motion.div
-      className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-3xl overflow-hidden mx-4 my-8"
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.3 }}
-      variants={containerVariants}
-    >
+    <>
+      <motion.div
+        className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-3xl overflow-hidden mx-4 my-8"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        variants={containerVariants}
+      >
       <div className="container mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-5 items-center gap-6 py-8 px-6">
           {/* Text Content */}
@@ -192,6 +195,7 @@ const Banner = () => {
                 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                onClick={() => window.location.href = 'mailto:josiejosiah89@gmail.con'}
               >
                 <span>List Your Car Now</span>
                 <motion.span
@@ -210,6 +214,7 @@ const Banner = () => {
                 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                onClick={() => setShowRequirementsModal(true)}
               >
                 Learn More
               </motion.button>
@@ -342,6 +347,75 @@ const Banner = () => {
         }}
       />
     </motion.div>
+
+    {/* Requirements Modal */}
+    {showRequirementsModal && (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          className="bg-white rounded-2xl max-w-md w-full max-h-[80vh] overflow-y-auto"
+        >
+          <div className="p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-gray-900">Car Listing Requirements</h3>
+              <button
+                onClick={() => setShowRequirementsModal(false)}
+                className="text-gray-400 hover:text-gray-600 text-2xl"
+              >
+                ×
+              </button>
+            </div>
+            <div className="space-y-3 text-gray-700">
+              <p className="text-sm text-gray-600 mb-4">
+                To list your car on our platform, please ensure your vehicle meets the following requirements:
+              </p>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 mt-1">✓</span>
+                  <span>Car must be manufactured in 2000 or later</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 mt-1">✓</span>
+                  <span>Valid registration and current insurance coverage</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 mt-1">✓</span>
+                  <span>Clean title with no outstanding liens or encumbrances</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 mt-1">✓</span>
+                  <span>Well-maintained with no major mechanical issues</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 mt-1">✓</span>
+                  <span>Located within our service areas (major cities)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 mt-1">✓</span>
+                  <span>Owner must be 21 years or older</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 mt-1">✓</span>
+                  <span>Valid driver's license</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 mt-1">✓</span>
+                  <span>Willing to provide vehicle history and maintenance records</span>
+                </li>
+              </ul>
+              <div className="mt-6 pt-4 border-t border-gray-200">
+                <p className="text-xs text-gray-500">
+                  Contact us if you have questions about these requirements or need assistance with the listing process.
+                </p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    )}
+  </>
   )
 }
 
