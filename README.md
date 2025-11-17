@@ -1,5 +1,24 @@
 # Autoria - Car Rental Platform
 
+<!-- Stars / Forks / Watchers -->
+![GitHub stars](https://img.shields.io/github/stars/TJ-dot-1/Autoria?style=for-the-badge)
+![GitHub forks](https://img.shields.io/github/forks/TJ-dot-1/Autoria?style=for-the-badge)
+![Watchers](https://img.shields.io/github/watchers/TJ-dot-1/Autoria?style=for-the-badge)
+
+<!-- Issues / PRs -->
+![Open issues](https://img.shields.io/github/issues/TJ-dot-1/Autoria?style=for-the-badge)
+![Pull requests](https://img.shields.io/github/issues-pr/TJ-dot-1/Autoria?style=for-the-badge)
+
+<!-- License / Last commit / Repo size / Top language -->
+![License](https://img.shields.io/github/license/TJ-dot-1/Autoria?style=for-the-badge)
+![Last commit](https://img.shields.io/github/last-commit/TJ-dot-1/Autoria?style=for-the-badge)
+![Repo size](https://img.shields.io/github/repo-size/TJ-dot-1/Autoria?style=for-the-badge)
+![Top language](https://img.shields.io/github/languages/top/TJ-dot-1/Autoria?style=for-the-badge)
+
+<!-- Releases -->
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/TJ-dot-1/Autoria?style=for-the-badge)
+
+
 A modern, full-stack car rental platform built with React, Node.js, Express, and MongoDB. Autoria provides a seamless experience for users to browse, book, and manage car rentals, with comprehensive admin functionality.
 
 ## 🚀 Features
