@@ -1,22 +1,23 @@
 # Autoria - Car Rental Platform
 
-<!-- Stars / Forks / Watchers -->
-![GitHub stars](https://img.shields.io/github/stars/TJ-dot-1/Autoria?style=for-the-badge)
-![GitHub forks](https://img.shields.io/github/forks/TJ-dot-1/Autoria?style=for-the-badge)
-![Watchers](https://img.shields.io/github/watchers/TJ-dot-1/Autoria?style=for-the-badge)
+## 🛠 Tech Stack
 
-<!-- Issues / PRs -->
-![Open issues](https://img.shields.io/github/issues/TJ-dot-1/Autoria?style=for-the-badge)
-![Pull requests](https://img.shields.io/github/issues-pr/TJ-dot-1/Autoria?style=for-the-badge)
+![MERN](https://img.shields.io/badge/MERN_Stack-0A0A0A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![React](https://img.shields.io/badge/React-18.2.0-61DAFB?style=for-the-badge&logo=react&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=for-the-badge&logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-7.5+-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
+![Mongoose](https://img.shields.io/badge/Mongoose-880000?style=for-the-badge&logo=mongoose&logoColor=white)
 
-<!-- License / Last commit / Repo size / Top language -->
-![License](https://img.shields.io/github/license/TJ-dot-1/Autoria?style=for-the-badge)
-![Last commit](https://img.shields.io/github/last-commit/TJ-dot-1/Autoria?style=for-the-badge)
-![Repo size](https://img.shields.io/github/repo-size/TJ-dot-1/Autoria?style=for-the-badge)
-![Top language](https://img.shields.io/github/languages/top/TJ-dot-1/Autoria?style=for-the-badge)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
-<!-- Releases -->
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/TJ-dot-1/Autoria?style=for-the-badge)
+![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
+![bcrypt](https://img.shields.io/badge/Bcrypt-35495E?style=for-the-badge&logo=security&logoColor=white)
+
+![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
+![GitHub](https://img.shields.io/badge/GitHub-171515?style=for-the-badge&logo=github&logoColor=white)
+
 
 
 A modern, full-stack car rental platform built with React, Node.js, Express, and MongoDB. Autoria provides a seamless experience for users to browse, book, and manage car rentals, with comprehensive admin functionality.
