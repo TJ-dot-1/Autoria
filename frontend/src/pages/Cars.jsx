@@ -12,6 +12,7 @@ const Cars = () => {
   const [cars, setCars] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [isMobile, setIsMobile] = useState(false)
 
   const fetchCars = async () => {
     try {
@@ -43,6 +44,14 @@ const Cars = () => {
     fetchCars()
   }, [])
 
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
   // Fetch cars when search query or sort changes
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
@@ -60,8 +69,8 @@ const Cars = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.1
+        staggerChildren: isMobile ? 0.02 : 0.1,
+        delayChildren: isMobile ? 0.05 : 0.1
       }
     }
   };
@@ -72,7 +81,7 @@ const Cars = () => {
       y: 0,
       opacity: 1,
       transition: {
-        duration: 0.6,
+        duration: isMobile ? 0.3 : 0.6,
         ease: "easeOut"
       }
     }
@@ -80,16 +89,16 @@ const Cars = () => {
 
   const cardVariants = {
     hidden: {
-      y: 60,
+      y: isMobile ? 30 : 60,
       opacity: 0,
-      scale: 0.9
+      scale: isMobile ? 1 : 0.9
     },
     visible: {
       y: 0,
       opacity: 1,
       scale: 1,
       transition: {
-        duration: 0.8,
+        duration: isMobile ? 0.4 : 0.8,
         ease: "easeOut"
       }
     }
@@ -370,7 +379,7 @@ const Cars = () => {
                 variants={cardVariants}
                 custom={index}
               >
-                <CarCard car={car} />
+                <CarCard car={car} isMobile={isMobile} />
               </motion.div>
             ))}
           </motion.div>

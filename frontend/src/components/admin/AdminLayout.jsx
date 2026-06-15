@@ -166,7 +166,6 @@ const AdminLayout = ({ children }) => {
     <div className="admin-container flex h-screen bg-[var(--bg-secondary)]">
       {/* Sidebar */}
       <div className={`
-        admin-sidebar
         bg-[var(--bg-primary)]
         border-r
         border-[var(--border-color)]
@@ -182,7 +181,8 @@ const AdminLayout = ({ children }) => {
         duration-300
         ease-in-out
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        w-80
+        w-64
+        shrink-0
       `}>
         
         {/* Sidebar Header */}
@@ -206,21 +206,21 @@ const AdminLayout = ({ children }) => {
         </div>
 
         {/* User Profile */}
-        <div className="p-6 border-b border-[var(--border-color)]">
+        <div className="px-4 py-3 border-b border-[var(--border-color)]">
           <div className="flex items-center">
-            <div className="relative">
+            <div className="relative shrink-0">
               <img
                 src={getProfileImage(user)}
                 alt={getFullName(user)}
-                className="h-12 w-12 rounded-full object-cover border-2 border-[var(--border-color)]"
+                className="h-10 w-10 rounded-full object-cover border-2 border-[var(--border-color)]"
                 onError={(e) => {
                   e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(getFullName(user))}&background=3B82F6&color=fff`;
                 }}
               />
-              <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-[var(--bg-primary)]"></div>
+              <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 rounded-full border-2 border-[var(--bg-primary)]"></div>
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-semibold text-[var(--text-primary)]">
+            <div className="ml-3 min-w-0">
+              <p className="text-sm font-semibold text-[var(--text-primary)] truncate">
                 {getFullName(user)}
               </p>
               <p className="text-xs text-[var(--text-secondary)] capitalize">
@@ -231,10 +231,10 @@ const AdminLayout = ({ children }) => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+        <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto min-h-0">
           {/* Main Navigation */}
           <div className="space-y-1">
-            <p className="px-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
+            <p className="px-3 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
               Main
             </p>
             {adminMenuLinks.map((item, index) => {
@@ -246,8 +246,8 @@ const AdminLayout = ({ children }) => {
                   className={`
                     flex
                     items-center
-                    px-4
-                    py-3
+                    px-3
+                    py-2.5
                     text-sm
                     font-medium
                     rounded-lg
@@ -276,8 +276,8 @@ const AdminLayout = ({ children }) => {
           </div>
 
           {/* Additional Admin Links */}
-          <div className="pt-6 border-t border-[var(--border-color)] space-y-1">
-            <p className="px-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
+          <div className="pt-4 border-t border-[var(--border-color)] space-y-1">
+            <p className="px-3 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
               Management
             </p>
             {additionalMenuLinks.map((item, index) => {
@@ -289,8 +289,8 @@ const AdminLayout = ({ children }) => {
                   className={`
                     flex
                     items-center
-                    px-4
-                    py-3
+                    px-3
+                    py-2.5
                     text-sm
                     font-medium
                     rounded-lg
@@ -320,10 +320,10 @@ const AdminLayout = ({ children }) => {
         </nav>
 
         {/* Logout */}
-        <div className="p-4 border-t border-[var(--border-color)]">
+        <div className="p-3 border-t border-[var(--border-color)]">
           <button
             onClick={handleLogout}
-            className="flex items-center w-full px-4 py-3 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50 transition-all duration-200 group"
+            className="flex items-center w-full px-3 py-2.5 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20 transition-all duration-200 group"
           >
             <div className="mr-3 text-red-500 group-hover:text-red-600">
               <LogoutIcon />

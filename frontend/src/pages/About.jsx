@@ -46,9 +46,9 @@ const About = () => {
   };
 
   const stats = [
-    { value: "10,000+", label: "Happy Customers" },
-    { value: "5,000+", label: "Cars Available" },
-    { value: "50+", label: "Locations" },
+    { value: "10,000+", label: "Happy Buyers" },
+    { value: "5,000+", label: "Cars Listed" },
+    { value: "1,200+", label: "Cars Sold" },
     { value: "24/7", label: "Customer Support" }
   ];
 
@@ -95,8 +95,8 @@ const About = () => {
             About Autoria
           </h1>
           <p className="text-xl text-[var(--text-secondary)] max-w-3xl mx-auto">
-            Revolutionizing car rental with technology, trust, and exceptional customer service.
-            Your journey begins with us.
+            Revolutionizing the car marketplace with technology, trust, and exceptional customer service.
+            Your journey to the perfect car starts here.
           </p>
         </motion.div>
 
@@ -113,18 +113,18 @@ const About = () => {
               <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-6">Our Story</h2>
               <div className="space-y-4 text-[var(--text-secondary)] leading-relaxed">
                 <p>
-                  Founded in 2020, Autoria emerged from a simple idea: make car rental as easy and accessible
-                  as booking a hotel room. We recognized the frustrations of traditional car rental processes
-                  and set out to create a seamless, technology-driven experience.
+                  Founded in 2020, Autoria emerged from a simple idea: make buying and selling cars as easy and
+                  transparent as possible. We recognized the frustrations of traditional car dealerships
+                  and set out to create a seamless, technology-driven marketplace.
                 </p>
                 <p>
-                  Today, we're proud to serve thousands of customers across multiple locations, offering
-                  a diverse fleet of vehicles from economy cars to luxury SUVs. Our commitment to innovation
-                  and customer satisfaction has made us a trusted name in the automotive rental industry.
+                  Today, we're proud to connect thousands of buyers and sellers across Kenya, offering
+                  a diverse selection of vehicles from economy cars to luxury SUVs. Our commitment to transparency,
+                  fair pricing, and customer satisfaction has made us a trusted name in the automotive marketplace.
                 </p>
                 <p>
-                  We're not just in the business of renting cars – we're in the business of creating
-                  memorable journeys and building lasting relationships with our customers.
+                  We're not just in the business of selling cars – we're in the business of connecting
+                  people with their dream vehicles and building lasting relationships with our community.
                 </p>
               </div>
             </motion.div>
@@ -202,9 +202,9 @@ const About = () => {
         >
           <h2 className="text-3xl font-bold mb-4">Our Mission</h2>
           <p className="text-xl opacity-90 max-w-3xl mx-auto leading-relaxed">
-            To democratize access to quality transportation by providing exceptional car rental services
-            that combine cutting-edge technology with personalized customer care, making every journey
-            memorable and hassle-free.
+            To democratize access to quality vehicles by providing an exceptional car marketplace
+            that combines cutting-edge technology with personalized customer care, making every
+            car purchase transparent, fair, and hassle-free.
           </p>
         </motion.div>
       </div>

@@ -17,64 +17,64 @@ const FAQ = () => {
 
   const faqs = [
     {
-      question: "How do I rent a car?",
-      answer: "Simply browse our available cars, select your preferred vehicle, and click 'Rent Now'. You'll be redirected to WhatsApp to discuss booking details with our team. We'll guide you through the rental process and confirm availability."
+      question: "How do I buy a car on Autoria?",
+      answer: "Browse our available listings, select a vehicle you're interested in, and click 'Make Inquiry'. You can send a message to the seller, make an offer, or contact them directly to schedule a viewing and test drive."
     },
     {
-      question: "What documents do I need to rent a car?",
-      answer: "You'll need a valid driver's license, national ID or passport, and proof of residence. For international customers, a valid international driving permit is required along with your home country license."
+      question: "How do I sell my car on Autoria?",
+      answer: "Contact our team to list your vehicle. You'll need to provide clear photos, accurate vehicle details (make, model, year, mileage, condition), your asking price, and contact information. We'll review and publish your listing."
     },
     {
-      question: "What is the minimum age requirement?",
-      answer: "The minimum age to rent a car is 21 years old. Drivers between 21-25 years may be subject to a young driver surcharge. Some premium vehicles require drivers to be at least 25 years old."
+      question: "What documents do I need to buy a car?",
+      answer: "You'll need a valid national ID or passport and proof of funds (bank statement or loan approval). For financed purchases, you'll also need proof of income and employment details."
     },
     {
-      question: "Is insurance included in the rental price?",
-      answer: "Yes, basic insurance is included in all our rental prices. This covers third-party liability. We also offer additional insurance options including collision damage waiver (CDW) and theft protection for comprehensive coverage."
+      question: "Do you offer financing options?",
+      answer: "Yes! We partner with leading Kenyan banks to offer competitive car financing. Options include standard loans, premium loans with lower interest rates, and balloon payment plans. Visit our Car Financing page for details."
     },
     {
-      question: "What is your cancellation policy?",
-      answer: "You can cancel your reservation up to 24 hours before the pickup time for a full refund. Cancellations made less than 24 hours in advance may be subject to a cancellation fee of one day's rental charge."
+      question: "Can I get a vehicle inspection before purchasing?",
+      answer: "Absolutely. We offer professional 200+ point vehicle inspections by certified mechanics. This covers engine, body, electronics, and safety systems. We highly recommend an inspection for all used vehicle purchases."
     },
     {
-      question: "Can I extend my rental period?",
-      answer: "Yes, you can extend your rental period by contacting us at least 24 hours before your scheduled return time. Extension is subject to vehicle availability and may incur additional charges."
+      question: "How do I know the car listing is legitimate?",
+      answer: "All sellers on Autoria go through a verification process. We verify seller identities and vehicle registration documents. However, we always recommend viewing the car in person and getting an inspection before purchasing."
     },
     {
-      question: "What happens if I return the car late?",
-      answer: "Late returns are charged at an hourly rate for the first 3 hours, after which a full additional day rate applies. Please contact us if you expect to be late to discuss options."
+      question: "What is the process for transferring ownership?",
+      answer: "After agreeing on a price, both buyer and seller visit the NTSA (National Transport and Safety Authority) to process the transfer. You'll need the logbook, KRA PIN certificates, and valid IDs. We can guide you through this process."
     },
     {
-      question: "Are there any additional fees I should know about?",
-      answer: "Additional fees may include fuel charges (if returned with less fuel than received), cleaning fees for excessively dirty vehicles, parking tickets, tolls, and traffic violations incurred during your rental period."
+      question: "Can I negotiate the price?",
+      answer: "Yes, you can make an offer through our inquiry form or contact the seller directly. The listed price is the seller's asking price, and negotiation is a normal part of the car buying process."
     },
     {
-      question: "What fuel policy do you follow?",
-      answer: "Cars are provided with a full tank and should be returned with a full tank. If returned with less fuel, you'll be charged the current market price plus a refueling service fee."
+      question: "What payment methods are accepted?",
+      answer: "Payment methods are arranged between buyer and seller. Common options include bank transfers, M-Pesa for deposits, and banker's cheques. We recommend using traceable payment methods for security."
     },
     {
-      question: "Can I cross borders with the rental car?",
-      answer: "Cross-border travel is allowed to neighboring countries with prior approval and additional insurance. A cross-border fee applies, and certain restrictions may apply depending on the destination country."
+      question: "Do you offer trade-in services?",
+      answer: "Yes, you can indicate interest in trading in your current vehicle when making an inquiry. Our team will help assess your trade-in value and facilitate the exchange process."
     },
     {
-      question: "What if the car breaks down during my rental?",
-      answer: "We provide 24/7 roadside assistance. Call us immediately at 0706667129, and we'll arrange for repairs or provide a replacement vehicle. Our roadside assistance service is included in your rental."
+      question: "What if I find a problem with the car after purchase?",
+      answer: "We recommend a thorough inspection before purchase. For issues discovered after sale, your options depend on the terms agreed between buyer and seller. Some listings include a warranty period — check the listing details."
     },
     {
-      question: "Can I add an additional driver?",
-      answer: "Yes, additional drivers can be added for a daily fee. The additional driver must meet the same age and license requirements and must be present at pickup to sign the rental agreement."
+      question: "How long does it take to sell a car on Autoria?",
+      answer: "Selling times vary based on the vehicle, price, and market demand. Well-priced cars with good photos and detailed descriptions typically sell within 2-4 weeks. Our team can advise on pricing strategy."
     },
     {
-      question: "Do you offer delivery and pickup services?",
-      answer: "Yes, we offer vehicle delivery and pickup services within Nairobi for a small fee. Contact us to schedule delivery/pickup at your preferred location and time."
+      question: "Is there a fee for listing my car?",
+      answer: "Basic listings are free on Autoria. We also offer premium listing options with enhanced visibility, featured placement, and professional photography for a competitive fee."
     },
     {
-      question: "What payment methods do you accept?",
-      answer: "We accept cash, mobile money (M-Pesa), bank transfers, and major credit cards (Visa, Mastercard). Payment is required at the time of pickup or delivery."
+      question: "Do you deliver cars to other locations?",
+      answer: "Delivery services can be arranged for an additional fee depending on the distance. Contact our team to discuss delivery options for your specific location within Kenya."
     },
     {
-      question: "Is there a security deposit required?",
-      answer: "Yes, a security deposit is required at pickup and will be refunded upon safe return of the vehicle, provided there are no damages or outstanding charges. The deposit amount varies by vehicle type."
+      question: "How do I contact a seller?",
+      answer: "You can contact sellers through our inquiry form on the car listing page, call them directly using the 'Contact Seller' button, or reach out via WhatsApp. Our team is also available to facilitate communication."
     }
   ];
 
@@ -135,7 +135,7 @@ const FAQ = () => {
             Frequently Asked Questions
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Find answers to common questions about our car rental services. 
+            Find answers to common questions about buying and selling cars on Autoria. 
             Can't find what you're looking for? Contact us directly!
           </p>
         </motion.div>
@@ -257,7 +257,7 @@ const FAQ = () => {
               {...getButtonHoverProps()}
               onClick={() => {
                 const phoneNumber = '0706667129';
-                const message = 'Hi! I have a question about your car rental services.';
+                const message = 'Hi! I have a question about buying/selling a car on Autoria.';
                 const whatsappUrl = `https://wa.me/${phoneNumber.replace(/^0/, '254')}?text=${encodeURIComponent(message)}`;
                 window.open(whatsappUrl, '_blank');
               }}

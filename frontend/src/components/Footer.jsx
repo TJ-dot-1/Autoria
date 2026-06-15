@@ -39,10 +39,10 @@ const Footer = () => {
     services: {
       title: "Services",
       links: [
-        { name: "Car Rental", path: "/services/car-rental" },
-        { name: "Long Term Lease", path: "/services/long-term-lease" },
-        { name: "Business Rental", path: "/services/business-rental" },
-        { name: "Airport Transfer", path: "/services/airport-transfer" },
+        { name: "Buy a Car", path: "/services/buy-a-car" },
+        { name: "Sell Your Car", path: "/services/sell-your-car" },
+        { name: "Car Financing", path: "/services/car-financing" },
+        { name: "Vehicle Inspection", path: "/services/vehicle-inspection" },
       ],
     },
     support: {
@@ -80,7 +80,7 @@ const Footer = () => {
             </Link>
 
             <p className="text-[var(--text-secondary)] mb-6">
-              Your trusted partner for car rentals across Kenya. Discover quality vehicles, reliable customer support, and seamless booking experiences.
+              Your trusted partner for buying and selling cars in Kenya. Discover quality vehicles, connect with verified sellers, and enjoy a seamless car buying experience.
             </p>
 
             {/* Social Icons */}
@@ -137,7 +137,7 @@ const Footer = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div>
               <h3 className="text-xl font-semibold text-[var(--text-primary)]">Stay Updated</h3>
-              <p className="text-[var(--text-secondary)]">Subscribe to our newsletter for the latest deals and offers.</p>
+              <p className="text-[var(--text-secondary)]">Subscribe to our newsletter for the latest car listings and market trends.</p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">

@@ -21,10 +21,10 @@ import Services from './pages/Services'
 import Contact from './pages/Contact'
 
 // Services pages
-import CarRental from './pages/services/CarRental'
-import LongTermLease from './pages/services/LongTermLease'
-import BusinessRental from './pages/services/BusinessRental'
-import AirportTransfer from './pages/services/AirportTransfer'
+import BuyACar from './pages/services/BuyACar'
+import SellYourCar from './pages/services/SellYourCar'
+import CarFinancing from './pages/services/CarFinancing'
+import VehicleInspection from './pages/services/VehicleInspection'
 
 // Support pages
 import HelpCenter from './pages/support/HelpCenter'
@@ -95,7 +95,7 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/cars/:id" element={<CarDetails />} />
-              <Route path="/my-bookings" element={<MyBookings />} />
+              <Route path="/my-inquiries" element={<MyBookings />} />
               <Route path="/cars" element={<Cars />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/services" element={<Services />} />
@@ -113,10 +113,10 @@ const App = () => {
               <Route path="/blog" element={<Blog />} />
               
               {/* Services Routes */}
-              <Route path="/services/car-rental" element={<CarRental />} />
-              <Route path="/services/long-term-lease" element={<LongTermLease />} />
-              <Route path="/services/business-rental" element={<BusinessRental />} />
-              <Route path="/services/airport-transfer" element={<AirportTransfer />} />
+              <Route path="/services/buy-a-car" element={<BuyACar />} />
+              <Route path="/services/sell-your-car" element={<SellYourCar />} />
+              <Route path="/services/car-financing" element={<CarFinancing />} />
+              <Route path="/services/vehicle-inspection" element={<VehicleInspection />} />
               
               {/* Support Routes */}
               <Route path="/support/help-center" element={<HelpCenter />} />

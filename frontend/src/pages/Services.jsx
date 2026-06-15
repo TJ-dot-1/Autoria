@@ -48,32 +48,32 @@ const Services = () => {
 
   const services = [
     {
-      title: "Car Rental",
-      description: "Flexible short-term car rental solutions for personal and business use. Choose from our wide range of vehicles.",
-      path: "/services/car-rental",
+      title: "Buy a Car",
+      description: "Browse our curated selection of quality vehicles. From economy cars to luxury SUVs, find your perfect match with detailed listings and verified sellers.",
+      path: "/services/buy-a-car",
       icon: "🚗",
-      features: ["Daily/Weekly Rates", "Flexible Pick-up", "24/7 Support", "Insurance Included"]
+      features: ["Verified Listings", "Detailed Specs", "Price Comparisons", "Test Drive Scheduling"]
     },
     {
-      title: "Long Term Lease",
-      description: "Cost-effective long-term leasing options for extended periods. Perfect for businesses and long-term needs.",
-      path: "/services/long-term-lease",
-      icon: "📅",
-      features: ["Monthly Plans", "Maintenance Included", "Flexible Terms", "Business Discounts"]
+      title: "Sell Your Car",
+      description: "List your vehicle and reach thousands of verified buyers across Kenya. Get the best price with our market valuation tools and seller support.",
+      path: "/services/sell-your-car",
+      icon: "💰",
+      features: ["Free Listings", "Market Valuation", "Buyer Verification", "Seller Dashboard"]
     },
     {
-      title: "Business Rental",
-      description: "Specialized rental solutions for corporate clients. Fleet management and dedicated account management.",
-      path: "/services/business-rental",
-      icon: "🏢",
-      features: ["Corporate Rates", "Fleet Solutions", "Dedicated Support", "Invoice Billing"]
+      title: "Car Financing",
+      description: "Flexible payment plans and loan options to help you drive your dream car. Partner with leading banks for competitive rates.",
+      path: "/services/car-financing",
+      icon: "🏦",
+      features: ["Low Interest Rates", "Flexible Terms", "Quick Approval", "Multiple Lenders"]
     },
     {
-      title: "Airport Transfer",
-      description: "Reliable airport transfer services to and from major airports. Punctual, safe, and comfortable rides.",
-      path: "/services/airport-transfer",
-      icon: "✈️",
-      features: ["Flight Tracking", "Meet & Greet", "Comfortable Vehicles", "On-time Guarantee"]
+      title: "Vehicle Inspection",
+      description: "Professional pre-purchase inspection services to give you complete peace of mind. Our certified mechanics check everything.",
+      path: "/services/vehicle-inspection",
+      icon: "🔍",
+      features: ["200+ Point Check", "Certified Mechanics", "Detailed Report", "Warranty Options"]
     }
   ];
 
@@ -97,8 +97,8 @@ const Services = () => {
             Our Services
           </h1>
           <p className="text-lg sm:text-xl text-[var(--text-secondary)] max-w-3xl mx-auto px-4">
-            Discover our comprehensive range of automotive services designed to meet your transportation needs.
-            From short-term rentals to long-term leasing, we have the perfect solution for you.
+            Everything you need to buy or sell a car with confidence. From financing to inspections,
+            we've got you covered every step of the way.
           </p>
         </motion.div>
 
@@ -160,19 +160,27 @@ const Services = () => {
           transition={{ delay: 0.6, duration: 0.8 }}
         >
           <div className="bg-gradient-to-r from-primary to-blue-600 rounded-2xl p-8 text-white">
-            <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
+            <h2 className="text-3xl font-bold mb-4">Ready to Find Your Dream Car?</h2>
             <p className="text-xl mb-6 opacity-90">
-              Contact our team to discuss your specific requirements and find the perfect service for you.
+              Browse thousands of cars from verified sellers, or list yours to reach buyers across Kenya.
             </p>
-            <Link
-              to="/contact"
-              className="inline-flex items-center px-8 py-4 bg-[var(--bg-primary)] text-primary font-semibold rounded-xl hover:bg-[var(--bg-secondary)] transition-colors duration-300 border border-[var(--border-color)]"
-            >
-              Contact Us Today
-              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                to="/cars"
+                className="inline-flex items-center px-8 py-4 bg-[var(--bg-primary)] text-primary font-semibold rounded-xl hover:bg-[var(--bg-secondary)] transition-colors duration-300 border border-[var(--border-color)]"
+              >
+                Browse Cars
+                <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </Link>
+              <Link
+                to="/contact"
+                className="inline-flex items-center px-8 py-4 bg-white/20 text-white font-semibold rounded-xl hover:bg-white/30 transition-colors duration-300 border border-white/30"
+              >
+                Contact Us
+              </Link>
+            </div>
           </div>
         </motion.div>
       </div>

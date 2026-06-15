@@ -10,7 +10,7 @@ const Hero = () => {
             Welcome to <span className="text-primary">Autoria</span>
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed px-4" style={{ color: 'var(--text-secondary)' }}>
-            Discover your perfect ride with Autoria - Kenya's premier car rental platform. Whether you're exploring the Maasai Mara or need a reliable vehicle for business across East Africa, we've got you covered.
+            Find your dream car on Autoria - Kenya's premier car marketplace. Whether you're buying your first vehicle or selling to upgrade, we connect buyers and sellers across East Africa.
           </p>
         </div>
 
@@ -33,15 +33,15 @@ const Hero = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8 mt-12 md:mt-16 max-w-4xl mx-auto px-4">
           <div className="text-center">
             <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">500+</div>
-            <div className="text-sm sm:text-base" style={{ color: 'var(--text-secondary)' }}>Vehicles Available</div>
+            <div className="text-sm sm:text-base" style={{ color: 'var(--text-secondary)' }}>Cars Listed</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">50+</div>
-            <div className="text-sm sm:text-base" style={{ color: 'var(--text-secondary)' }}>Locations</div>
+            <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">1,200+</div>
+            <div className="text-sm sm:text-base" style={{ color: 'var(--text-secondary)' }}>Cars Sold</div>
           </div>
           <div className="text-center">
             <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">10K+</div>
-            <div className="text-sm sm:text-base" style={{ color: 'var(--text-secondary)' }}>Happy Customers</div>
+            <div className="text-sm sm:text-base" style={{ color: 'var(--text-secondary)' }}>Happy Buyers</div>
           </div>
         </div>
       </div>

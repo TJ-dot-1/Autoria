@@ -191,7 +191,7 @@ const Navbar = () => {
                                         placeholder="Search cars..."
                                         className={`w-64 px-4 py-2 rounded-full border transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary ${
                                             scrolled || !isHomePage
-                                                ? 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400'
+                                                ? 'border-[var(--border-color)] bg-[var(--bg-secondary)] text-[var(--text-primary)] placeholder-[var(--text-secondary)]'
                                                 : 'border-white/30 bg-white/20 text-white placeholder-white/70 backdrop-blur-sm'
                                         }`}
                                     />
@@ -199,7 +199,7 @@ const Navbar = () => {
                                         type="submit"
                                         className={`absolute right-3 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${
                                             scrolled || !isHomePage
-                                                ? 'text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary'
+                                                ? 'text-[var(--text-secondary)] hover:text-primary'
                                                 : 'text-white hover:text-gray-200'
                                         }`}
                                     >
@@ -215,7 +215,7 @@ const Navbar = () => {
                                     onClick={toggleTheme}
                                     className={`p-2 rounded-full transition-all duration-300 transform hover:scale-110 ${
                                         scrolled || !isHomePage
-                                            ? 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                            ? 'text-[var(--text-primary)] hover:bg-[var(--bg-secondary)]'
                                             : 'text-white hover:bg-white/20'
                                     }`}
                                     aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
@@ -228,7 +228,7 @@ const Navbar = () => {
                                     className={`px-6 py-2 rounded-full font-medium transition-all duration-300 transform hover:scale-105 ${
                                         scrolled || !isHomePage
                                             ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 shadow-lg'
-                                            : 'bg-white dark:bg-gray-800 text-primary dark:text-primary hover:bg-gray-100 dark:hover:bg-gray-700 shadow-lg'
+                                            : 'bg-white text-primary hover:bg-gray-100 shadow-lg'
                                     }`}
                                 >
                                     Login
@@ -240,7 +240,7 @@ const Navbar = () => {
                         <button
                             className={`lg:hidden p-2 rounded-md transition-all duration-300 z-50 ${
                                 scrolled || !isHomePage
-                                    ? 'hover:bg-gray-100 text-gray-700'
+                                    ? 'hover:bg-[var(--bg-secondary)] text-[var(--text-primary)]'
                                     : 'hover:bg-white/20 text-white'
                             }`}
                             onClick={(e) => {
@@ -281,12 +281,12 @@ const Navbar = () => {
                                         type="text"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full py-3 px-4 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
+                                        className="w-full py-3 px-4 pr-12 border border-[var(--border-color)] rounded-lg bg-[var(--bg-secondary)] text-[var(--text-primary)] placeholder-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
                                         placeholder="Search cars..."
                                     />
                                     <button
                                         type="submit"
-                                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-400 hover:text-primary transition-colors"
+                                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[var(--text-secondary)] hover:text-primary transition-colors"
                                     >
                                         <SearchIcon />
                                     </button>

@@ -11,9 +11,18 @@ const Home = () => {
     const [featuredCars, setFeaturedCars] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+    const [isMobile, setIsMobile] = useState(false)
 
     useEffect(() => {
         fetchFeaturedCars()
+    }, [])
+
+    // Mobile detection
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768)
+        checkMobile()
+        window.addEventListener('resize', checkMobile)
+        return () => window.removeEventListener('resize', checkMobile)
     }, [])
 
     const fetchFeaturedCars = async () => {
@@ -35,24 +44,24 @@ const Home = () => {
         visible: {
             opacity: 1,
             transition: {
-                staggerChildren: 0.2,
-                delayChildren: 0.1
+                staggerChildren: isMobile ? 0.05 : 0.2,
+                delayChildren: isMobile ? 0.05 : 0.1
             }
         }
     };
 
     const itemVariants = {
         hidden: {
-            y: 60,
+            y: isMobile ? 30 : 60,
             opacity: 0,
-            scale: 0.8
+            scale: isMobile ? 0.9 : 0.8
         },
         visible: {
             y: 0,
             opacity: 1,
             scale: 1,
             transition: {
-                duration: 0.8,
+                duration: isMobile ? 0.4 : 0.8,
                 ease: "easeOut"
             }
         }
@@ -125,7 +134,7 @@ const Home = () => {
                         viewport={{ once: true }}
                         transition={{ duration: 0.8 }}
                     >
-                        Featured Cars
+                        Featured Cars for Sale
                     </motion.h2>
                     
                     <motion.div
@@ -141,7 +150,7 @@ const Home = () => {
                                 variants={itemVariants}
                                 custom={index}
                             >
-                                <CarCard car={car} />
+                                <CarCard car={car} isMobile={isMobile} />
                             </motion.div>
                         ))}
                     </motion.div>
@@ -166,7 +175,7 @@ const Home = () => {
                                 className="inline-flex items-center px-8 py-4 bg-primary text-white font-semibold rounded-xl shadow-lg"
                                 onClick={() => scrollToTopWithRetry(true)}
                             >
-                                Explore More Cars
+                                Explore All Cars
                                 <motion.svg
                                     className="w-5 h-5 ml-2"
                                     fill="none"

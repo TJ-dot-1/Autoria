@@ -129,7 +129,7 @@ const Banner = () => {
                   ease: "easeInOut"
                 }}
               >
-                🚗 For Car Owners
+                🚗 Sell Your Car
               </motion.span>
             </motion.div>
             
@@ -137,14 +137,14 @@ const Banner = () => {
               className="text-xl sm:text-2xl lg:text-3xl font-bold text-white leading-tight"
               variants={itemVariants}
             >
-              Do You Own a{' '}
+              Ready to Sell Your{' '}
               <motion.span
                 className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-blue-400 to-primary bg-[length:200%_100%]"
                 variants={gradientVariants}
                 animate="animate"
                 style={{ backgroundSize: '200% 100%' }}
               >
-                Luxury Car?
+                Car?
               </motion.span>
             </motion.h2>
             
@@ -152,7 +152,7 @@ const Banner = () => {
               className="text-xs sm:text-sm text-gray-300 leading-relaxed max-w-sm"
               variants={itemVariants}
             >
-              Turn your luxury vehicle into a source of passive income. Join thousands of car owners who are earning extra income by renting out their vehicles.
+              Get the best price for your vehicle. List it on Autoria and reach thousands of verified buyers across Kenya. Sell faster, sell smarter.
             </motion.p>
 
             {/* Stats */}
@@ -161,8 +161,8 @@ const Banner = () => {
               variants={containerVariants}
             >
               {[
-                { value: "$1,200+", label: "Avg. Monthly", icon: "💰" },
-                { value: "4.8★", label: "Owner Rating", icon: "⭐" },
+                { value: "KSh 2.5M+", label: "Avg. Sale Price", icon: "💰" },
+                { value: "4.8★", label: "Seller Rating", icon: "⭐" },
                 { value: "24/7", label: "Support", icon: "🛡️" }
               ].map((stat, index) => (
                 <motion.div
@@ -207,7 +207,7 @@ const Banner = () => {
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
                 onClick={() => window.location.href = 'mailto:josiejosiah89@gmail.con'}
               >
-                <span>List Your Car Now</span>
+                <span>List Your Car for Sale</span>
                 <motion.span
                   animate={{ x: [0, 3, 0] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
@@ -236,9 +236,9 @@ const Banner = () => {
               variants={containerVariants}
             >
               {[
-                { text: "Fully Insured", icon: "📄" },
-                { text: "Secure Payments", icon: "🔒" },
-                { text: "Verified Renters", icon: "✅" }
+                { text: "Fair Pricing", icon: "💰" },
+                { text: "Verified Buyers", icon: "✅" },
+                { text: "Secure Transactions", icon: "🔒" }
               ].map((item, index) => (
                 <motion.div
                   key={index}
@@ -269,7 +269,7 @@ const Banner = () => {
             >
               <img
                 src={'/banner_car_image.png'}
-                alt="Luxury Car for Rent"
+                alt="Car for Sale on Autoria"
                 className="w-full max-w-2xl mx-auto rounded-lg shadow-2xl"
               />
               
@@ -302,8 +302,8 @@ const Banner = () => {
                   animate={{ scale: [1, 1.05, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 >
-                  <div className="text-lg font-bold">85%</div>
-                  <div className="text-xs text-gray-300 mt-1">Utilization</div>
+                  <div className="text-lg font-bold">95%</div>
+                  <div className="text-xs text-gray-300 mt-1">Sold Rate</div>
                 </motion.div>
               </motion.div>
               
@@ -320,8 +320,8 @@ const Banner = () => {
                   animate={{ scale: [1, 1.05, 1] }}
                   transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
                 >
-                  <div className="text-lg font-bold">$50K+</div>
-                  <div className="text-xs text-gray-300 mt-1">Total Earned</div>
+                  <div className="text-lg font-bold">1,200+</div>
+                  <div className="text-xs text-gray-300 mt-1">Cars Sold</div>
                 </motion.div>
               </motion.div>
             </motion.div>
@@ -375,7 +375,7 @@ const Banner = () => {
         >
           <div className="p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold text-gray-900">Car Listing Requirements</h3>
+              <h3 className="text-xl font-bold text-gray-900">Selling Requirements</h3>
               <button
                 onClick={() => setShowRequirementsModal(false)}
                 className="text-gray-400 hover:text-gray-600 text-2xl"
@@ -385,7 +385,7 @@ const Banner = () => {
             </div>
             <div className="space-y-3 text-gray-700">
               <p className="text-sm text-gray-600 mb-4">
-                To list your car on our platform, please ensure your vehicle meets the following requirements:
+                To list your car for sale on our platform, please ensure you meet the following requirements:
               </p>
               <ul className="space-y-2 text-sm">
                 <li className="flex items-start gap-2">
@@ -402,23 +402,23 @@ const Banner = () => {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-green-500 mt-1">✓</span>
-                  <span>Well-maintained with no major mechanical issues</span>
+                  <span>Vehicle must pass a basic mechanical inspection</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-green-500 mt-1">✓</span>
-                  <span>Located within our service areas (major cities)</span>
+                  <span>Accurate mileage and condition description required</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-green-500 mt-1">✓</span>
-                  <span>Owner must be 21 years or older</span>
+                  <span>Seller must be 18 years or older</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-green-500 mt-1">✓</span>
-                  <span>Valid driver's license</span>
+                  <span>Valid national ID or passport</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-green-500 mt-1">✓</span>
-                  <span>Willing to provide vehicle history and maintenance records</span>
+                  <span>Clear, high-quality photos of the vehicle (minimum 4 photos)</span>
                 </li>
               </ul>
               <div className="mt-6 pt-4 border-t border-gray-200">

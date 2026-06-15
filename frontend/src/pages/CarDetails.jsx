@@ -3,14 +3,13 @@ import { motion } from 'framer-motion';
 import { useParams, Link } from 'react-router-dom';
 import { scrollToTop } from '../utils/scrollToTop';
 import { carsAPI } from '../utils/api';
-import BookingForm from '../components/BookingForm';
-// animation helpers not used here
+import InquiryForm from '../components/InquiryForm';
 
 const CarDetails = () => {
     const { id } = useParams();
     const [selectedImage, setSelectedImage] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
-    const [isBookingFormOpen, setIsBookingFormOpen] = useState(false);
+    const [isInquiryFormOpen, setIsInquiryFormOpen] = useState(false);
     const [car, setCar] = useState(null);
     const [error, setError] = useState('');
     const PLACEHOLDER_IMAGE = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect fill="%23e0e0e0" width="400" height="300"/%3E%3Ctext x="50%25" y="50%25" font-size="20" fill="%23999" text-anchor="middle" dominant-baseline="middle"%3ENo Image Available%3C/text%3E%3C/svg%3E';
@@ -107,10 +106,11 @@ const CarDetails = () => {
     }
 
     // Normalize common fields (support both camelCase and snake_case from different sources)
-    const pricePerDay = car.pricePerDay ?? car.price_per_day ?? car.price;
-    const seatingCapacity = car.seatingCapacity ?? car.seating_capacity ?? car.seating_capacity;
+    const salePrice = car.salePrice ?? car.pricePerDay ?? car.price_per_day ?? car.price;
+    const seatingCapacity = car.seatingCapacity ?? car.seating_capacity;
     const fuelType = car.fuelType ?? car.fuel_type ?? car.fuel;
-    const transmission = car.transmission ?? car.transmission;
+    const transmission = car.transmission;
+    const condition = car.condition || 'Used';
 
     // Handle car images from the API or legacy/local data
     const carImages = (car.images && car.images.length > 0)
@@ -150,6 +150,11 @@ const CarDetails = () => {
             'Plug-in Hybrid': '🔋'
         };
         return icons[fuelType] || '⛽';
+    };
+
+    const formatPrice = (price) => {
+        if (!price) return 'Contact for price';
+        return `${currency}${Number(price).toLocaleString()}`;
     };
 
     return (
@@ -225,13 +230,18 @@ const CarDetails = () => {
                                         e.currentTarget.src = PLACEHOLDER_IMAGE;
                                     }}
                                 />
-                                <div className="absolute top-4 left-4">
+                                <div className="absolute top-4 left-4 flex gap-2">
                                     <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
                                         car.isAvailable 
                                             ? 'bg-green-500 text-white' 
                                             : 'bg-red-500 text-white'
                                     }`}>
-                                        {car.isAvailable ? 'Available' : 'Not Available'}
+                                        {car.isAvailable ? 'For Sale' : 'Sold'}
+                                    </span>
+                                    <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                                        condition === 'New' ? 'bg-emerald-500 text-white' : 'bg-amber-500 text-white'
+                                    }`}>
+                                        {condition}
                                     </span>
                                 </div>
                                 <div className="absolute top-4 right-4">
@@ -276,7 +286,7 @@ const CarDetails = () => {
                         <div className="bg-[var(--bg-primary)] rounded-2xl shadow-lg p-6 mb-6 border border-[var(--border-color)]">
                             <h3 className="text-xl font-bold mb-4 text-[var(--text-primary)]">Description</h3>
                             <p className="text-[var(--text-secondary)] leading-relaxed">
-                                {car.description || `The ${car.brand} ${car.model} is a ${car.category?.toLowerCase() || ''} vehicle that offers excellent performance and comfort. With ${seatingCapacity || 'N/A'} seats and ${fuelType ? fuelType.toLowerCase() : 'fuel'} engine, it's perfect for both city driving and long trips.`}
+                                {car.description || `This ${condition.toLowerCase()} ${car.brand} ${car.model} is a ${car.category?.toLowerCase() || ''} vehicle in excellent condition. With ${seatingCapacity || 'N/A'} seats, ${fuelType ? fuelType.toLowerCase() : 'efficient'} engine, and ${car.mileage ? car.mileage.toLocaleString() + ' km on the odometer' : 'low mileage'}, it's a great choice for anyone looking for a reliable ${car.type?.toLowerCase() || 'vehicle'}.`}
                             </p>
                         </div>
 
@@ -285,7 +295,7 @@ const CarDetails = () => {
                             <h3 className="text-xl font-bold mb-4 text-[var(--text-primary)]">Features & Specifications</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <h4 className="font-semibold mb-3 text-[var(--text-primary)]">Basic Info</h4>
+                                    <h4 className="font-semibold mb-3 text-[var(--text-primary)]">Vehicle Info</h4>
                                     <div className="space-y-2">
                                         <div className="flex justify-between">
                                             <span className="text-[var(--text-secondary)]">Brand:</span>
@@ -300,13 +310,31 @@ const CarDetails = () => {
                                             <span className="font-medium text-[var(--text-primary)]">{car.year}</span>
                                         </div>
                                         <div className="flex justify-between">
+                                            <span className="text-[var(--text-secondary)]">Condition:</span>
+                                            <span className={`font-medium px-2 py-0.5 rounded text-sm ${
+                                                condition === 'New' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                                            }`}>{condition}</span>
+                                        </div>
+                                        <div className="flex justify-between">
                                             <span className="text-[var(--text-secondary)]">Location:</span>
                                             <span className="font-medium text-[var(--text-primary)]">{car.location}</span>
                                         </div>
                                         {car.mileage && (
                                             <div className="flex justify-between">
                                                 <span className="text-[var(--text-secondary)]">Mileage:</span>
-                                                <span className="font-medium text-[var(--text-primary)]">{car.mileage} miles</span>
+                                                <span className="font-medium text-[var(--text-primary)]">{car.mileage.toLocaleString()} km</span>
+                                            </div>
+                                        )}
+                                        {car.color && car.color.exterior && (
+                                            <div className="flex justify-between">
+                                                <span className="text-[var(--text-secondary)]">Exterior Color:</span>
+                                                <span className="font-medium text-[var(--text-primary)]">{car.color.exterior}</span>
+                                            </div>
+                                        )}
+                                        {car.color && car.color.interior && (
+                                            <div className="flex justify-between">
+                                                <span className="text-[var(--text-secondary)]">Interior Color:</span>
+                                                <span className="font-medium text-[var(--text-primary)]">{car.color.interior}</span>
                                             </div>
                                         )}
                                     </div>
@@ -337,6 +365,18 @@ const CarDetails = () => {
                                             <span className="text-[var(--text-secondary)]">Category:</span>
                                             <span className="font-medium text-[var(--text-primary)]">{car.category}</span>
                                         </div>
+                                        {car.engine && car.engine.power && (
+                                            <div className="flex justify-between">
+                                                <span className="text-[var(--text-secondary)]">Power:</span>
+                                                <span className="font-medium text-[var(--text-primary)]">{car.engine.power} HP</span>
+                                            </div>
+                                        )}
+                                        {car.engine && car.engine.type && (
+                                            <div className="flex justify-between">
+                                                <span className="text-[var(--text-secondary)]">Engine:</span>
+                                                <span className="font-medium text-[var(--text-primary)]">{car.engine.type}{car.engine.displacement ? ` ${car.engine.displacement}L` : ''}</span>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -360,7 +400,7 @@ const CarDetails = () => {
                         </div>
                     </div>
 
-                    {/* Right Column - Booking Card */}
+                    {/* Right Column - Purchase Card */}
                     <div className="lg:col-span-1">
                         <div className="bg-[var(--bg-primary)] rounded-2xl shadow-lg p-6 sticky top-6 border border-[var(--border-color)]">
                             <div className="text-center mb-6">
@@ -373,14 +413,42 @@ const CarDetails = () => {
 
                             <div className="text-center mb-6">
                                 <span className="text-4xl font-bold text-primary">
-                                    {currency}{pricePerDay ? Number(pricePerDay).toLocaleString() : ''}
+                                    {formatPrice(salePrice)}
                                 </span>
-                                <span className="text-[var(--text-secondary)] text-lg"> / day</span>
-                                {car.pricePerWeek && (
-                                    <div className="text-sm text-[var(--text-secondary)] mt-1">
-                                        {currency}{car.pricePerWeek?.toLocaleString()} / week
+                                {car.condition && (
+                                    <div className="mt-2">
+                                        <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
+                                            condition === 'New' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                                        }`}>
+                                            {condition} Vehicle
+                                        </span>
                                     </div>
                                 )}
+                            </div>
+
+                            {/* Key Highlights */}
+                            <div className="space-y-3 mb-6">
+                                <div className="flex items-center justify-between text-sm bg-[var(--bg-secondary)] rounded-lg p-3">
+                                    <div className="flex items-center space-x-2">
+                                        <span className="text-lg">📊</span>
+                                        <span className="text-[var(--text-secondary)]">Mileage</span>
+                                    </div>
+                                    <span className="font-medium text-[var(--text-primary)]">{car.mileage ? `${car.mileage.toLocaleString()} km` : 'N/A'}</span>
+                                </div>
+                                <div className="flex items-center justify-between text-sm bg-[var(--bg-secondary)] rounded-lg p-3">
+                                    <div className="flex items-center space-x-2">
+                                        <span className="text-lg">⚙️</span>
+                                        <span className="text-[var(--text-secondary)]">Transmission</span>
+                                    </div>
+                                    <span className="font-medium text-[var(--text-primary)]">{transmission || 'N/A'}</span>
+                                </div>
+                                <div className="flex items-center justify-between text-sm bg-[var(--bg-secondary)] rounded-lg p-3">
+                                    <div className="flex items-center space-x-2">
+                                        <span className="text-lg">{getFuelTypeIcon(fuelType)}</span>
+                                        <span className="text-[var(--text-secondary)]">Fuel Type</span>
+                                    </div>
+                                    <span className="font-medium text-[var(--text-primary)]">{fuelType || 'N/A'}</span>
+                                </div>
                             </div>
 
                             <div className="space-y-4 mb-6">
@@ -389,13 +457,13 @@ const CarDetails = () => {
                                         <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                                         </svg>
-                                        <span>Insurance Included</span>
+                                        <span>Financing Available</span>
                                     </div>
                                     <div className="flex items-center space-x-1">
                                         <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                                         </svg>
-                                        <span>AC Included</span>
+                                        <span>Inspection Report</span>
                                     </div>
                                 </div>
                             </div>
@@ -410,13 +478,13 @@ const CarDetails = () => {
                                     disabled={!car.isAvailable}
                                     onClick={() => {
                                         if (car.isAvailable) {
-                                            setIsBookingFormOpen(true);
+                                            setIsInquiryFormOpen(true);
                                         }
                                     }}
                                     whileHover={car.isAvailable ? { scale: 1.02 } : {}}
                                     whileTap={car.isAvailable ? { scale: 0.98 } : {}}
                                 >
-                                    {car.isAvailable ? 'Rent Now' : 'Not Available'}
+                                    {car.isAvailable ? 'Make Inquiry' : 'Sold'}
                                 </motion.button>
                                 <motion.button
                                     className="w-full py-3 px-6 border-2 border-[var(--border-color)] rounded-lg font-semibold text-[var(--text-primary)] hover:border-primary hover:text-primary transition-colors bg-[var(--bg-primary)]"
@@ -427,13 +495,13 @@ const CarDetails = () => {
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
                                 >
-                                    Contact Owner
+                                    Contact Seller
                                 </motion.button>
                             </div>
 
                             <div className="mt-6 pt-6 border-t border-[var(--border-color)]">
                                 <div className="text-center text-sm text-[var(--text-secondary)] mb-2">
-                                    Need help booking?
+                                    Need help with your purchase?
                                 </div>
                                 <Link
                                     to="/faq"
@@ -448,14 +516,13 @@ const CarDetails = () => {
                 </div>
             </div>
             
-            {/* Booking Form Modal */}
-            <BookingForm
+            {/* Inquiry Form Modal */}
+            <InquiryForm
                 car={car}
-                isOpen={isBookingFormOpen}
-                onClose={() => setIsBookingFormOpen(false)}
+                isOpen={isInquiryFormOpen}
+                onClose={() => setIsInquiryFormOpen(false)}
                 onSuccess={() => {
-                    // Handle successful booking submission
-                    console.log('Booking submitted successfully');
+                    console.log('Inquiry submitted successfully');
                 }}
             />
         </motion.div>

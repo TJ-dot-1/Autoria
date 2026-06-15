@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 
-const CarCard = ({ car, cardType = 'rental' }) => {
+const CarCard = ({ car, cardType = 'sale', isMobile = false }) => {
   // Format price for display
   const formatPrice = (price) => {
     if (price === null || price === undefined) return 'Price not available'
@@ -16,7 +16,7 @@ const CarCard = ({ car, cardType = 'rental' }) => {
   // Format mileage for display
   const formatMileage = (mileage) => {
     if (!mileage) return 'N/A'
-    return new Intl.NumberFormat('en-US').format(mileage) + ' miles'
+    return new Intl.NumberFormat('en-US').format(mileage) + ' km'
   }
 
   // Get car image URL or fallback (handles strings, objects, arrays)
@@ -52,51 +52,56 @@ const CarCard = ({ car, cardType = 'rental' }) => {
     return PLACEHOLDER
   }
 
-  // Determine card styling based on type
-  // Determine card styling based on type
+  // Get sale price (prefer salePrice, fallback to pricePerDay for backward compat)
+  const getSalePrice = () => {
+    return car.salePrice || car.pricePerDay || car.price || null
+  }
+
+  // Determine card styling based on availability
   const getCardStyles = () => {
-    if (cardType === 'sale') {
-      return {
-        badge: 'bg-green-500',
-        badgeText: 'For Sale',
-        buttonText: 'View Details',
-        buttonClass: 'bg-green-600 hover:bg-green-700'
-      }
-    }
     if (!car.isAvailable) {
       return {
         badge: 'bg-red-500',
-        badgeText: 'Booked',
-        buttonText: 'Unavailable',
+        badgeText: 'Sold',
+        buttonText: 'Sold Out',
         buttonClass: 'bg-gray-400 cursor-not-allowed'
+      }
+    }
+    if (car.condition === 'New') {
+      return {
+        badge: 'bg-emerald-500',
+        badgeText: 'Brand New',
+        buttonText: 'View Details',
+        buttonClass: 'bg-primary hover:bg-blue-700'
       }
     }
     return {
       badge: 'bg-blue-500',
-      badgeText: 'Available',
-      buttonText: 'Book Now',
+      badgeText: 'For Sale',
+      buttonText: 'View Details',
       buttonClass: 'bg-primary hover:bg-blue-700'
     }
-  };  const cardStyles = getCardStyles()
+  };
+  const cardStyles = getCardStyles()
 
   const cardVariants = {
     hidden: {
-      y: 20,
+      y: isMobile ? 10 : 20,
       opacity: 0,
-      scale: 0.9
+      scale: isMobile ? 1 : 0.9
     },
     visible: {
       y: 0,
       opacity: 1,
-      scale: 1,
+
       transition: {
-        duration: 0.5,
+        duration: isMobile ? 0.3 : 0.5,
         ease: "easeOut"
       }
     },
     hover: {
       y: -8,
-      scale: 1.02,
+
       transition: {
         duration: 0.3,
         ease: "easeOut"
@@ -106,7 +111,7 @@ const CarCard = ({ car, cardType = 'rental' }) => {
 
   const imageVariants = {
     hover: {
-      scale: 1.1,
+
       transition: {
         duration: 0.4,
         ease: "easeOut"
@@ -124,7 +129,7 @@ const CarCard = ({ car, cardType = 'rental' }) => {
       }
     },
     tap: {
-      scale: 0.95,
+      scale: isMobile ? 1 : 0.95,
       transition: {
         duration: 0.1
       }
@@ -143,7 +148,7 @@ const CarCard = ({ car, cardType = 'rental' }) => {
       <div className="relative h-48 overflow-hidden bg-gray-100">
         <motion.img
           src={getCarImage(car)}
-          alt={`${car.make} ${car.model}`}
+          alt={`${car.brand || car.make} ${car.model}`}
           crossOrigin="anonymous"
           className="w-full h-full object-cover"
           variants={imageVariants}
@@ -165,9 +170,25 @@ const CarCard = ({ car, cardType = 'rental' }) => {
           </span>
         </motion.div>
 
+        {/* Condition Badge */}
+        {car.condition && (
+          <motion.div
+            className="absolute top-4 right-4"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <span className={`px-2 py-1 rounded-md text-xs font-medium ${
+              car.condition === 'New' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+            }`}>
+              {car.condition}
+            </span>
+          </motion.div>
+        )}
+
         {/* Favorite Button */}
         <motion.button
-          className="absolute top-4 right-4 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center text-gray-600 hover:text-red-500 transition-colors"
+          className="absolute bottom-4 right-4 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center text-gray-600 hover:text-red-500 transition-colors"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >
@@ -181,13 +202,13 @@ const CarCard = ({ car, cardType = 'rental' }) => {
       <div className="p-6">
         {/* Car Title and Year */}
         <motion.div
-          className="mb-4"
+          className="mb-3"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
           <h3 className="text-xl font-bold text-gray-900 mb-1">
-            {car.year} {car.make} {car.model}
+            {car.year} {car.brand || car.make} {car.model}
           </h3>
           <div className="flex items-center text-sm text-gray-500">
             <span className="capitalize">{car.category}</span>
@@ -197,10 +218,28 @@ const CarCard = ({ car, cardType = 'rental' }) => {
                 <span>{formatMileage(car.mileage)}</span>
               </>
             )}
+            {car.transmission && (
+              <>
+                <span className="mx-2">•</span>
+                <span>{car.transmission}</span>
+              </>
+            )}
           </div>
         </motion.div>
 
-        {/* Features */}
+        {/* Price */}
+        <motion.div
+          className="mb-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.35 }}
+        >
+          <div className="text-2xl font-bold text-primary">
+            {formatPrice(getSalePrice())}
+          </div>
+        </motion.div>
+
+        {/* Quick Specs */}
         <motion.div
           className="mb-4"
           initial={{ opacity: 0 }}
@@ -208,14 +247,21 @@ const CarCard = ({ car, cardType = 'rental' }) => {
           transition={{ delay: 0.4 }}
         >
           <div className="flex flex-wrap gap-2">
-            {car.features && car.features.map((feature, index) => (
-              <span
-                key={index}
-                className="bg-gray-100 text-gray-700 px-2 py-1 rounded-md text-xs"
-              >
-                {feature}
+            {car.fuelType && (
+              <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded-md text-xs">
+                {car.fuelType}
               </span>
-            ))}
+            )}
+            {car.seatingCapacity && (
+              <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded-md text-xs">
+                {car.seatingCapacity} seats
+              </span>
+            )}
+            {car.location && (
+              <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded-md text-xs">
+                📍 {car.location}
+              </span>
+            )}
           </div>
         </motion.div>
 
