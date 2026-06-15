@@ -25,7 +25,8 @@ A modern React-based frontend for the Autoria Car Rental Platform, built with Vi
 - **State Management**: React Context API
 - **HTTP Client**: Fetch API (via custom utils)
 - **Notifications**: React Hot Toast
-- **Icons**: Custom SVG icons and Tailwind classes
+- **Icons**: React Icons
+- **Charts**: Chart.js and react-chartjs-2
 
 ## 📋 Prerequisites
 
@@ -95,6 +96,7 @@ frontend/
 │   │   ├── BookingForm.jsx
 │   │   ├── Footer.jsx
 │   │   ├── Hero.jsx
+│   │   ├── InquiryForm.jsx
 │   │   ├── Loader.jsx
 │   │   ├── LoadingSpinner.jsx
 │   │   ├── MicroInteractions.jsx
@@ -123,8 +125,12 @@ frontend/
 │   │   ├── services/
 │   │   │   ├── AirportTransfer.jsx
 │   │   │   ├── BusinessRental.jsx
+│   │   │   ├── BuyACar.jsx
+│   │   │   ├── CarFinancing.jsx
 │   │   │   ├── CarRental.jsx
-│   │   │   └── LongTermLease.jsx
+│   │   │   ├── LongTermLease.jsx
+│   │   │   ├── SellYourCar.jsx
+│   │   │   └── VehicleInspection.jsx
 │   │   ├── support/
 │   │   │   ├── ContactUs.jsx
 │   │   │   ├── HelpCenter.jsx

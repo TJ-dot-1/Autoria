@@ -30,18 +30,18 @@ const Hero = () => {
         </div>
 
         {/* Stats Section */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8 mt-12 md:mt-16 max-w-4xl mx-auto px-4">
+        <div className="grid grid-cols-3 gap-2 sm:gap-6 md:gap-8 mt-12 md:mt-16 max-w-4xl mx-auto px-2 sm:px-4">
           <div className="text-center">
-            <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">500+</div>
-            <div className="text-sm sm:text-base" style={{ color: 'var(--text-secondary)' }}>Cars Listed</div>
+            <div className="text-xl sm:text-3xl font-bold text-primary mb-1 sm:mb-2">500+</div>
+            <div className="text-xs sm:text-base" style={{ color: 'var(--text-secondary)' }}>Cars Listed</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">1,200+</div>
-            <div className="text-sm sm:text-base" style={{ color: 'var(--text-secondary)' }}>Cars Sold</div>
+            <div className="text-xl sm:text-3xl font-bold text-primary mb-1 sm:mb-2">1,200+</div>
+            <div className="text-xs sm:text-base" style={{ color: 'var(--text-secondary)' }}>Cars Sold</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">10K+</div>
-            <div className="text-sm sm:text-base" style={{ color: 'var(--text-secondary)' }}>Happy Buyers</div>
+            <div className="text-xl sm:text-3xl font-bold text-primary mb-1 sm:mb-2">10K+</div>
+            <div className="text-xs sm:text-base" style={{ color: 'var(--text-secondary)' }}>Happy Buyers</div>
           </div>
         </div>
       </div>

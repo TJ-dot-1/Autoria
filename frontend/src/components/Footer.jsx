@@ -68,7 +68,7 @@ const Footer = () => {
   return (
     <footer className="bg-[var(--bg-primary)] border-t border-[var(--border-color)]">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-6 gap-8">
           
           {/* Brand Section */}
           <div className="lg:col-span-2">
@@ -116,20 +116,22 @@ const Footer = () => {
           </div>
 
           {/* Footer Sections */}
-          {Object.values(footerSections).map((section, i) => (
-            <div key={i}>
-              <h3 className="font-semibold text-lg mb-4 text-[var(--text-primary)]">{section.title}</h3>
-              <ul className="space-y-3">
-                {section.links.map((link, index) => (
-                  <li key={index}>
-                    <Link className="text-[var(--text-secondary)] hover:text-primary" to={link.path}>
-                      {link.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <div className="lg:col-span-4 grid grid-cols-2 md:grid-cols-4 gap-8">
+            {Object.values(footerSections).map((section, i) => (
+              <div key={i}>
+                <h3 className="font-semibold text-lg mb-4 text-[var(--text-primary)]">{section.title}</h3>
+                <ul className="space-y-3">
+                  {section.links.map((link, index) => (
+                    <li key={index}>
+                      <Link className="text-[var(--text-secondary)] hover:text-primary" to={link.path}>
+                        {link.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Newsletter */}
