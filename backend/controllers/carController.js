@@ -97,7 +97,8 @@ export const getCars = async (req, res, next) => {
     console.error('Get cars error:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error fetching cars'
+      message: 'Server error fetching cars',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };

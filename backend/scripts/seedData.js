@@ -67,7 +67,7 @@ const sampleCars = [
     },
     features: ['GPS Navigation', 'Bluetooth', 'USB Port', 'Backup Camera', 'Air Conditioning'],
     images: [{
-      url: 'https://images.unsplash.com/photo-1549924231-f129b911e442?w=800',
+      url: '/uploads/cars/car-1763063644802-28089825.jpg',
       caption: 'Toyota Camry Front View',
       isPrimary: true
     }],
@@ -120,7 +120,7 @@ const sampleCars = [
     },
     features: ['GPS Navigation', 'Bluetooth', 'USB Port', 'Backup Camera', 'Air Conditioning', 'Remote Start'],
     images: [{
-      url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
+      url: '/uploads/cars/car-1763065991367-691024656.jpg',
       caption: 'Honda CR-V Side View',
       isPrimary: true
     }],
@@ -173,7 +173,7 @@ const sampleCars = [
     },
     features: ['GPS Navigation', 'Bluetooth', 'USB Port', 'Backup Camera', 'Air Conditioning', 'Premium Audio', 'Wireless Charging'],
     images: [{
-      url: 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800',
+      url: '/uploads/cars/car-1763066334737-745166483.jpg',
       caption: 'Tesla Model 3 Front View',
       isPrimary: true
     }],
@@ -225,7 +225,7 @@ const sampleCars = [
     },
     features: ['GPS Navigation', 'Bluetooth', 'USB Port', 'Backup Camera', 'Air Conditioning', 'Premium Audio', 'Leather Seats', 'Heated Seats'],
     images: [{
-      url: 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800',
+      url: '/uploads/cars/car-1763066446008-378204993.jpg',
       caption: 'BMW X5 Side View',
       isPrimary: true
     }],
@@ -278,7 +278,7 @@ const sampleCars = [
     },
     features: ['GPS Navigation', 'Bluetooth', 'USB Port', 'Backup Camera', 'Air Conditioning', 'Premium Audio'],
     images: [{
-      url: 'https://images.unsplash.com/photo-1544829099-b9a0c5303bea?w=800',
+      url: '/uploads/cars/car-1763057892003-587830213.jpg',
       caption: 'Ford Mustang Front View',
       isPrimary: true
     }],
