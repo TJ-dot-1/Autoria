@@ -207,7 +207,7 @@ app.use(notFound);
 app.use(errorHandler);
 
 // Start the server
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/health`);
   console.log(`🔗 API Documentation: http://localhost:${PORT}/api`);
@@ -215,17 +215,16 @@ const server = app.listen(PORT, () => {
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err, promise) => {
-  console.log(`Error: ${err.message}`);
-  // Close server & exit process
-  server.close(() => {
-    process.exit(1);
-  });
+  console.log(`Unhandled Rejection Error: ${err.message}`);
+  // In production (Render), we often want to log the error rather than crash 
+  // the entire server if it's a minor unhandled promise.
+  // server.close(() => process.exit(1));
 });
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (err) => {
-  console.log(`Error: ${err.message}`);
-  process.exit(1);
+  console.log(`Uncaught Exception Error: ${err.message}`);
+  // process.exit(1);
 });
 
 
