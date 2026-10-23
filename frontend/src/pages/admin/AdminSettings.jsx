@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import toast from 'react-hot-toast'
 import { useAuth } from '../../contexts/AuthContext'
 import { uploadAPI, adminAPI } from '../../utils/api'
-import { getProfileImage } from '../../utils/imageHelpers'
+import { getProfileImage, convertImageToWebP } from '../../utils/imageHelpers'
 
 const AdminSettings = () => {
   const { user, updateUser } = useAuth()
@@ -244,8 +244,15 @@ const AdminSettings = () => {
     try {
       setIsUploading(true)
       
-      // Upload image to Cloudinary
-      const uploadResponse = await uploadAPI.uploadImage(file)
+      // Convert to WebP format in browser before upload
+      const optimizedWebpFile = await convertImageToWebP(file, {
+        quality: 0.85,
+        maxWidth: 800,
+        maxHeight: 800
+      })
+
+      // Upload image to Cloudinary / backend
+      const uploadResponse = await uploadAPI.uploadImage(optimizedWebpFile)
       
       if (uploadResponse.success && uploadResponse.data) {
         // Get the Cloudinary URL (secure_url for HTTPS)

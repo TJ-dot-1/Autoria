@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import Title from '../../components/Title'
 import { carsAPI } from '../../utils/api'
+import { convertImageToWebP } from '../../utils/imageHelpers'
 
 // Enum-safe features list matching backend/models/Car.js
 const ALLOWED_FEATURES = [
@@ -271,7 +272,14 @@ const AddCar = () => {
     clearError('image')
 
     try {
-      const uploadResult = await uploadImage(file)
+      // Automatically convert image to WebP format for fast loading
+      const optimizedWebpFile = await convertImageToWebP(file, {
+        quality: 0.85,
+        maxWidth: 1920,
+        maxHeight: 1200
+      })
+
+      const uploadResult = await uploadImage(optimizedWebpFile)
       let imageUrl = uploadResult.data.url
 
       if (!/^https?:\/\//i.test(imageUrl)) {

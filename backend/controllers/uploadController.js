@@ -23,26 +23,78 @@ export const uploadImage = async (req, res, next) => {
       });
     }
 
-    // Upload buffer to Cloudinary using upload_stream
+    // Upload buffer to Cloudinary using upload_stream with WebP conversion
     const uploadStream = () => new Promise((resolve, reject) => {
-      const stream = cloudinary.v2.uploader.upload_stream({ folder: 'autoria/cars' }, (error, result) => {
-        if (error) return reject(error);
-        resolve(result);
-      });
+      const stream = cloudinary.v2.uploader.upload_stream(
+        { 
+          folder: 'autoria/cars',
+          format: 'webp', // Force format to WebP for high performance
+          transformation: [
+            { width: 1920, crop: 'limit' },
+            { quality: 'auto:good' },
+            { fetch_format: 'webp' }
+          ]
+        }, 
+        (error, result) => {
+          if (error) return reject(error);
+          resolve(result);
+        }
+      );
       streamifier.createReadStream(req.file.buffer).pipe(stream);
     });
 
-    const result = await uploadStream();
+    let result = null;
+    const hasCloudinary = Boolean(
+      process.env.CLOUDINARY_CLOUD_NAME && 
+      process.env.CLOUDINARY_API_KEY && 
+      process.env.CLOUDINARY_API_SECRET
+    );
+
+    if (hasCloudinary) {
+      try {
+        result = await uploadStream();
+      } catch (cloudErr) {
+        console.warn('Cloudinary upload warning, using local fallback:', cloudErr.message);
+      }
+    }
+
+    if (result) {
+      return res.status(200).json({
+        success: true,
+        data: {
+          url: result.secure_url,
+          filename: result.public_id,
+          originalName: req.file.originalname,
+          size: result.bytes || req.file.size,
+          mimetype: 'image/webp',
+          format: 'webp',
+          provider: 'cloudinary'
+        }
+      });
+    }
+
+    // Local file fallback if Cloudinary is unavailable
+    const uploadsDir = path.join(process.cwd(), 'uploads', 'cars');
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+
+    const uniqueId = `car-${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    const filename = `${uniqueId}.webp`;
+    const localFilePath = path.join(uploadsDir, filename);
+
+    fs.writeFileSync(localFilePath, req.file.buffer);
 
     res.status(200).json({
       success: true,
       data: {
-        url: result.secure_url,
-        filename: result.public_id, // return public_id so client can delete if needed
+        url: `/uploads/cars/${filename}`,
+        filename,
         originalName: req.file.originalname,
         size: req.file.size,
-        mimetype: req.file.mimetype,
-        provider: 'cloudinary'
+        mimetype: 'image/webp',
+        format: 'webp',
+        provider: 'local'
       }
     });
   } catch (error) {
