@@ -208,6 +208,39 @@ export const getBookings = async (req, res, next) => {
   }
 };
 
+// @desc    Get logged in user bookings
+// @route   GET /api/bookings/my-bookings
+// @access  Private
+export const getMyBookings = async (req, res, next) => {
+  try {
+    const userId = req.user._id || req.user.id;
+    const userEmail = (req.user.email || '').toLowerCase();
+
+    const query = {
+      $or: [
+        { user: userId },
+        ...(userEmail ? [{ 'driver.email': userEmail }] : [])
+      ]
+    };
+
+    const bookings = await Booking.find(query)
+      .populate('car', 'brand model year type category images primaryImage pricePerDay salePrice location isAvailable')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: bookings.length,
+      data: bookings
+    });
+  } catch (error) {
+    console.error('Get my bookings error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error fetching user bookings'
+    });
+  }
+};
+
 // @desc    Get single booking
 // @route   GET /api/bookings/:id
 // @access  Private

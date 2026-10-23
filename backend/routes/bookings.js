@@ -1,8 +1,18 @@
 import express from 'express';
-import { createBooking, getBookings, updateBookingStatus, cancelBooking, getBooking } from '../controllers/bookingController.js';
+import { 
+  createBooking, 
+  getBookings, 
+  getMyBookings,
+  updateBookingStatus, 
+  cancelBooking, 
+  getBooking 
+} from '../controllers/bookingController.js';
 import { authenticateAdmin, protect } from '../middleware/auth.js';
 
 const router = express.Router();
+
+// Get logged-in user bookings
+router.get('/my-bookings', protect, getMyBookings);
 
 // Get all bookings (Admin only)
 router.get('/', authenticateAdmin, getBookings);
