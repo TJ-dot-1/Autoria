@@ -1,438 +1,115 @@
-import React, { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { 
+  FiArrowRight, 
+  FiCheckCircle, 
+  FiTag, 
+  FiHeart, 
+  FiLayers, 
+  FiPercent, 
+  FiTruck 
+} from 'react-icons/fi';
 
 const Banner = () => {
-  const [showRequirementsModal, setShowRequirementsModal] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
-    }
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 30, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut"
-      }
-    }
-  };
-
-  const badgeVariants = {
-    hidden: { scale: 0, opacity: 0 },
-    visible: {
-      scale: 1,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 200,
-        damping: 10
-      }
-    }
-  };
-
-  const imageVariants = {
-    hidden: { x: 50, opacity: 0 },
-    visible: {
-      x: 0,
-      opacity: 1,
-      transition: {
-        delay: 0.4,
-        duration: 0.8,
-        ease: "easeOut"
-      }
-    }
-  };
-
-  const floatingVariants = {
-    animate: {
-      y: [-10, 10, -10],
-      transition: {
-        duration: 3,
-        repeat: Infinity,
-        ease: "easeInOut"
-      }
-    }
-  };
-
-  const pulseVariants = {
-    animate: {
-      scale: [1, 1.02, 1],
-      transition: {
-        duration: 2,
-        repeat: Infinity,
-        ease: "easeInOut"
-      }
-    }
-  };
-
-  const gradientVariants = {
-    animate: {
-      backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-      transition: {
-        duration: 5,
-        repeat: Infinity,
-        ease: "linear"
-      }
-    }
-  };
+  const quickActions = [
+    { label: 'New Cars', filter: 'New', icon: FiTruck, path: '/cars?condition=New' },
+    { label: 'Used Cars', filter: 'Used', icon: FiTag, path: '/cars?condition=Used' },
+    { label: 'Compare', filter: 'compare', icon: FiLayers, path: '/cars' },
+    { label: 'Favorites', filter: 'favorites', icon: FiHeart, path: '/my-inquiries' },
+    { label: 'Deals', filter: 'deals', icon: FiPercent, path: '/cars?deals=true' },
+  ];
 
   return (
-    <>
-      <motion.div
-        className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-3xl overflow-hidden mx-4 my-8"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
-        variants={containerVariants}
-      >
-      <div className="container mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-5 items-center gap-6 py-8 px-6">
-          {/* Text Content */}
-          <motion.div
-            className="lg:col-span-2 text-center lg:text-left space-y-4 z-10"
-            variants={itemVariants}
-          >
-            <motion.div
-              className="inline-flex items-center px-3 py-1 bg-primary/20 rounded-full mb-2"
-              variants={badgeVariants}
-              whileHover={{ scale: 1.05 }}
+    <section className="py-8 md:py-16 px-4 max-w-7xl mx-auto">
+      {/* Quick Action Category Tiles (AutoHub Panel 2 Style) */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-10">
+        {quickActions.map((action, idx) => {
+          const Icon = action.icon;
+          return (
+            <Link
+              key={idx}
+              to={action.path}
+              className="flex items-center gap-3 p-3.5 rounded-2xl bg-[#0B1D33]/70 hover:bg-[#0B1D33] border border-[rgba(107,203,255,0.15)] hover:border-[#6BCBFF]/50 shadow-[0_4px_16px_rgba(0,0,0,0.3)] hover:shadow-[0_0_20px_rgba(38,132,255,0.25)] group transition-all duration-300"
             >
-              <motion.span
-                className="text-primary font-semibold text-xs"
-                animate={{ 
-                  scale: [1, 1.05, 1],
-                  opacity: [0.8, 1, 0.8]
-                }}
-                transition={{ 
-                  duration: 2, 
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              >
-                🚗 Sell Your Car
-              </motion.span>
-            </motion.div>
-            
-            <motion.h2
-              className="text-xl sm:text-2xl lg:text-3xl font-bold text-white leading-tight"
-              variants={itemVariants}
-            >
-              Ready to Sell Your{' '}
-              <motion.span
-                className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-blue-400 to-primary bg-[length:200%_100%]"
-                variants={gradientVariants}
-                animate="animate"
-                style={{ backgroundSize: '200% 100%' }}
-              >
-                Car?
-              </motion.span>
-            </motion.h2>
-            
-            <motion.p
-              className="text-xs sm:text-sm text-gray-300 leading-relaxed max-w-sm"
-              variants={itemVariants}
-            >
-              Get the best price for your vehicle. List it on Autoria and reach thousands of verified buyers across Kenya. Sell faster, sell smarter.
-            </motion.p>
-
-            {/* Stats */}
-            <motion.div
-              className="flex flex-wrap gap-3 pt-2"
-              variants={containerVariants}
-            >
-              {[
-                { value: "KSh 2.5M+", label: "Avg. Sale Price", icon: "💰" },
-                { value: "4.8★", label: "Seller Rating", icon: "⭐" },
-                { value: "24/7", label: "Support", icon: "🛡️" }
-              ].map((stat, index) => (
-                <motion.div
-                  key={index}
-                  className="text-center lg:text-left"
-                  variants={itemVariants}
-                  whileHover={{ 
-                    scale: 1.05,
-                    y: -2
-                  }}
-                >
-                  <motion.div
-                    className="text-lg font-bold text-white flex items-center gap-1"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ 
-                      delay: 0.8 + index * 0.1, 
-                      type: "spring",
-                      stiffness: 200
-                    }}
-                  >
-                    <span>{stat.icon}</span>
-                    {stat.value}
-                  </motion.div>
-                  <div className="text-gray-400 text-xs">{stat.label}</div>
-                </motion.div>
-              ))}
-            </motion.div>
-
-            {/* CTA Buttons */}
-            <motion.div
-              className="flex flex-col sm:flex-row gap-3 pt-4"
-              variants={itemVariants}
-            >
-              <motion.button
-                className="bg-primary text-white px-6 py-3 rounded-xl font-semibold shadow-lg text-sm flex items-center gap-2"
-                whileHover={{
-                  scale: 1.05,
-                  boxShadow: "0 20px 25px -5px rgba(59, 130, 246, 0.3), 0 10px 10px -5px rgba(59, 130, 246, 0.2)"
-                }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                onClick={() => window.location.href = 'mailto:josiejosiah89@gmail.con'}
-              >
-                <span>List Your Car for Sale</span>
-                <motion.span
-                  animate={{ x: [0, 3, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                >
-                  →
-                </motion.span>
-              </motion.button>
-              <motion.button
-                className="border border-white/50 text-white px-6 py-3 rounded-xl font-semibold text-sm backdrop-blur-sm"
-                whileHover={{
-                  scale: 1.05,
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
-                  borderColor: "white"
-                }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                onClick={() => setShowRequirementsModal(true)}
-              >
-                Learn More
-              </motion.button>
-            </motion.div>
-
-            {/* Trust Indicators */}
-            <motion.div
-              className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-4"
-              variants={containerVariants}
-            >
-              {[
-                { text: "Fair Pricing", icon: "💰" },
-                { text: "Verified Buyers", icon: "✅" },
-                { text: "Secure Transactions", icon: "🔒" }
-              ].map((item, index) => (
-                <motion.div
-                  key={index}
-                  className="flex items-center space-x-1 bg-white/5 rounded-lg px-2 py-1"
-                  variants={itemVariants}
-                  whileHover={{ 
-                    scale: 1.05,
-                    backgroundColor: "rgba(255, 255, 255, 0.1)"
-                  }}
-                >
-                  <span className="text-xs">{item.icon}</span>
-                  <span className="text-gray-400 text-xs">{item.text}</span>
-                </motion.div>
-              ))}
-            </motion.div>
-          </motion.div>
-
-          {/* Image Content */}
-          <motion.div
-            className="lg:col-span-3 relative z-10"
-            variants={imageVariants}
-          >
-            <motion.div
-              className="relative"
-              variants={pulseVariants}
-              animate={isMobile ? undefined : "animate"}
-              style={{ transform: 'translateZ(0)' }}
-            >
-              <img
-                src={'/banner_car_image.png'}
-                alt="Car for Sale on Autoria"
-                className="w-full max-w-2xl mx-auto rounded-lg shadow-2xl"
-              />
-              
-              {/* Animated Floating Elements */}
-              <motion.div
-                className="absolute -top-3 -right-3 w-16 h-16 bg-primary/30 rounded-full blur-xl"
-                variants={floatingVariants}
-                animate={isMobile ? undefined : "animate"}
-                style={{ transform: 'translateZ(0)' }}
-              />
-              <motion.div
-                className="absolute -bottom-3 -left-3 w-20 h-20 bg-blue-500/30 rounded-full blur-xl"
-                variants={floatingVariants}
-                animate={isMobile ? undefined : "animate"}
-                transition={{ delay: 1.5 }}
-                style={{ transform: 'translateZ(0)' }}
-              />
-              
-              {/* Feature Badges */}
-              <motion.div
-                className="absolute top-3 left-3 bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 shadow-lg"
-                initial={{ scale: 0, opacity: 0, rotate: -10 }}
-                animate={{ scale: 1, opacity: 1, rotate: 0 }}
-                transition={{ delay: 1.2, type: "spring", stiffness: 200 }}
-                whileHover={{ scale: 1.1, rotate: 2 }}
-                style={{ transform: 'translateZ(0)' }}
-              >
-                <motion.div
-                  className="text-white text-center"
-                  animate={{ scale: [1, 1.05, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  <div className="text-lg font-bold">95%</div>
-                  <div className="text-xs text-gray-300 mt-1">Sold Rate</div>
-                </motion.div>
-              </motion.div>
-              
-              <motion.div
-                className="absolute bottom-4 right-3 bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 shadow-lg"
-                initial={{ scale: 0, opacity: 0, rotate: 10 }}
-                animate={{ scale: 1, opacity: 1, rotate: 0 }}
-                transition={{ delay: 1.4, type: "spring", stiffness: 200 }}
-                whileHover={{ scale: 1.1, rotate: -2 }}
-                style={{ transform: 'translateZ(0)' }}
-              >
-                <motion.div
-                  className="text-white text-center"
-                  animate={{ scale: [1, 1.05, 1] }}
-                  transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
-                >
-                  <div className="text-lg font-bold">1,200+</div>
-                  <div className="text-xs text-gray-300 mt-1">Cars Sold</div>
-                </motion.div>
-              </motion.div>
-            </motion.div>
-          </motion.div>
-        </div>
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2684FF]/20 to-[#6BCBFF]/10 border border-[#2684FF]/30 flex items-center justify-center text-[#6BCBFF] group-hover:scale-110 group-hover:text-white group-hover:bg-[#2684FF] transition-all duration-300 shadow-[0_0_10px_rgba(38,132,255,0.2)]">
+                <Icon className="w-5 h-5" />
+              </div>
+              <span className="text-sm font-semibold text-[#F5F8FF] group-hover:text-[#6BCBFF] transition-colors">
+                {action.label}
+              </span>
+            </Link>
+          );
+        })}
       </div>
 
-      {/* Background Pattern with Animation */}
+      {/* Featured Banner Card: "Discover Your Next Car" */}
       <motion.div
-        className="absolute inset-0 opacity-10"
-        animate={{
-          opacity: [0.05, 0.1, 0.05],
-        }}
-        transition={{
-          duration: 4,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#0B1D33] via-[#0D2440] to-[#07192F] border border-[rgba(107,203,255,0.22)] shadow-[0_15px_40px_rgba(0,0,0,0.6),0_0_30px_rgba(38,132,255,0.15)]"
       >
-        <div 
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }}
-        />
-      </motion.div>
+        {/* Glow ambient background accents */}
+        <div className="absolute top-0 right-1/4 w-80 h-80 bg-[#2684FF]/15 blur-[90px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-0 left-10 w-60 h-60 bg-[#6BCBFF]/10 blur-[80px] rounded-full pointer-events-none" />
 
-      {/* Animated Gradient Overlay */}
-      <motion.div
-        className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent"
-        animate={isMobile ? {} : {
-          x: ["-100%", "200%", "-100%"],
-        }}
-        transition={{
-          duration: 6,
-          repeat: Infinity,
-          ease: "linear"
-        }}
-        style={{ transform: 'translateZ(0)' }}
-      />
-    </motion.div>
-
-    {/* Requirements Modal */}
-    {showRequirementsModal && (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.9 }}
-          className="bg-white rounded-2xl max-w-md w-full max-h-[80vh] overflow-y-auto"
-        >
-          <div className="p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold text-gray-900">Selling Requirements</h3>
-              <button
-                onClick={() => setShowRequirementsModal(false)}
-                className="text-gray-400 hover:text-gray-600 text-2xl"
-              >
-                ×
-              </button>
+        <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-8 p-6 sm:p-10 lg:p-12 relative z-10">
+          {/* Left Text & CTA */}
+          <div className="lg:col-span-7 space-y-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2684FF]/15 border border-[#2684FF]/35 text-[#6BCBFF] text-xs font-semibold">
+              <FiCheckCircle className="w-3.5 h-3.5" />
+              <span>Certified Autoria Showroom</span>
             </div>
-            <div className="space-y-3 text-gray-700">
-              <p className="text-sm text-gray-600 mb-4">
-                To list your car for sale on our platform, please ensure you meet the following requirements:
-              </p>
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 mt-1">✓</span>
-                  <span>Car must be manufactured in 2000 or later</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 mt-1">✓</span>
-                  <span>Valid registration and current insurance coverage</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 mt-1">✓</span>
-                  <span>Clean title with no outstanding liens or encumbrances</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 mt-1">✓</span>
-                  <span>Vehicle must pass a basic mechanical inspection</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 mt-1">✓</span>
-                  <span>Accurate mileage and condition description required</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 mt-1">✓</span>
-                  <span>Seller must be 18 years or older</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 mt-1">✓</span>
-                  <span>Valid national ID or passport</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 mt-1">✓</span>
-                  <span>Clear, high-quality photos of the vehicle (minimum 4 photos)</span>
-                </li>
-              </ul>
-              <div className="mt-6 pt-4 border-t border-gray-200">
-                <p className="text-xs text-gray-500">
-                  Contact us if you have questions about these requirements or need assistance with the listing process.
-                </p>
+
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
+              Discover Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6BCBFF] to-[#2684FF]">Next Car</span>
+            </h2>
+
+            <p className="text-base text-[#A8B7CC] max-w-xl leading-relaxed">
+              Explore thousands of verified vehicles from certified dealers near you. Transparent pricing, complete inspection reports, and easy financing options.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-4 pt-2">
+              <Link
+                to="/cars"
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-bold text-white bg-gradient-to-r from-[#2684FF] to-[#1255CC] hover:from-[#3B92FF] hover:to-[#1C64E3] shadow-[0_0_25px_rgba(38,132,255,0.5)] transform hover:-translate-y-0.5 transition-all duration-300"
+              >
+                <span>Explore Inventory</span>
+                <FiArrowRight className="w-4 h-4" />
+              </Link>
+              <Link
+                to="/services/buy-a-car"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-sm font-semibold text-[#F5F8FF] bg-[#061426]/60 hover:bg-[#2684FF]/20 border border-[rgba(107,203,255,0.3)] hover:border-[#6BCBFF] transition-all duration-300"
+              >
+                <span>Buyer's Guide</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Right Automotive Photography (Panel 2 Banner Sedan) */}
+          <div className="lg:col-span-5 relative">
+            <div className="relative rounded-2xl overflow-hidden border border-[rgba(107,203,255,0.2)] shadow-2xl group">
+              <img
+                src="/banner_sedan.jpg"
+                alt="Luxury German Sedan"
+                className="w-full h-64 sm:h-72 object-cover object-center transform group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#061426]/80 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs text-white bg-[#061426]/85 backdrop-blur-md px-3.5 py-2 rounded-xl border border-[rgba(107,203,255,0.2)]">
+                <div>
+                  <span className="text-[#A8B7CC] text-[10px] block">Special Spotlight</span>
+                  <span className="font-bold text-[#6BCBFF]">Audi A8 L Quattro</span>
+                </div>
+                <span className="font-extrabold text-white text-sm">Certified</span>
               </div>
             </div>
           </div>
-        </motion.div>
-      </div>
-    )}
-  </>
-  )
-}
+        </div>
+      </motion.div>
+    </section>
+  );
+};
 
-export default Banner
+export default Banner;

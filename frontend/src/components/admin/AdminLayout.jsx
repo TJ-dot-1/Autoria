@@ -254,7 +254,7 @@ const AdminLayout = ({ children }) => {
                     transition-all
                     duration-200
                     ${isActive
-                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
+                      ? 'bg-gradient-to-r from-[#2684FF] to-[#1255CC] text-white shadow-[0_0_18px_rgba(38,132,255,0.35)]'
                       : 'text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]'
                     }
                   `}
@@ -297,7 +297,7 @@ const AdminLayout = ({ children }) => {
                     transition-all
                     duration-200
                     ${isActive
-                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
+                      ? 'bg-gradient-to-r from-[#2684FF] to-[#1255CC] text-white shadow-[0_0_18px_rgba(38,132,255,0.35)]'
                       : 'text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]'
                     }
                   `}
@@ -323,9 +323,9 @@ const AdminLayout = ({ children }) => {
         <div className="p-3 border-t border-[var(--border-color)]">
           <button
             onClick={handleLogout}
-            className="flex items-center w-full px-3 py-2.5 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20 transition-all duration-200 group"
+            className="flex items-center w-full px-3 py-2.5 text-sm font-medium text-red-400 rounded-lg hover:bg-red-500/10 transition-all duration-200 group"
           >
-            <div className="mr-3 text-red-500 group-hover:text-red-600">
+            <div className="mr-3 text-red-400 group-hover:text-red-300">
               <LogoutIcon />
             </div>
             Logout
@@ -337,31 +337,31 @@ const AdminLayout = ({ children }) => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 lg:ml-0">
+      <div className="flex-1 flex flex-col min-w-0 lg:ml-0 overflow-hidden">
         {/* Top Bar */}
-        <div className="bg-[var(--bg-primary)] border-b border-[var(--border-color)] shadow-sm">
-          <div className="flex items-center justify-between h-16 px-6">
+        <div className="bg-[var(--bg-primary)] border-b border-[var(--border-color)] shadow-sm shrink-0">
+          <div className="flex items-center justify-between h-16 px-4 sm:px-6">
             <div className="flex items-center">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="lg:hidden p-2 rounded-md text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-colors mr-4"
+                className="lg:hidden p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-colors mr-3"
               >
                 <MenuIcon />
               </button>
 
-              <div className="hidden sm:block">
-                <h1 className="text-2xl font-bold text-[var(--text-primary)]">
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]">
                   {adminMenuLinks.concat(additionalMenuLinks).find(item => item.path === location.pathname)?.name || 'Dashboard'}
                 </h1>
               </div>
             </div>
 
-            <div className="flex items-center space-x-4">
-               <div className="hidden md:block text-sm text-[var(--text-secondary)]">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+               <div className="hidden md:block text-xs sm:text-sm text-[var(--text-secondary)]">
                   {new Date().toLocaleDateString('en-KE', {
-                    weekday: 'long',
+                    weekday: 'short',
                     year: 'numeric',
-                    month: 'long',
+                    month: 'short',
                     day: 'numeric'
                   })}
                 </div>
@@ -375,7 +375,7 @@ const AdminLayout = ({ children }) => {
                 </button>
                 <Link
                   to="/"
-                  className="flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-sm"
+                  className="flex items-center gap-1.5 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white bg-gradient-to-r from-[#2684FF] to-[#1255CC] rounded-lg hover:from-[#3a93ff] hover:to-[#1a65e0] transition-all duration-200 shadow-[0_0_15px_rgba(38,132,255,0.3)]"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -387,8 +387,8 @@ const AdminLayout = ({ children }) => {
         </div>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-auto bg-[var(--bg-secondary)]">
-          <div className="p-6">
+        <main className="flex-1 overflow-y-auto bg-[var(--bg-secondary)]">
+          <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
             {children}
           </div>
         </main>

@@ -123,40 +123,42 @@ const FAQ = () => {
         </div>
       </motion.div>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-12 max-w-4xl">
         {/* Header */}
         <motion.div
           className="text-center mb-12"
-          initial={{ y: 30, opacity: 0 }}
+          initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          transition={{ duration: 0.5 }}
         >
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Frequently Asked Questions
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2684FF]/10 text-[#6BCBFF] text-xs font-semibold border border-[#2684FF]/30 mb-3">
+            <span>Help Center &amp; Guidance</span>
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-3">
+            Frequently Asked <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6BCBFF] to-[#2684FF]">Questions</span>
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Find answers to common questions about buying and selling cars on Autoria. 
-            Can't find what you're looking for? Contact us directly!
+          <p className="text-sm text-[#A8B7CC] max-w-xl mx-auto">
+            Find answers to common questions about buying, selling, and inspecting vehicles on Autoria.
           </p>
         </motion.div>
 
         {/* Search Bar */}
         <motion.div
-          className="max-w-2xl mx-auto mb-8"
-          initial={{ y: 30, opacity: 0 }}
+          className="max-w-xl mx-auto mb-10"
+          initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
         >
           <div className="relative">
             <input
               type="text"
-              placeholder="Search FAQ..."
+              placeholder="Search FAQ questions..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+              className="w-full px-4 py-3 pl-12 rounded-full text-xs sm:text-sm bg-[#0B1D33]/90 text-white placeholder-[#A8B7CC]/60 border border-[rgba(107,203,255,0.2)] focus:border-[#2684FF] focus:shadow-[0_0_15px_rgba(38,132,255,0.3)] transition-all"
             />
-            <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#6BCBFF]">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
@@ -164,33 +166,27 @@ const FAQ = () => {
         </motion.div>
 
         {/* FAQ List */}
-        <motion.div
-          className="max-w-4xl mx-auto"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
+        <div className="space-y-3">
           <AnimatePresence>
             {filteredFAQs.length > 0 ? (
               filteredFAQs.map((faq, index) => (
-                <motion.div
+                <div
                   key={index}
-                  variants={itemVariants}
-                  className="bg-white rounded-lg shadow-md mb-4 overflow-hidden"
+                  className="rounded-2xl overflow-hidden bg-[#0B1D33]/70 border border-[rgba(107,203,255,0.15)] shadow-md transition-all"
                 >
                   <button
                     onClick={() => toggleAccordion(index)}
-                    className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors"
+                    className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-white/5 transition-colors"
                   >
-                    <h3 className="text-lg font-semibold text-gray-900 pr-4">
+                    <h3 className="text-sm sm:text-base font-bold text-white pr-4">
                       {faq.question}
                     </h3>
                     <motion.div
                       animate={{ rotate: openIndex === index ? 180 : 0 }}
                       transition={{ duration: 0.2 }}
-                      className="flex-shrink-0"
+                      className="flex-shrink-0 text-[#6BCBFF]"
                     >
-                      <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
                     </motion.div>
@@ -201,72 +197,53 @@ const FAQ = () => {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
+                        transition={{ duration: 0.25 }}
                         className="overflow-hidden"
                       >
-                        <div className="px-6 pb-4">
-                          <p className="text-gray-600 leading-relaxed">
+                        <div className="px-6 pb-5 pt-1 border-t border-[rgba(107,203,255,0.08)]">
+                          <p className="text-xs sm:text-sm text-[#A8B7CC] leading-relaxed">
                             {faq.answer}
                           </p>
                         </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
-                </motion.div>
+                </div>
               ))
             ) : (
-              <motion.div
-                className="text-center py-12"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-              >
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No results found</h3>
-                <p className="text-gray-600">Try adjusting your search terms or contact us directly.</p>
-              </motion.div>
+              <div className="text-center py-12 p-8 rounded-3xl bg-[#0B1D33]/60 border border-[rgba(107,203,255,0.15)]">
+                <h3 className="text-base font-bold text-white mb-1">No matching questions found</h3>
+                <p className="text-xs text-[#A8B7CC]">Try searching with a different keyword or contact our support team.</p>
+              </div>
             )}
           </AnimatePresence>
-        </motion.div>
+        </div>
 
-        {/* Contact Section */}
-        <motion.div
-          className="bg-blue-50 rounded-2xl p-8 mt-12 text-center"
-          initial={{ y: 30, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-        >
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">
-            Still have questions?
+        {/* Contact Support Section */}
+        <div className="mt-12 p-8 rounded-3xl bg-gradient-to-r from-[#0B1D33] via-[#0E2644] to-[#0B1D33] border border-[rgba(107,203,255,0.2)] text-center shadow-2xl">
+          <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">
+            Still Have Questions?
           </h3>
-          <p className="text-gray-600 mb-6">
-            Our team is here to help! Contact us directly for personalized assistance.
+          <p className="text-xs sm:text-sm text-[#A8B7CC] mb-6 max-w-lg mx-auto">
+            Our automotive marketplace support team is available 24/7 to assist with inquiries, financing, and paperwork.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <motion.button
-              {...getButtonHoverProps()}
-              onClick={() => window.location.href = 'tel:0706667129'}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <a
+              href="tel:0706667129"
+              className="px-6 py-3 rounded-full text-xs font-bold text-white bg-gradient-to-r from-[#2684FF] to-[#1255CC] shadow-[0_0_20px_rgba(38,132,255,0.4)]"
             >
-              Call Us: 0706667129
-            </motion.button>
-            <motion.button
-              {...getButtonHoverProps()}
-              onClick={() => {
-                const phoneNumber = '0706667129';
-                const message = 'Hi! I have a question about buying/selling a car on Autoria.';
-                const whatsappUrl = `https://wa.me/${phoneNumber.replace(/^0/, '254')}?text=${encodeURIComponent(message)}`;
-                window.open(whatsappUrl, '_blank');
-              }}
-              className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+              Call Specialist: 0706667129
+            </a>
+            <a
+              href="https://wa.me/254706667129?text=Hi!%20I%20have%20a%20question%20about%20Autoria"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-6 py-3 rounded-full text-xs font-semibold text-emerald-300 bg-emerald-500/20 border border-emerald-500/30 hover:bg-emerald-500/30 transition-all"
             >
-              WhatsApp Us
-            </motion.button>
+              WhatsApp Support
+            </a>
           </div>
-        </motion.div>
+        </div>
       </div>
     </motion.div>
   );

@@ -1,69 +1,98 @@
-import React from 'react'
-import { motion } from 'framer-motion'
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { 
+  FiCamera, 
+  FiUsers, 
+  FiDollarSign, 
+  FiShield, 
+  FiTrendingUp, 
+  FiHelpCircle,
+  FiArrowRight,
+  FiCheckCircle
+} from 'react-icons/fi';
+import { useAuth } from '../../contexts/AuthContext';
 
 const SellYourCar = () => {
+  const { isAuthenticated } = useAuth();
+
   const benefits = [
-    { icon: '📸', title: 'Easy Listing', description: 'Upload photos, add details, and publish your listing in minutes.' },
-    { icon: '👥', title: 'Thousands of Buyers', description: 'Reach verified buyers across Kenya looking for vehicles like yours.' },
-    { icon: '💰', title: 'Best Price', description: 'Our market valuation tools help you price your car competitively.' },
-    { icon: '🔒', title: 'Secure Process', description: 'Verified buyer identities and secure payment processing for peace of mind.' },
-    { icon: '📊', title: 'Seller Dashboard', description: 'Track views, inquiries, and manage your listings from one place.' },
-    { icon: '🤝', title: 'Expert Support', description: 'Our team is here to help you every step of the selling process.' },
-  ]
+    { icon: FiCamera, title: 'Effortless Listing', description: 'Upload verified photos, define vehicle specs, and go live in front of active buyers.' },
+    { icon: FiUsers, title: 'Verified Audience', description: 'Reach thousands of serious car buyers and vetted dealerships looking for inventory.' },
+    { icon: FiDollarSign, title: 'Max Market Value', description: 'Our automated market valuation guides help you price for fast and profitable sales.' },
+    { icon: FiShield, title: 'Secure Transactions', description: 'Buyer verification and safe communication channels protect you against fraud.' },
+    { icon: FiTrendingUp, title: 'Seller Analytics', description: 'Track listing impressions, inquiry rates, and buyer engagement live.' },
+    { icon: FiHelpCircle, title: 'Dedicated Support', description: 'Our automotive marketplace specialists are on hand to guide pricing and paperwork.' },
+  ];
 
   return (
-    <motion.div
-      className="min-h-screen bg-[var(--bg-secondary)] py-16 px-4"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
-      <div className="container mx-auto max-w-4xl">
-        <motion.div
-          className="text-center mb-12"
-          initial={{ y: 30, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.6 }}
-        >
-          <span className="text-5xl mb-4 block">💰</span>
-          <h1 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-4">Sell Your Car</h1>
-          <p className="text-xl text-[var(--text-secondary)] max-w-2xl mx-auto">
-            List your vehicle on Kenya's most trusted car marketplace and get the best price.
+    <div className="min-h-screen bg-[#061426] text-[#F5F8FF] pt-28 pb-20 px-4">
+      <div className="max-w-5xl mx-auto">
+        
+        {/* Header */}
+        <div className="text-center max-w-3xl mx-auto mb-12">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2684FF]/10 text-[#6BCBFF] text-xs font-semibold border border-[#2684FF]/30 mb-4">
+            <FiCheckCircle className="w-3.5 h-3.5" />
+            <span>Trusted Seller Platform</span>
+          </div>
+
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight mb-4">
+            Sell Your Car at <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6BCBFF] to-[#2684FF]">Top Value</span>
+          </h1>
+
+          <p className="text-base text-[#A8B7CC] leading-relaxed">
+            Connect with pre-qualified buyers and verified dealerships across the nation. Fast turnaround, transparent escrow, and zero hidden seller fees.
           </p>
-        </motion.div>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-          {benefits.map((item, index) => (
-            <motion.div
-              key={index}
-              className="bg-[var(--bg-primary)] rounded-xl p-6 border border-[var(--border-color)]"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: index * 0.1, duration: 0.5 }}
+        {/* Benefits Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-14">
+          {benefits.map((item, index) => {
+            const Icon = item.icon;
+            return (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.08, duration: 0.5 }}
+                className="p-6 rounded-2xl bg-[#0B1D33]/80 border border-[rgba(107,203,255,0.16)] shadow-lg hover:border-[#6BCBFF]/40 hover:shadow-[0_0_20px_rgba(38,132,255,0.2)] transition-all"
+              >
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#2684FF]/25 to-[#6BCBFF]/10 border border-[#2684FF]/40 text-[#6BCBFF] flex items-center justify-center mb-4 shadow-[0_0_12px_rgba(38,132,255,0.3)]">
+                  <Icon className="w-6 h-6" />
+                </div>
+                <h3 className="text-base font-bold text-white mb-2">{item.title}</h3>
+                <p className="text-xs text-[#A8B7CC] leading-relaxed">{item.description}</p>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* CTA Banner */}
+        <div className="p-8 sm:p-10 rounded-3xl bg-gradient-to-r from-[#0B1D33] via-[#0D2440] to-[#07192F] border border-[rgba(107,203,255,0.22)] shadow-2xl text-center max-w-2xl mx-auto space-y-6">
+          <h2 className="text-2xl font-bold text-white">Ready to list your vehicle?</h2>
+          <p className="text-xs text-[#A8B7CC] max-w-md mx-auto">
+            Submit your car details now or access your dealer portal to manage active inventory.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <Link
+              to={isAuthenticated ? "/admin/add-car" : "/login"}
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-xs font-bold text-white bg-gradient-to-r from-[#2684FF] to-[#1255CC] shadow-[0_0_25px_rgba(38,132,255,0.5)] transform hover:-translate-y-0.5 transition-all"
             >
-              <span className="text-3xl mb-3 block">{item.icon}</span>
-              <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">{item.title}</h3>
-              <p className="text-[var(--text-secondary)] text-sm">{item.description}</p>
-            </motion.div>
-          ))}
+              <span>{isAuthenticated ? "Add Car to Fleet" : "Sign In to List Car"}</span>
+              <FiArrowRight className="w-4 h-4" />
+            </Link>
+            <a
+              href="mailto:contact@autoria.com"
+              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-xs font-semibold text-[#F5F8FF] bg-[#061426] border border-[rgba(107,203,255,0.25)] hover:border-[#6BCBFF] transition-all"
+            >
+              <span>Contact Seller Support</span>
+            </a>
+          </div>
         </div>
 
-        <div className="text-center">
-          <motion.button
-            className="inline-flex items-center px-8 py-4 bg-primary text-white font-semibold rounded-xl hover:bg-primary-dark transition-colors"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => window.location.href = 'mailto:josiejosiah89@gmail.con'}
-          >
-            Start Selling
-            <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </motion.button>
-        </div>
       </div>
-    </motion.div>
-  )
-}
+    </div>
+  );
+};
 
-export default SellYourCar
+export default SellYourCar;

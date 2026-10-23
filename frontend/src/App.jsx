@@ -1,5 +1,6 @@
 import React from 'react'
 import Navbar from './components/Navbar'
+import MobileBottomNav from './components/MobileBottomNav'
 import ScrollToTop from './components/ScrollToTop'
 import { Route, Routes, useNavigate } from 'react-router-dom'
 import Home from './pages/Home'
@@ -129,7 +130,10 @@ const App = () => {
               <Route path="/legal/cookies" element={<CookiePolicy />} />
               <Route path="/legal/legal-notice" element={<LegalNotice />} />
             </Routes>
-            <Footer />
+            <div className="pb-16 md:pb-0">
+              <Footer />
+            </div>
+            <MobileBottomNav />
           </div>
         } />
 

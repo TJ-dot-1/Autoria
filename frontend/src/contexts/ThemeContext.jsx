@@ -18,10 +18,11 @@ export const ThemeProvider = ({ children }) => {
       if (savedTheme) {
         return savedTheme;
       }
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      return prefersDark ? 'dark' : 'light';
+      const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+      // Default to the cinematic dark theme
+      return savedTheme || 'dark';
     }
-    return 'light';
+    return 'dark';
   };
 
   const [theme, setTheme] = useState(getInitialTheme);

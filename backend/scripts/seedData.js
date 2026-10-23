@@ -94,6 +94,8 @@ const sampleCars = [
     },
     isAvailable: true,
     isPopular: true,
+    salePrice: 3250000,
+    isForSale: true,
     mileage: 25000
   },
   {
@@ -105,6 +107,8 @@ const sampleCars = [
     pricePerDay: 55,
     pricePerWeek: 350,
     pricePerMonth: 1400,
+    salePrice: 4200000,
+    isForSale: true,
     fuelType: 'Gasoline',
     transmission: 'Automatic',
     seatingCapacity: 5,
@@ -158,6 +162,8 @@ const sampleCars = [
     pricePerDay: 75,
     pricePerWeek: 450,
     pricePerMonth: 1800,
+    salePrice: 5800000,
+    isForSale: true,
     fuelType: 'Electric',
     transmission: 'Automatic',
     seatingCapacity: 5,
@@ -171,26 +177,26 @@ const sampleCars = [
       zipCode: '10002',
       country: 'USA'
     },
-    features: ['GPS Navigation', 'Bluetooth', 'USB Port', 'Backup Camera', 'Air Conditioning', 'Premium Audio', 'Wireless Charging'],
+    features: ['GPS Navigation', 'Bluetooth', 'USB Port', 'Backup Camera', 'Air Conditioning', 'Premium Audio', 'Wireless Charging', 'Keyless Entry'],
     images: [{
       url: '/uploads/cars/car-1763066334737-745166483.jpg',
       caption: 'Tesla Model 3 Front View',
       isPrimary: true
     }],
     color: {
-      exterior: 'Red',
+      exterior: 'Midnight Blue',
       interior: 'Black'
     },
     engine: {
       type: 'Electric Motor',
-      power: 283,
-      torque: 317
+      power: 346,
+      torque: 389
     },
     performance: {
       acceleration: {
-        zeroToSixty: 5.8
+        zeroToSixty: 4.4
       },
-      topSpeed: 140,
+      topSpeed: 233,
       fuelEconomy: {
         city: 134,
         highway: 126,
@@ -198,18 +204,20 @@ const sampleCars = [
       }
     },
     isAvailable: true,
-    isPopular: false,
+    isPopular: true,
     mileage: 8000
   },
   {
     brand: 'BMW',
     model: 'X5',
-    year: 2022,
-    category: 'Luxury',
+    year: 2024,
+    category: 'SUV',
     type: 'SUV',
     pricePerDay: 95,
     pricePerWeek: 600,
     pricePerMonth: 2400,
+    salePrice: 8500000,
+    isForSale: true,
     fuelType: 'Gasoline',
     transmission: 'Automatic',
     seatingCapacity: 7,
@@ -223,7 +231,7 @@ const sampleCars = [
       zipCode: '10003',
       country: 'USA'
     },
-    features: ['GPS Navigation', 'Bluetooth', 'USB Port', 'Backup Camera', 'Air Conditioning', 'Premium Audio', 'Leather Seats', 'Heated Seats'],
+    features: ['GPS Navigation', 'Bluetooth', 'USB Port', 'Backup Camera', 'Air Conditioning', 'Premium Audio', 'Leather Seats', 'Heated Seats', 'Sunroof'],
     images: [{
       url: '/uploads/cars/car-1763066446008-378204993.jpg',
       caption: 'BMW X5 Side View',
@@ -236,14 +244,14 @@ const sampleCars = [
     engine: {
       type: 'V6',
       displacement: 3.0,
-      power: 335,
-      torque: 330
+      power: 375,
+      torque: 398
     },
     performance: {
       acceleration: {
         zeroToSixty: 5.3
       },
-      topSpeed: 130,
+      topSpeed: 243,
       fuelEconomy: {
         city: 23,
         highway: 29,
@@ -252,17 +260,129 @@ const sampleCars = [
     },
     isAvailable: true,
     isPopular: true,
-    mileage: 20000
+    mileage: 14000
+  },
+  {
+    brand: 'Audi',
+    model: 'A6',
+    year: 2023,
+    category: 'Luxury',
+    type: 'Sedan',
+    pricePerDay: 80,
+    pricePerWeek: 500,
+    pricePerMonth: 2100,
+    salePrice: 6300000,
+    isForSale: true,
+    fuelType: 'Gasoline',
+    transmission: 'Automatic',
+    seatingCapacity: 5,
+    doors: 4,
+    luggageCapacity: 3,
+    location: 'Metro Branch',
+    address: {
+      street: '500 Central Park',
+      city: 'New York',
+      state: 'NY',
+      zipCode: '10019',
+      country: 'USA'
+    },
+    features: ['GPS Navigation', 'Bluetooth', 'USB Port', 'Backup Camera', 'Air Conditioning', 'Premium Audio', 'Apple CarPlay', 'Leather Seats'],
+    images: [{
+      url: '/uploads/cars/audi_a6.jpg',
+      caption: 'Audi A6 Studio View',
+      isPrimary: true
+    }],
+    color: {
+      exterior: 'Silver',
+      interior: 'Black'
+    },
+    engine: {
+      type: 'V6',
+      displacement: 3.0,
+      power: 335,
+      torque: 369
+    },
+    performance: {
+      acceleration: {
+        zeroToSixty: 5.1
+      },
+      topSpeed: 250,
+      fuelEconomy: {
+        city: 24,
+        highway: 31,
+        combined: 27
+      }
+    },
+    isAvailable: true,
+    isPopular: true,
+    mileage: 18500
+  },
+  {
+    brand: 'Mercedes-Benz',
+    model: 'C-Class',
+    year: 2023,
+    category: 'Luxury',
+    type: 'Sedan',
+    pricePerDay: 85,
+    pricePerWeek: 540,
+    pricePerMonth: 2200,
+    salePrice: 5900000,
+    isForSale: true,
+    fuelType: 'Gasoline',
+    transmission: 'Automatic',
+    seatingCapacity: 5,
+    doors: 4,
+    luggageCapacity: 3,
+    location: 'Eastside Showroom',
+    address: {
+      street: '880 Madison Ave',
+      city: 'New York',
+      state: 'NY',
+      zipCode: '10021',
+      country: 'USA'
+    },
+    features: ['GPS Navigation', 'Bluetooth', 'USB Port', 'Backup Camera', 'Air Conditioning', 'Wireless Charging', 'Apple CarPlay', 'Android Auto', 'Keyless Entry'],
+    images: [{
+      url: '/uploads/cars/mercedes_c_class.jpg',
+      caption: 'Mercedes C-Class Studio View',
+      isPrimary: true
+    }],
+    color: {
+      exterior: 'Ice Blue',
+      interior: 'Black'
+    },
+    engine: {
+      type: 'V4',
+      displacement: 2.0,
+      power: 255,
+      torque: 295
+    },
+    performance: {
+      acceleration: {
+        zeroToSixty: 5.9
+      },
+      topSpeed: 240,
+      fuelEconomy: {
+        city: 25,
+        highway: 35,
+        combined: 29
+      }
+    },
+    isAvailable: true,
+    isPopular: true,
+    mileage: 11000
   },
   {
     brand: 'Ford',
-    model: 'Mustang',
+    model: 'Mustang GT',
     year: 2023,
     category: 'Sports',
     type: 'Coupe',
     pricePerDay: 85,
     pricePerWeek: 520,
     pricePerMonth: 2000,
+    salePrice: 7200000,
+    isForSale: true,
     fuelType: 'Gasoline',
     transmission: 'Automatic',
     seatingCapacity: 4,
@@ -296,7 +416,7 @@ const sampleCars = [
       acceleration: {
         zeroToSixty: 4.2
       },
-      topSpeed: 155,
+      topSpeed: 250,
       fuelEconomy: {
         city: 16,
         highway: 25,

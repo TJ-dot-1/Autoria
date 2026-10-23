@@ -1,61 +1,60 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { FaFacebookF, FaInstagram, FaTwitter, FaGooglePlay, FaApple } from "react-icons/fa";
+import { FiArrowUpRight, FiShield } from "react-icons/fi";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
-  // Social Media Icons
   const socialLinks = [
-    { name: "Facebook", icon: <FaFacebookF className="w-5 h-5" />, url: "https://facebook.com" },
-    { name: "Twitter", icon: <FaTwitter className="w-5 h-5" />, url: "https://twitter.com" },
-    { name: "Instagram", icon: <FaInstagram className="w-5 h-5" />, url: "https://instagram.com" },
+    { name: "Facebook", icon: <FaFacebookF className="w-4 h-4" />, url: "https://facebook.com" },
+    { name: "Twitter", icon: <FaTwitter className="w-4 h-4" />, url: "https://twitter.com" },
+    { name: "Instagram", icon: <FaInstagram className="w-4 h-4" />, url: "https://instagram.com" },
   ];
 
-  // App Store Buttons (No assets, fully UI-based)
   const appStores = [
     { 
       name: "Google Play", 
-      icon: <FaGooglePlay className="w-6 h-6" />,
+      icon: <FaGooglePlay className="w-5 h-5" />,
       url: "https://play.google.com"
     },
     { 
       name: "App Store", 
-      icon: <FaApple className="w-6 h-6" />,
+      icon: <FaApple className="w-5 h-5" />,
       url: "https://apple.com/app-store"
     },
   ];
 
-  // Footer Sections
   const footerSections = {
     company: {
       title: "Company",
       links: [
+        { name: "About Us", path: "/about" },
         { name: "Careers", path: "/careers" },
-        { name: "Press", path: "/press" },
-        { name: "Blog", path: "/blog" },
+        { name: "Press & Media", path: "/press" },
+        { name: "Automotive Blog", path: "/blog" },
       ],
     },
-    services: {
-      title: "Services",
+    marketplace: {
+      title: "Marketplace",
       links: [
-        { name: "Buy a Car", path: "/services/buy-a-car" },
-        { name: "Sell Your Car", path: "/services/sell-your-car" },
-        { name: "Car Financing", path: "/services/car-financing" },
+        { name: "Browse Inventory", path: "/cars" },
+        { name: "Sell Your Vehicle", path: "/services/sell-your-car" },
+        { name: "Financing Plans", path: "/services/car-financing" },
         { name: "Vehicle Inspection", path: "/services/vehicle-inspection" },
       ],
     },
     support: {
-      title: "Support",
+      title: "Customer Support",
       links: [
         { name: "Help Center", path: "/support/help-center" },
-        { name: "Contact Us", path: "/support/contact" },
+        { name: "Contact Dealers", path: "/contact" },
         { name: "FAQ", path: "/faq" },
-        { name: "Insurance Info", path: "/support/insurance-info" },
+        { name: "Insurance Coverage", path: "/support/insurance-info" },
       ],
     },
     legal: {
-      title: "Legal",
+      title: "Legal & Trust",
       links: [
         { name: "Terms of Service", path: "/legal/terms" },
         { name: "Privacy Policy", path: "/legal/privacy" },
@@ -66,124 +65,81 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-[var(--bg-primary)] border-t border-[var(--border-color)]">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-6 gap-8">
+    <footer className="bg-[#040E1B] border-t border-[rgba(107,203,255,0.12)] text-[#A8B7CC]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-10">
           
           {/* Brand Section */}
-          <div className="lg:col-span-2">
-            <Link to="/" className="flex items-center mb-6">
-              <div className="h-8 w-8 rounded-lg border border-[var(--border-color)] bg-white shadow-sm">
-                <img src="/auto.png" alt="Autoria Logo" className="h-full w-full rounded-lg object-contain p-1" />
+          <div className="lg:col-span-2 space-y-4">
+            <Link to="/" className="flex items-center gap-3 group">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2684FF]/25 to-[#6BCBFF]/10 border border-[#2684FF]/40 p-2 flex items-center justify-center shadow-[0_0_15px_rgba(38,132,255,0.3)]">
+                <img src="/auto.png" alt="Autoria Logo" className="w-full h-full object-contain filter drop-shadow" />
               </div>
-              <span className="ml-3 text-2xl font-bold text-[var(--text-primary)]">Autoria</span>
+              <div className="flex flex-col">
+                <span className="text-xl font-black text-white tracking-tight group-hover:text-[#6BCBFF] transition-colors">
+                  Autoria
+                </span>
+                <span className="text-[10px] uppercase tracking-widest text-[#6BCBFF]/80 font-bold -mt-1">
+                  Motors
+                </span>
+              </div>
             </Link>
 
-            <p className="text-[var(--text-secondary)] mb-6">
-              Your trusted partner for buying and selling cars in Kenya. Discover quality vehicles, connect with verified sellers, and enjoy a seamless car buying experience.
+            <p className="text-xs text-[#A8B7CC] leading-relaxed max-w-sm">
+              The premier cinematic automotive marketplace. Connecting passionate buyers and verified dealerships with total transparency, verified paperwork, and effortless financing.
             </p>
 
-            {/* Social Icons */}
-            <div className="flex space-x-4 mb-6">
-              {socialLinks.map((social, i) => (
+            {/* Social Links */}
+            <div className="flex items-center gap-2 pt-2">
+              {socialLinks.map((social) => (
                 <a
-                  key={i}
+                  key={social.name}
                   href={social.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition shadow-sm text-[var(--text-primary)]"
+                  className="w-9 h-9 rounded-xl bg-[#0B1D33] hover:bg-[#2684FF] text-[#A8B7CC] hover:text-white border border-[rgba(107,203,255,0.15)] hover:border-[#6BCBFF] flex items-center justify-center transition-all duration-300 shadow"
                 >
                   {social.icon}
                 </a>
               ))}
             </div>
-
-            {/* App Store Buttons */}
-            <div className="flex space-x-3">
-              {appStores.map((store, i) => (
-                <a
-                  key={i}
-                  href={store.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center space-x-2 border bg-[var(--bg-primary)] border-[var(--border-color)] px-3 py-2 rounded-lg hover:bg-primary hover:text-white transition shadow-sm text-[var(--text-primary)]"
-                >
-                  {store.icon}
-                  <span className="text-sm font-medium">{store.name}</span>
-                </a>
-              ))}
-            </div>
           </div>
 
-          {/* Footer Sections */}
-          <div className="lg:col-span-4 grid grid-cols-2 md:grid-cols-4 gap-8">
-            {Object.values(footerSections).map((section, i) => (
-              <div key={i}>
-                <h3 className="font-semibold text-lg mb-4 text-[var(--text-primary)]">{section.title}</h3>
-                <ul className="space-y-3">
-                  {section.links.map((link, index) => (
-                    <li key={index}>
-                      <Link className="text-[var(--text-secondary)] hover:text-primary" to={link.path}>
-                        {link.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+          {/* Links Columns */}
+          {Object.entries(footerSections).map(([key, section]) => (
+            <div key={key} className="space-y-3">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-white">
+                {section.title}
+              </h4>
+              <ul className="space-y-2 text-xs">
+                {section.links.map((link) => (
+                  <li key={link.name}>
+                    <Link
+                      to={link.path}
+                      className="text-[#A8B7CC] hover:text-[#6BCBFF] transition-colors flex items-center gap-1 group"
+                    >
+                      <span>{link.name}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="mt-12 pt-8 border-t border-[rgba(107,203,255,0.08)] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#6B7D96]">
+          <p>© {currentYear} Autoria Motors Inc. All rights reserved.</p>
+          <div className="flex items-center gap-4">
+            <span className="flex items-center gap-1.5 text-[#6BCBFF]">
+              <FiShield className="w-3.5 h-3.5" />
+              Verified Automotive Platform
+            </span>
           </div>
         </div>
 
-        {/* Newsletter */}
-        <div className="border-t border-[var(--border-color)] mt-12 pt-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-            <div>
-              <h3 className="text-xl font-semibold text-[var(--text-primary)]">Stay Updated</h3>
-              <p className="text-[var(--text-secondary)]">Subscribe to our newsletter for the latest car listings and market trends.</p>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 px-4 py-3 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] focus:ring-primary text-[var(--text-primary)]"
-              />
-              <button className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-dark">Subscribe</button>
-            </div>
-          </div>
-        </div>
       </div>
-
-      {/* Bottom bar */}
-      <div className="border-t border-[var(--border-color)] bg-[var(--bg-secondary)]">
-        <div className="container mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center">
-          <div className="text-[var(--text-secondary)] text-sm">© {currentYear} Autoria. All rights reserved.</div>
-
-          <div className="flex items-center space-x-6 text-sm text-[var(--text-secondary)]">
-            <span>Accepted Payment:</span>
-            <div className="flex space-x-2">
-              <span className="w-8 h-5 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded flex items-center justify-center text-xs text-[var(--text-primary)]">Visa</span>
-              <span className="w-8 h-5 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded flex items-center justify-center text-xs text-[var(--text-primary)]">MC</span>
-              <span className="w-8 h-5 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded flex items-center justify-center text-xs text-[var(--text-primary)]">PP</span>
-            </div>
-          </div>
-
-          <select className="border border-[var(--border-color)] bg-[var(--bg-primary)] text-[var(--text-primary)] px-2 py-1 rounded text-sm">
-            <option>English</option>
-            <option>Kiswahili</option>
-            <option>French</option>
-            <option>German</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Back to Top */}
-      <button
-        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        className="fixed bottom-6 right-6 bg-primary text-white p-3 rounded-full shadow-lg hover:bg-primary-dark"
-      >
-        ↑
-      </button>
     </footer>
   );
 };

@@ -99,7 +99,7 @@
 /* Common Admin Responsive Classes */
 .admin-container {
   width: 100%;
-  padding: 1rem;
+  padding: 0;
 }
 
 .admin-header {

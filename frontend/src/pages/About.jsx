@@ -130,11 +130,11 @@ const About = () => {
             </motion.div>
 
             <motion.div variants={itemVariants} className="relative">
-              <div className="aspect-square bg-white rounded-2xl flex items-center justify-center p-8">
+              <div className="aspect-square bg-[#0B1D33] rounded-3xl flex items-center justify-center p-8 border border-[rgba(107,203,255,0.2)] shadow-[0_0_30px_rgba(38,132,255,0.2)]">
                 <img
                   src="/auto.png"
                   alt="Autoria Logo"
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain filter drop-shadow"
                 />
               </div>
             </motion.div>

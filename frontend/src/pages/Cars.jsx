@@ -1,511 +1,388 @@
-import React, { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { useSearchParams } from 'react-router-dom'
-import Title from '../components/Title'
-import CarCard from './CarCard'
-import { carsAPI } from '../utils/api'
+import React, { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useSearchParams, Link } from 'react-router-dom';
+import CarCard from './CarCard';
+import { carsAPI } from '../utils/api';
+import { 
+  FiSearch, 
+  FiSliders, 
+  FiX, 
+  FiGrid, 
+  FiList, 
+  FiChevronDown, 
+  FiRotateCcw,
+  FiFilter
+} from 'react-icons/fi';
 
 const Cars = () => {
-  const [searchParams] = useSearchParams()
-  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '')
-  const [sortBy, setSortBy] = useState('featured')
-  const [cars, setCars] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [isMobile, setIsMobile] = useState(false)
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'All');
+  const [selectedBrand, setSelectedBrand] = useState(searchParams.get('brand') || 'All');
+  const [selectedFuel, setSelectedFuel] = useState('All');
+  const [selectedCondition, setSelectedCondition] = useState(searchParams.get('condition') || 'All');
+  const [sortBy, setSortBy] = useState('popular');
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'horizontal'
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
+  const [cars, setCars] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Sync with URL query parameter changes
+  useEffect(() => {
+    const q = searchParams.get('q');
+    if (q !== null && q !== searchQuery) {
+      setSearchQuery(q);
+    }
+    const cat = searchParams.get('category');
+    if (cat && cat !== selectedCategory) {
+      setSelectedCategory(cat);
+    }
+    const cond = searchParams.get('condition');
+    if (cond && cond !== selectedCondition) {
+      setSelectedCondition(cond);
+    }
+  }, [searchParams]);
+
+  // Fetch cars from API
   const fetchCars = async () => {
     try {
-      setLoading(true)
-      
-      // Build API parameters
-      const params = {
-        limit: 50, // Get more cars for client-side sorting
-        ...(searchQuery && { search: searchQuery }),
-        ...(sortBy === 'price-low' && { sort: 'price', order: 'asc' }),
-        ...(sortBy === 'price-high' && { sort: 'price', order: 'desc' }),
-        ...(sortBy === 'year-new' && { sort: 'year', order: 'desc' }),
-        ...(sortBy === 'year-old' && { sort: 'year', order: 'asc' })
-      }
-      
-      const response = await carsAPI.getAll(params)
-      setCars(response.data || [])
-      setError(null)
+      setLoading(true);
+      setError(null);
+      const params = { limit: 50 };
+      const response = await carsAPI.getAll(params);
+      setCars(response.data || []);
     } catch (err) {
-      setError(err.message || 'Failed to fetch cars')
-      console.error('Fetch cars error:', err)
+      console.error('Fetch cars error:', err);
+      setError(err.message || 'Failed to fetch inventory');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  // Initial fetch
   useEffect(() => {
-    fetchCars()
-  }, [])
+    fetchCars();
+  }, []);
 
-  // Mobile detection
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768)
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
+  // Category filter tabs matching AutoHub Panel 4
+  const categoryTabs = ['All', 'SUV', 'Sedan', 'Hatchback', 'Coupe', 'Electric'];
 
-  // Fetch cars when search query or sort changes
-  useEffect(() => {
-    const debounceTimer = setTimeout(() => {
-      fetchCars()
-    }, 300) // Debounce search input
+  // Extract unique brands from real inventory
+  const availableBrands = useMemo(() => {
+    const brands = new Set(cars.map(c => c.brand).filter(Boolean));
+    return ['All', ...Array.from(brands)];
+  }, [cars]);
 
-    return () => clearTimeout(debounceTimer)
-  }, [searchQuery, sortBy])
-
-  // Remove client-side filtering since we're doing it server-side now
-  const sortedCars = cars
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: isMobile ? 0.02 : 0.1,
-        delayChildren: isMobile ? 0.05 : 0.1
+  // Filter & Sort cars client-side for immediate responsiveness
+  const filteredCars = useMemo(() => {
+    return cars.filter(car => {
+      // Search query (brand, model, category, features)
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        const matchesBrand = car.brand?.toLowerCase().includes(query);
+        const matchesModel = car.model?.toLowerCase().includes(query);
+        const matchesType = car.type?.toLowerCase().includes(query);
+        const matchesCategory = car.category?.toLowerCase().includes(query);
+        const matchesLocation = car.location?.toLowerCase().includes(query);
+        if (!matchesBrand && !matchesModel && !matchesType && !matchesCategory && !matchesLocation) {
+          return false;
+        }
       }
-    }
-  };
 
-  const itemVariants = {
-    hidden: { y: 30, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: isMobile ? 0.3 : 0.6,
-        ease: "easeOut"
+      // Category tab filter
+      if (selectedCategory !== 'All') {
+        const cat = selectedCategory.toLowerCase();
+        const matchesType = car.type?.toLowerCase() === cat;
+        const matchesCategory = car.category?.toLowerCase().includes(cat);
+        if (!matchesType && !matchesCategory) return false;
       }
-    }
-  };
 
-  const cardVariants = {
-    hidden: {
-      y: isMobile ? 30 : 60,
-      opacity: 0,
-      scale: isMobile ? 1 : 0.9
-    },
-    visible: {
-      y: 0,
-      opacity: 1,
-      scale: 1,
-      transition: {
-        duration: isMobile ? 0.4 : 0.8,
-        ease: "easeOut"
+      // Brand dropdown filter
+      if (selectedBrand !== 'All') {
+        if (car.brand?.toLowerCase() !== selectedBrand.toLowerCase()) return false;
       }
-    }
+
+      // Fuel dropdown filter
+      if (selectedFuel !== 'All') {
+        if (car.fuelType?.toLowerCase() !== selectedFuel.toLowerCase()) return false;
+      }
+
+      // Condition filter
+      if (selectedCondition !== 'All') {
+        if (car.condition?.toLowerCase() !== selectedCondition.toLowerCase()) return false;
+      }
+
+      return true;
+    }).sort((a, b) => {
+      const priceA = a.salePrice || a.pricePerDay || a.price || 0;
+      const priceB = b.salePrice || b.pricePerDay || b.price || 0;
+
+      if (sortBy === 'price-low') return priceA - priceB;
+      if (sortBy === 'price-high') return priceB - priceA;
+      if (sortBy === 'year-new') return (b.year || 0) - (a.year || 0);
+      if (sortBy === 'year-old') return (a.year || 0) - (b.year || 0);
+      // 'popular'
+      return (b.isPopular ? 1 : 0) - (a.isPopular ? 1 : 0);
+    });
+  }, [cars, searchQuery, selectedCategory, selectedBrand, selectedFuel, selectedCondition, sortBy]);
+
+  // Clear all filters
+  const resetAllFilters = () => {
+    setSearchQuery('');
+    setSelectedCategory('All');
+    setSelectedBrand('All');
+    setSelectedFuel('All');
+    setSelectedCondition('All');
+    setSortBy('popular');
+    setSearchParams({});
   };
 
-  const filterVariants = {
-    inactive: {
-      scale: 1,
-      backgroundColor: "#f3f4f6",
-      color: "#374151"
-    },
-    active: {
-      scale: 1.05,
-      backgroundColor: "var(--color-primary)",
-      color: "white"
-    },
-    hover: {
-      scale: 1.02,
-      backgroundColor: "#e5e7eb",
-      transition: { duration: 0.2 }
-    }
-  };
-
-  const buttonVariants = {
-    hover: {
-      scale: 1.05,
-      y: -2,
-      boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
-      transition: { duration: 0.3 }
-    },
-    tap: {
-      scale: 0.95,
-      transition: { duration: 0.1 }
-    }
-  };
-
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value)
-  }
-
-  const handleCategoryClick = (category) => {
-    setSearchQuery(category === 'All' ? '' : category)
-  }
-
-  const clearSearch = () => {
-    setSearchQuery('')
-  }
-
-  if (loading) {
-    return (
-      <motion.div
-        className="min-h-screen flex items-center justify-center"
-        style={{ backgroundColor: 'var(--bg-primary)' }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <motion.div
-          className="text-center"
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.6 }}
-        >
-          <motion.div
-            className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          />
-          <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>Loading cars...</p>
-        </motion.div>
-      </motion.div>
-    )
-  }
+  const hasActiveFilters = searchQuery || selectedCategory !== 'All' || selectedBrand !== 'All' || selectedFuel !== 'All' || selectedCondition !== 'All';
 
   return (
-    <motion.div
-      className="min-h-screen"
-      style={{ backgroundColor: 'var(--bg-primary)' }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
-      <div className="container mx-auto px-4 py-4 md:py-8">
-        <motion.div
-          initial={{ y: -50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-        >
-          <Title
-            title="Available Cars"
-            subtitle="Browse Our Premium Collection of Luxury and Economy Vehicles"
-            className="px-4"
-          />
-        </motion.div>
+    <div className="min-h-screen bg-[#061426] text-[#F5F8FF] pt-24 pb-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Header Title Section (AutoHub Panel 4 Style) */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2684FF]/10 border border-[#2684FF]/30 text-[#6BCBFF] text-xs font-semibold mb-2">
+              <FiFilter className="w-3.5 h-3.5" />
+              <span>Explore Marketplace</span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+              Find Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6BCBFF] to-[#2684FF]">Car</span>
+            </h1>
+          </div>
 
-        {/* Search and Filter Section */}
-        <motion.div
-          className="rounded-2xl shadow-sm p-6 mb-8"
-          style={{ backgroundColor: 'var(--bg-primary)', border: '1px solid var(--border-color)' }}
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-        >
-          <motion.div
-            className="flex flex-col lg:flex-row gap-6 items-center justify-between"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {/* Search Bar */}
-            <motion.div
-              className="flex-1 w-full max-w-2xl"
-              variants={itemVariants}
-            >
-              <div className="relative">
-                <motion.div
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2"
-                  whileHover={{ scale: 1.1 }}
-                >
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </motion.div>
-                <motion.input
-                  type="text"
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                  placeholder="Search by model, make, or features (e.g., SUV, GPS, Bluetooth)"
-                  className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
-                  whileFocus={{
-                    scale: 1.02,
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.1)"
-                  }}
-                />
-                {searchQuery && (
-                  <motion.button
-                    onClick={clearSearch}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </motion.button>
-                )}
-              </div>
-            </motion.div>
-
-            {/* Sort Dropdown */}
-            <motion.div
-              className="w-full lg:w-auto"
-              variants={itemVariants}
-            >
-              <motion.select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="w-full lg:w-48 px-4 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white appearance-none cursor-pointer"
-                whileFocus={{
-                  scale: 1.02,
-                  boxShadow: "0 4px 20px rgba(0,0,0,0.1)"
-                }}
-              >
-                <option value="featured">Featured</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="year-new">Year: Newest First</option>
-                <option value="year-old">Year: Oldest First</option>
-              </motion.select>
-            </motion.div>
-          </motion.div>
-
-          {/* Results Count and Quick Filters */}
-          <motion.div
-            className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mt-6 pt-6 border-t border-gray-100"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
-          >
-            <motion.div
-              className="flex items-center space-x-4"
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              <motion.p
-                className="font-medium"
-                style={{ color: 'var(--text-primary)' }}
-                variants={itemVariants}
-              >
-                Showing <motion.span
-                  className="text-primary font-bold inline-block"
-                  animate={{
-                    scale: [1, 1.1, 1],
-                    color: ["#374151", "var(--color-primary)", "#374151"]
-                  }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {sortedCars.length}
-                </motion.span>
-                {sortedCars.length === 1 ? ' Car' : ' Cars'}
-                {searchQuery && (
-                  <motion.span
-                    className="text-gray-500 ml-2"
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                  >
-                    for "<span className="font-medium">{searchQuery}</span>"
-                  </motion.span>
-                )}
-              </motion.p>
-            </motion.div>
-
-            {/* Quick Category Filters */}
-            <motion.div
-              className="flex flex-wrap gap-2"
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              {['All', 'SUV', 'Sedan', 'Luxury', 'Electric', 'Sports'].map((category, index) => (
-                <motion.button
-                  key={category}
-                  onClick={() => handleCategoryClick(category)}
-                  className="px-4 py-2 rounded-lg text-sm font-medium relative overflow-hidden"
-                  variants={filterVariants}
-                  initial="inactive"
-                  animate={
-                    (category === 'All' && !searchQuery) ||
-                    (category !== 'All' && searchQuery.toLowerCase() === category.toLowerCase())
-                      ? "active"
-                      : "inactive"
-                  }
-                  whileHover="hover"
-                  transition={{ delay: index * 0.05 }}
-                >
-                  {category}
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0"
-                    whileHover={{
-                      opacity: [0, 0.2, 0],
-                      x: ["-100%", "100%"]
-                    }}
-                    transition={{ duration: 0.6 }}
-                  />
-                </motion.button>
-              ))}
-            </motion.div>
-          </motion.div>
-
-          {/* Error Message */}
-          {error && (
-            <motion.div
-              className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              {error}
-            </motion.div>
-          )}
-
-        </motion.div>
-
-        {/* Cars Grid */}
-        {sortedCars.length > 0 ? (
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12"
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.1 }}
-          >
-            {sortedCars.map((car, index) => (
-              <motion.div
-                key={car._id || car.id}
-                variants={cardVariants}
-                custom={index}
-              >
-                <CarCard car={car} isMobile={isMobile} />
-              </motion.div>
-            ))}
-          </motion.div>
-        ) : (
-          /* Empty State */
-          <motion.div
-            className="text-center py-16 rounded-2xl shadow-sm"
-            style={{ backgroundColor: 'var(--bg-primary)', border: '1px solid var(--border-color)' }}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
-          >
-            <motion.div
-              className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6"
-              style={{ backgroundColor: 'var(--bg-secondary)' }}
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-            >
-              <motion.svg
-                className="w-12 h-12 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                animate={{
-                  scale: [1, 1.1, 1],
-                  rotate: [0, 5, -5, 0]
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 16l2.879-2.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </motion.svg>
-            </motion.div>
-            <motion.h3
-              className="text-2xl font-bold mb-3"
-              style={{ color: 'var(--text-primary)' }}
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
-              No Cars Found
-            </motion.h3>
-            <motion.p
-              className="max-w-md mx-auto mb-6"
-              style={{ color: 'var(--text-secondary)' }}
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.4 }}
-            >
-              {searchQuery 
-                ? `We couldn't find any cars matching "${searchQuery}". Try adjusting your search terms or browse different categories.`
-                : "We couldn't find any cars at the moment. Please check back later."
-              }
-            </motion.p>
+          {/* Search Input Bar */}
+          <div className="relative w-full md:w-80">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search make, model, city..."
+              className="w-full pl-10 pr-10 py-2.5 rounded-full text-xs font-medium bg-[#0B1D33]/90 text-white placeholder-[#A8B7CC]/60 border border-[rgba(107,203,255,0.2)] focus:border-[#2684FF] focus:shadow-[0_0_15px_rgba(38,132,255,0.3)] transition-all"
+            />
+            <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6BCBFF] w-4 h-4" />
             {searchQuery && (
-              <motion.button
-                onClick={clearSearch}
-                className="bg-primary text-white px-6 py-3 rounded-lg font-semibold relative overflow-hidden"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                variants={buttonVariants}
-                whileHover="hover"
-                whileTap="tap"
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#A8B7CC] hover:text-white"
               >
-                <span className="relative z-10">Clear Search</span>
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0"
-                  whileHover={{
-                    opacity: [0, 0.3, 0],
-                    x: ["-100%", "100%"]
-                  }}
-                  transition={{ duration: 0.6 }}
-                />
-              </motion.button>
+                <FiX className="w-4 h-4" />
+              </button>
             )}
-          </motion.div>
-        )}
+          </div>
+        </div>
 
-        {/* Load More Button (if needed) */}
-        {sortedCars.length > 0 && (
-          <motion.div
-            className="text-center"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.6 }}
-          >
-            <motion.button
-              className="inline-flex items-center gap-3 px-8 py-4 border-2 border-primary text-primary font-semibold rounded-xl relative overflow-hidden"
-              variants={buttonVariants}
-              whileHover="hover"
-              whileTap="tap"
-            >
-              <span className="relative z-10">Load More Cars</span>
-              <motion.svg
-                className="w-5 h-5 relative z-10"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                animate={{
-                  y: [0, 2, 0]
-                }}
-                transition={{
-                  duration: 1.5,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
+        {/* Category Pill Tabs (AutoHub Panel 4 Style) */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-6 no-scrollbar">
+          {categoryTabs.map((category) => {
+            const isActive = selectedCategory.toLowerCase() === category.toLowerCase();
+            return (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`px-5 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-200 ${
+                  isActive
+                    ? 'bg-[#2684FF] text-white shadow-[0_0_16px_rgba(38,132,255,0.6)] border border-[#6BCBFF]'
+                    : 'bg-[#0B1D33]/70 hover:bg-[#0B1D33] text-[#A8B7CC] hover:text-[#F5F8FF] border border-[rgba(107,203,255,0.15)] hover:border-[#6BCBFF]/40'
+                }`}
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </motion.svg>
-              <motion.div
-                className="absolute inset-0 bg-primary"
-                initial={{ x: "-100%" }}
-                whileHover={{ x: 0 }}
-                transition={{ duration: 0.3 }}
-              />
-            </motion.button>
-          </motion.div>
-        )}
-      </div>
-    </motion.div>
-  )
-}
+                {category}
+              </button>
+            );
+          })}
+        </div>
 
-export default Cars
+        {/* Filter Dropdowns Bar */}
+        <div className="p-4 rounded-2xl bg-[#0B1D33]/70 border border-[rgba(107,203,255,0.14)] shadow-lg mb-8">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            
+            {/* Left Filter Dropdowns */}
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Brand Filter */}
+              <div className="relative">
+                <select
+                  value={selectedBrand}
+                  onChange={(e) => setSelectedBrand(e.target.value)}
+                  className="appearance-none pl-3.5 pr-8 py-2 rounded-xl text-xs font-semibold bg-[#061426] text-[#F5F8FF] border border-[rgba(107,203,255,0.2)] focus:border-[#2684FF] cursor-pointer"
+                >
+                  <option value="All">Brand: All</option>
+                  {availableBrands.filter(b => b !== 'All').map(brand => (
+                    <option key={brand} value={brand}>{brand}</option>
+                  ))}
+                </select>
+                <FiChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#A8B7CC] w-3.5 h-3.5 pointer-events-none" />
+              </div>
+
+              {/* Fuel Type Filter */}
+              <div className="relative">
+                <select
+                  value={selectedFuel}
+                  onChange={(e) => setSelectedFuel(e.target.value)}
+                  className="appearance-none pl-3.5 pr-8 py-2 rounded-xl text-xs font-semibold bg-[#061426] text-[#F5F8FF] border border-[rgba(107,203,255,0.2)] focus:border-[#2684FF] cursor-pointer"
+                >
+                  <option value="All">Fuel: All</option>
+                  <option value="Gasoline">Gasoline</option>
+                  <option value="Electric">Electric</option>
+                  <option value="Hybrid">Hybrid</option>
+                  <option value="Diesel">Diesel</option>
+                </select>
+                <FiChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#A8B7CC] w-3.5 h-3.5 pointer-events-none" />
+              </div>
+
+              {/* Condition Filter */}
+              <div className="relative">
+                <select
+                  value={selectedCondition}
+                  onChange={(e) => setSelectedCondition(e.target.value)}
+                  className="appearance-none pl-3.5 pr-8 py-2 rounded-xl text-xs font-semibold bg-[#061426] text-[#F5F8FF] border border-[rgba(107,203,255,0.2)] focus:border-[#2684FF] cursor-pointer"
+                >
+                  <option value="All">Condition: All</option>
+                  <option value="New">Brand New</option>
+                  <option value="Used">Certified Used</option>
+                </select>
+                <FiChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#A8B7CC] w-3.5 h-3.5 pointer-events-none" />
+              </div>
+
+              {/* Reset Action */}
+              {hasActiveFilters && (
+                <button
+                  onClick={resetAllFilters}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#6BCBFF] bg-[#2684FF]/10 hover:bg-[#2684FF]/20 border border-[#2684FF]/30 transition-all"
+                >
+                  <FiRotateCcw className="w-3.5 h-3.5" />
+                  <span>Reset</span>
+                </button>
+              )}
+            </div>
+
+            {/* Right Sort & View Controls */}
+            <div className="flex items-center gap-3 ml-auto">
+              {/* Sort By Dropdown */}
+              <div className="relative flex items-center gap-2">
+                <span className="text-xs text-[#A8B7CC] hidden sm:inline">Sort:</span>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="appearance-none pl-3 pr-8 py-2 rounded-xl text-xs font-semibold bg-[#061426] text-[#F5F8FF] border border-[rgba(107,203,255,0.2)] focus:border-[#2684FF] cursor-pointer"
+                >
+                  <option value="popular">Popular</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="year-new">Year: Newest First</option>
+                  <option value="year-old">Year: Oldest First</option>
+                </select>
+                <FiChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#A8B7CC] w-3.5 h-3.5 pointer-events-none" />
+              </div>
+
+              {/* View Toggle (Grid / List) */}
+              <div className="flex items-center rounded-xl bg-[#061426] p-1 border border-[rgba(107,203,255,0.15)]">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  title="Grid View"
+                  className={`p-1.5 rounded-lg transition-all ${
+                    viewMode === 'grid' 
+                      ? 'bg-[#2684FF] text-white shadow-[0_0_8px_rgba(38,132,255,0.6)]' 
+                      : 'text-[#A8B7CC] hover:text-white'
+                  }`}
+                >
+                  <FiGrid className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setViewMode('horizontal')}
+                  title="List / Horizontal View (AutoHub Style)"
+                  className={`p-1.5 rounded-lg transition-all ${
+                    viewMode === 'horizontal' 
+                      ? 'bg-[#2684FF] text-white shadow-[0_0_8px_rgba(38,132,255,0.6)]' 
+                      : 'text-[#A8B7CC] hover:text-white'
+                  }`}
+                >
+                  <FiList className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* Results Count Line */}
+        <div className="flex items-center justify-between mb-6">
+          <p className="text-sm font-semibold text-white">
+            <span className="text-[#6BCBFF] font-bold text-base">{filteredCars.length}</span> Cars Found
+          </p>
+
+          {selectedCategory !== 'All' && (
+            <span className="text-xs text-[#A8B7CC]">
+              Filtering by: <span className="text-[#6BCBFF] font-medium">{selectedCategory}</span>
+            </span>
+          )}
+        </div>
+
+        {/* Cars Inventory List / Grid */}
+        {loading ? (
+          <div className={viewMode === 'grid' 
+            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" 
+            : "space-y-4"
+          }>
+            {[1, 2, 3, 4, 5, 6].map((n) => (
+              <div 
+                key={n} 
+                className="h-72 rounded-2xl bg-[#0B1D33]/60 border border-[rgba(107,203,255,0.12)] animate-pulse p-4"
+              >
+                <div className="h-40 rounded-xl bg-white/5 mb-4" />
+                <div className="h-4 w-3/4 rounded bg-white/5 mb-2" />
+                <div className="h-3 w-1/2 rounded bg-white/5" />
+              </div>
+            ))}
+          </div>
+        ) : error ? (
+          <div className="p-12 text-center rounded-3xl bg-[#0B1D33]/80 border border-red-500/30">
+            <p className="text-red-400 font-medium mb-3">{error}</p>
+            <button
+              onClick={fetchCars}
+              className="px-5 py-2.5 bg-[#2684FF] text-white text-xs font-semibold rounded-full shadow"
+            >
+              Retry
+            </button>
+          </div>
+        ) : filteredCars.length === 0 ? (
+          <div className="p-16 text-center rounded-3xl bg-[#0B1D33]/60 border border-[rgba(107,203,255,0.15)] max-w-xl mx-auto">
+            <div className="w-16 h-16 rounded-2xl bg-[#2684FF]/20 text-[#6BCBFF] flex items-center justify-center mx-auto mb-4 border border-[#2684FF]/30">
+              <FiSearch className="w-8 h-8" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">No Cars Found</h3>
+            <p className="text-sm text-[#A8B7CC] mb-6">
+              We couldn't find any vehicles matching your current search and filter criteria. Try resetting your filters.
+            </p>
+            <button
+              onClick={resetAllFilters}
+              className="px-6 py-3 rounded-full text-xs font-bold text-white bg-gradient-to-r from-[#2684FF] to-[#1255CC] shadow-[0_0_20px_rgba(38,132,255,0.4)]"
+            >
+              Reset All Filters
+            </button>
+          </div>
+        ) : (
+          <div className={viewMode === 'grid' 
+            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" 
+            : "space-y-4 max-w-4xl"
+          }>
+            {filteredCars.map((car) => (
+              <CarCard 
+                key={car._id} 
+                car={car} 
+                layout={viewMode}
+              />
+            ))}
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+};
+
+export default Cars;
