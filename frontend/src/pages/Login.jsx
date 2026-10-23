@@ -249,7 +249,7 @@ const Login = ({ initialMode = 'login' }) => {
                       autoComplete="email"
                       value={loginData.email}
                       onChange={handleLoginChange}
-                      className={`block w-full pl-10 pr-3.5 py-3 rounded-xl text-xs sm:text-sm bg-[#061426] text-white placeholder-[#A8B7CC]/50 border ${
+                      className={`block w-full pl-10 pr-3.5 py-3 rounded-xl text-base sm:text-sm bg-[#061426] text-white placeholder-[#A8B7CC]/50 border ${
                         errors.email ? 'border-red-500' : 'border-[rgba(107,203,255,0.2)]'
                       } focus:outline-none focus:border-[#2684FF] focus:shadow-[0_0_15px_rgba(38,132,255,0.3)] transition-all`}
                       placeholder="name@example.com"
@@ -274,7 +274,7 @@ const Login = ({ initialMode = 'login' }) => {
                       autoComplete="current-password"
                       value={loginData.password}
                       onChange={handleLoginChange}
-                      className={`block w-full pl-10 pr-3.5 py-3 rounded-xl text-xs sm:text-sm bg-[#061426] text-white placeholder-[#A8B7CC]/50 border ${
+                      className={`block w-full pl-10 pr-3.5 py-3 rounded-xl text-base sm:text-sm bg-[#061426] text-white placeholder-[#A8B7CC]/50 border ${
                         errors.password ? 'border-red-500' : 'border-[rgba(107,203,255,0.2)]'
                       } focus:outline-none focus:border-[#2684FF] focus:shadow-[0_0_15px_rgba(38,132,255,0.3)] transition-all`}
                       placeholder="••••••••"
@@ -364,7 +364,7 @@ const Login = ({ initialMode = 'login' }) => {
                         value={registerData.firstName}
                         onChange={handleRegisterChange}
                         placeholder="John"
-                        className={`w-full pl-9 pr-3 py-2.5 rounded-xl text-xs bg-[#061426] text-white border ${
+                        className={`w-full pl-9 pr-3 py-2.5 rounded-xl text-base sm:text-xs bg-[#061426] text-white border ${
                           errors.firstName ? 'border-red-500' : 'border-[rgba(107,203,255,0.2)]'
                         } focus:outline-none focus:border-[#2684FF] transition-all`}
                       />
@@ -382,7 +382,7 @@ const Login = ({ initialMode = 'login' }) => {
                       value={registerData.lastName}
                       onChange={handleRegisterChange}
                       placeholder="Doe"
-                      className={`w-full px-3 py-2.5 rounded-xl text-xs bg-[#061426] text-white border ${
+                      className={`w-full px-3 py-2.5 rounded-xl text-base sm:text-xs bg-[#061426] text-white border ${
                         errors.lastName ? 'border-red-500' : 'border-[rgba(107,203,255,0.2)]'
                       } focus:outline-none focus:border-[#2684FF] transition-all`}
                     />
@@ -405,7 +405,7 @@ const Login = ({ initialMode = 'login' }) => {
                       value={registerData.email}
                       onChange={handleRegisterChange}
                       placeholder="your.email@example.com"
-                      className={`w-full pl-9 pr-3 py-2.5 rounded-xl text-xs bg-[#061426] text-white border ${
+                      className={`w-full pl-9 pr-3 py-2.5 rounded-xl text-base sm:text-xs bg-[#061426] text-white border ${
                         errors.email ? 'border-red-500' : 'border-[rgba(107,203,255,0.2)]'
                       } focus:outline-none focus:border-[#2684FF] transition-all`}
                     />
@@ -428,7 +428,7 @@ const Login = ({ initialMode = 'login' }) => {
                       value={registerData.phone}
                       onChange={handleRegisterChange}
                       placeholder="+254 700 000 000"
-                      className="w-full pl-9 pr-3 py-2.5 rounded-xl text-xs bg-[#061426] text-white border border-[rgba(107,203,255,0.2)] focus:outline-none focus:border-[#2684FF] transition-all"
+                      className="w-full pl-9 pr-3 py-2.5 rounded-xl text-base sm:text-xs bg-[#061426] text-white border border-[rgba(107,203,255,0.2)] focus:outline-none focus:border-[#2684FF] transition-all"
                     />
                   </div>
                 </div>
@@ -445,7 +445,7 @@ const Login = ({ initialMode = 'login' }) => {
                       value={registerData.password}
                       onChange={handleRegisterChange}
                       placeholder="Min 6 characters"
-                      className={`w-full px-3 py-2.5 rounded-xl text-xs bg-[#061426] text-white border ${
+                      className={`w-full px-3 py-2.5 rounded-xl text-base sm:text-xs bg-[#061426] text-white border ${
                         errors.password ? 'border-red-500' : 'border-[rgba(107,203,255,0.2)]'
                       } focus:outline-none focus:border-[#2684FF] transition-all`}
                     />
@@ -462,7 +462,7 @@ const Login = ({ initialMode = 'login' }) => {
                       value={registerData.confirmPassword}
                       onChange={handleRegisterChange}
                       placeholder="Repeat password"
-                      className={`w-full px-3 py-2.5 rounded-xl text-xs bg-[#061426] text-white border ${
+                      className={`w-full px-3 py-2.5 rounded-xl text-base sm:text-xs bg-[#061426] text-white border ${
                         errors.confirmPassword ? 'border-red-500' : 'border-[rgba(107,203,255,0.2)]'
                       } focus:outline-none focus:border-[#2684FF] transition-all`}
                     />

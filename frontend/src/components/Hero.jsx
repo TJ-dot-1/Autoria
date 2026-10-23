@@ -76,11 +76,11 @@ const Hero = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search by make, model (e.g. Tesla, BMW, Audi)..."
-                className="w-full bg-transparent border-0 px-3 py-2.5 text-sm sm:text-base text-white placeholder-[#A8B7CC]/60 focus:outline-none focus:ring-0"
+                className="w-full bg-transparent border-0 px-3 py-2.5 text-base text-white placeholder-[#A8B7CC]/60 focus:outline-none focus:ring-0"
               />
               <button
                 type="submit"
-                className="flex-shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-[#2684FF] to-[#1255CC] hover:from-[#3B92FF] hover:to-[#1B63E0] shadow-[0_0_15px_rgba(38,132,255,0.5)] transition-all duration-300"
+                className="flex-shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white bg-gradient-to-r from-[#2684FF] to-[#1255CC] hover:from-[#3B92FF] hover:to-[#1B63E0] shadow-[0_0_15px_rgba(38,132,255,0.5)] transition-all duration-300"
               >
                 <span>Search</span>
                 <FiArrowRight className="w-4 h-4" />

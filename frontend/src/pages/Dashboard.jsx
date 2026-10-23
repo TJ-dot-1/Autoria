@@ -1005,7 +1005,7 @@ const Dashboard = () => {
                       value={profileData.firstName}
                       onChange={(e) => setProfileData({ ...profileData, firstName: e.target.value })}
                       required
-                      className="w-full px-3.5 py-2.5 rounded-xl text-xs bg-[#061426] text-white border border-[rgba(107,203,255,0.2)] focus:outline-none focus:border-[#2684FF] transition-all"
+                      className="w-full px-3.5 py-2.5 rounded-xl text-base sm:text-sm bg-[#061426] text-white border border-[rgba(107,203,255,0.2)] focus:outline-none focus:border-[#2684FF] transition-all"
                     />
                   </div>
 
@@ -1018,7 +1018,7 @@ const Dashboard = () => {
                       value={profileData.lastName}
                       onChange={(e) => setProfileData({ ...profileData, lastName: e.target.value })}
                       required
-                      className="w-full px-3.5 py-2.5 rounded-xl text-xs bg-[#061426] text-white border border-[rgba(107,203,255,0.2)] focus:outline-none focus:border-[#2684FF] transition-all"
+                      className="w-full px-3.5 py-2.5 rounded-xl text-base sm:text-sm bg-[#061426] text-white border border-[rgba(107,203,255,0.2)] focus:outline-none focus:border-[#2684FF] transition-all"
                     />
                   </div>
                 </div>
@@ -1031,7 +1031,7 @@ const Dashboard = () => {
                     type="email"
                     value={user?.email || ''}
                     disabled
-                    className="w-full px-3.5 py-2.5 rounded-xl text-xs bg-[#061426]/50 text-[#A8B7CC] border border-white/5 cursor-not-allowed"
+                    className="w-full px-3.5 py-2.5 rounded-xl text-base sm:text-sm bg-[#061426]/50 text-[#A8B7CC] border border-white/5 cursor-not-allowed"
                   />
                 </div>
 
@@ -1044,7 +1044,7 @@ const Dashboard = () => {
                     value={profileData.phone}
                     onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
                     placeholder="+254 700 000 000"
-                    className="w-full px-3.5 py-2.5 rounded-xl text-xs bg-[#061426] text-white border border-[rgba(107,203,255,0.2)] focus:outline-none focus:border-[#2684FF] transition-all"
+                    className="w-full px-3.5 py-2.5 rounded-xl text-base sm:text-sm bg-[#061426] text-white border border-[rgba(107,203,255,0.2)] focus:outline-none focus:border-[#2684FF] transition-all"
                   />
                 </div>
 
@@ -1057,7 +1057,7 @@ const Dashboard = () => {
                     value={profileData.bio}
                     onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
                     placeholder="Tell buyers a little about yourself or your dealership..."
-                    className="w-full px-3.5 py-2.5 rounded-xl text-xs bg-[#061426] text-white border border-[rgba(107,203,255,0.2)] focus:outline-none focus:border-[#2684FF] transition-all resize-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl text-base sm:text-sm bg-[#061426] text-white border border-[rgba(107,203,255,0.2)] focus:outline-none focus:border-[#2684FF] transition-all resize-none"
                   />
                 </div>
 
@@ -1065,7 +1065,7 @@ const Dashboard = () => {
                   <button
                     type="submit"
                     disabled={savingProfile}
-                    className="w-full py-3 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#2684FF] to-[#1255CC] hover:from-[#3B92FF] hover:to-[#1F63D6] shadow-[0_0_20px_rgba(38,132,255,0.4)] transition-all flex items-center justify-center gap-2"
+                    className="w-full py-3 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-[#2684FF] to-[#1255CC] hover:from-[#3B92FF] hover:to-[#1F63D6] shadow-[0_0_20px_rgba(38,132,255,0.4)] transition-all flex items-center justify-center gap-2"
                   >
                     {savingProfile ? (
                       <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

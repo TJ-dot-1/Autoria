@@ -6,6 +6,13 @@ import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext.jsx'
 import { ThemeProvider } from './contexts/ThemeContext.jsx'
 
+// Prevent mobile gesture/pinch zoom on iOS Safari
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+  document.addEventListener('gesturestart', (e) => e.preventDefault(), { passive: false });
+  document.addEventListener('gesturechange', (e) => e.preventDefault(), { passive: false });
+  document.addEventListener('gestureend', (e) => e.preventDefault(), { passive: false });
+}
+
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <ThemeProvider>

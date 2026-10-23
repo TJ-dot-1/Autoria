@@ -163,7 +163,7 @@ const Cars = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search make, model, city..."
-              className="w-full pl-10 pr-10 py-2.5 rounded-full text-xs font-medium bg-[#0B1D33]/90 text-white placeholder-[#A8B7CC]/60 border border-[rgba(107,203,255,0.2)] focus:border-[#2684FF] focus:shadow-[0_0_15px_rgba(38,132,255,0.3)] transition-all"
+              className="w-full pl-10 pr-10 py-2.5 rounded-full text-base sm:text-xs font-medium bg-[#0B1D33]/90 text-white placeholder-[#A8B7CC]/60 border border-[rgba(107,203,255,0.2)] focus:border-[#2684FF] focus:shadow-[0_0_15px_rgba(38,132,255,0.3)] transition-all"
             />
             <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6BCBFF] w-4 h-4" />
             {searchQuery && (
@@ -208,7 +208,7 @@ const Cars = () => {
                 <select
                   value={selectedBrand}
                   onChange={(e) => setSelectedBrand(e.target.value)}
-                  className="appearance-none pl-3.5 pr-8 py-2 rounded-xl text-xs font-semibold bg-[#061426] text-[#F5F8FF] border border-[rgba(107,203,255,0.2)] focus:border-[#2684FF] cursor-pointer"
+                  className="appearance-none pl-3.5 pr-8 py-2 rounded-xl text-base sm:text-xs font-semibold bg-[#061426] text-[#F5F8FF] border border-[rgba(107,203,255,0.2)] focus:border-[#2684FF] cursor-pointer"
                 >
                   <option value="All">Brand: All</option>
                   {availableBrands.filter(b => b !== 'All').map(brand => (
@@ -223,7 +223,7 @@ const Cars = () => {
                 <select
                   value={selectedFuel}
                   onChange={(e) => setSelectedFuel(e.target.value)}
-                  className="appearance-none pl-3.5 pr-8 py-2 rounded-xl text-xs font-semibold bg-[#061426] text-[#F5F8FF] border border-[rgba(107,203,255,0.2)] focus:border-[#2684FF] cursor-pointer"
+                  className="appearance-none pl-3.5 pr-8 py-2 rounded-xl text-base sm:text-xs font-semibold bg-[#061426] text-[#F5F8FF] border border-[rgba(107,203,255,0.2)] focus:border-[#2684FF] cursor-pointer"
                 >
                   <option value="All">Fuel: All</option>
                   <option value="Gasoline">Gasoline</option>
@@ -239,7 +239,7 @@ const Cars = () => {
                 <select
                   value={selectedCondition}
                   onChange={(e) => setSelectedCondition(e.target.value)}
-                  className="appearance-none pl-3.5 pr-8 py-2 rounded-xl text-xs font-semibold bg-[#061426] text-[#F5F8FF] border border-[rgba(107,203,255,0.2)] focus:border-[#2684FF] cursor-pointer"
+                  className="appearance-none pl-3.5 pr-8 py-2 rounded-xl text-base sm:text-xs font-semibold bg-[#061426] text-[#F5F8FF] border border-[rgba(107,203,255,0.2)] focus:border-[#2684FF] cursor-pointer"
                 >
                   <option value="All">Condition: All</option>
                   <option value="New">Brand New</option>
