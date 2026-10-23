@@ -36,7 +36,7 @@ export const register = async (req, res, next) => {
       lastName: lastName.trim(),
       email: email.toLowerCase().trim(),
       password,
-      phone: phone ? phone.trim() : undefined,
+      phone: (phone && typeof phone === 'string' && phone.trim()) ? phone.trim() : undefined,
       role: userRole,
       isActive: true
     });
@@ -161,7 +161,7 @@ export const updateProfile = async (req, res, next) => {
     const fieldsToUpdate = {};
     if (firstName !== undefined) fieldsToUpdate.firstName = firstName;
     if (lastName !== undefined) fieldsToUpdate.lastName = lastName;
-    if (phone !== undefined) fieldsToUpdate.phone = phone;
+    if (phone !== undefined) fieldsToUpdate.phone = (typeof phone === 'string' && phone.trim()) ? phone.trim() : null;
     if (dateOfBirth !== undefined) fieldsToUpdate.dateOfBirth = dateOfBirth;
     if (address !== undefined) fieldsToUpdate.address = address;
     if (driversLicense !== undefined) fieldsToUpdate.driversLicense = driversLicense;

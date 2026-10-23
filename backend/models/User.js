@@ -34,10 +34,16 @@ const userSchema = new mongoose.Schema({
   phone: {
     type: String,
     trim: true,
-    match: [
-      /^[\+]?[1-9][\d]{0,15}$/,
-      'Please provide a valid phone number'
-    ]
+    validate: {
+      validator: function(v) {
+        if (!v || v.trim() === '') return true;
+        // Strip common formatting characters: spaces, hyphens, parentheses, periods
+        const cleaned = v.replace(/[\s\-\(\)\.]/g, '');
+        // Allow optional leading '+', followed by 7 to 15 digits (starting with any digit 0-9)
+        return /^\+?[0-9]{7,15}$/.test(cleaned);
+      },
+      message: 'Please provide a valid phone number'
+    }
   },
   role: {
     type: String,
