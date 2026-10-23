@@ -1,12 +1,29 @@
 import mongoose from 'mongoose';
 import Car from '../models/Car.js';
 import { calculatePagination } from '../utils/pagination.js';
+import connectDatabase, { dbState } from '../configs/database.js';
 
 // @desc    Get all cars
 // @route   GET /api/cars
 // @access  Public
 export const getCars = async (req, res, next) => {
   try {
+    if (mongoose.connection.readyState === 0) {
+      try {
+        await connectDatabase();
+      } catch (e) {
+        // handled in connectDatabase
+      }
+    }
+
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message: 'Database connection unavailable',
+        error: dbState.lastError || 'Database is not connected. Verify MongoDB Atlas Network Access has 0.0.0.0/0 added.'
+      });
+    }
+
     let query = { isActive: true };
     let sortBy = {};
     

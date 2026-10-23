@@ -210,13 +210,19 @@ const Home = () => {
             ))}
           </div>
         ) : error ? (
-          <div className="p-8 text-center rounded-2xl bg-[#0B1D33]/80 border border-red-500/30">
-            <p className="text-red-400 font-medium mb-3">{error}</p>
+          <div className="p-8 text-center rounded-2xl bg-[#0B1D33]/80 border border-red-500/30 max-w-lg mx-auto">
+            <div className="w-12 h-12 rounded-full bg-red-500/10 text-red-400 flex items-center justify-center mx-auto mb-3">
+              <FiZap className="w-6 h-6" />
+            </div>
+            <p className="text-white font-semibold mb-1">{error}</p>
+            <p className="text-xs text-[#A8B7CC] mb-4">
+              The service is connecting to the cloud database. If this persists, please ensure MongoDB Atlas allows connection from anywhere (0.0.0.0/0).
+            </p>
             <button
               onClick={fetchFeaturedCars}
-              className="px-4 py-2 bg-[#2684FF] text-white text-xs font-semibold rounded-lg shadow"
+              className="px-5 py-2.5 bg-[#2684FF] hover:bg-[#1B6AD5] text-white text-xs font-semibold rounded-full shadow transition-all"
             >
-              Retry
+              Retry Connection
             </button>
           </div>
         ) : displayCars.length === 0 ? (

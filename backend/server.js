@@ -9,7 +9,7 @@ import rateLimit from 'express-rate-limit';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import connectDatabase from './configs/database.js';
+import connectDatabase, { dbState, getEffectiveMongoUri } from './configs/database.js';
 import authRoutes from './routes/auth.js';
 import carRoutes from './routes/cars.js';
 import bookingRoutes from './routes/bookings.js';
@@ -154,12 +154,61 @@ app.use('/uploads', (req, res, next) => {
 
 // Health check endpoint
 app.get('/health', (req, res) => {
+  const readyStates = ['disconnected', 'connected', 'connecting', 'disconnecting'];
+  const readyState = mongoose.connection.readyState;
+  const statusStr = readyStates[readyState] || 'unknown';
+  const effectiveUri = getEffectiveMongoUri();
+  const maskedUri = effectiveUri ? effectiveUri.replace(/:([^@]+)@/, ':****@') : 'not configured';
+
   res.status(200).json({
     status: 'OK',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     environment: process.env.NODE_ENV,
-    version: '1.0.0'
+    version: '1.0.0',
+    database: {
+      status: statusStr,
+      readyState,
+      host: mongoose.connection.host || dbState.activeHost || null,
+      name: mongoose.connection.name || null,
+      cluster: maskedUri,
+      lastError: dbState.lastError,
+      lastConnectedAt: dbState.lastConnectedAt,
+      notice: readyState !== 1 
+        ? 'If database is disconnected, please verify that 0.0.0.0/0 is added in MongoDB Atlas -> Security -> Network Access.'
+        : 'Database connected.'
+    }
+  });
+});
+
+// Force database reconnect / diagnostic endpoint
+app.get('/health/db', async (req, res) => {
+  if (mongoose.connection.readyState !== 1) {
+    try {
+      await connectDatabase();
+    } catch (e) {
+      // captured in dbState
+    }
+  }
+
+  let carsCount = null;
+  if (mongoose.connection.readyState === 1) {
+    try {
+      carsCount = await mongoose.connection.db.collection('cars').countDocuments();
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  const readyStates = ['disconnected', 'connected', 'connecting', 'disconnecting'];
+  res.status(200).json({
+    status: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    readyState: mongoose.connection.readyState,
+    readyStateText: readyStates[mongoose.connection.readyState],
+    host: mongoose.connection.host,
+    carsCount,
+    lastError: dbState.lastError,
+    notice: 'If connection times out, add 0.0.0.0/0 to MongoDB Atlas -> Network Access'
   });
 });
 
