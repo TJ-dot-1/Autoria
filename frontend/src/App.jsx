@@ -88,6 +88,7 @@ const App = () => {
       <Routes>
         {/* Auth routes without footer */}
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Login initialMode="register" />} />
 
         {/* Public routes with navbar and footer */}
         <Route path="/*" element={
@@ -105,6 +106,22 @@ const App = () => {
               <Route path="/dashboard" element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              } />
+
+              {/* Direct user car listing routes */}
+              <Route path="/sell-car" element={
+                <ProtectedRoute>
+                  <AdminLayout>
+                    <AddCar />
+                  </AdminLayout>
+                </ProtectedRoute>
+              } />
+              <Route path="/add-car" element={
+                <ProtectedRoute>
+                  <AdminLayout>
+                    <AddCar />
+                  </AdminLayout>
                 </ProtectedRoute>
               } />
 
@@ -137,9 +154,9 @@ const App = () => {
           </div>
         } />
 
-        {/* Admin routes with admin layout */}
+        {/* Admin and Seller portal routes with admin layout */}
         <Route path="/admin/*" element={
-          <ProtectedRoute adminOnly>
+          <ProtectedRoute>
             <AdminLayout>
               <Routes>
                 <Route path="" element={<AdminDashboard />} />
@@ -148,9 +165,9 @@ const App = () => {
                 <Route path="add-car" element={<AddCar />} />
                 <Route path="edit-car/:id" element={<AddCar />} />
                 <Route path="bookings" element={<ManageBookings />} />
-                <Route path="users" element={<ManageUsers />} />
-                <Route path="reports" element={<ReportsAnalytics />} />
-                <Route path="settings" element={<AdminSettings />} />
+                <Route path="users" element={<ProtectedRoute adminOnly><ManageUsers /></ProtectedRoute>} />
+                <Route path="reports" element={<ProtectedRoute adminOnly><ReportsAnalytics /></ProtectedRoute>} />
+                <Route path="settings" element={<ProtectedRoute adminOnly><AdminSettings /></ProtectedRoute>} />
               </Routes>
             </AdminLayout>
           </ProtectedRoute>
@@ -158,7 +175,7 @@ const App = () => {
 
         {/* Owner routes (using admin layout) */}
         <Route path="/owner/*" element={
-          <ProtectedRoute adminOnly>
+          <ProtectedRoute>
             <AdminLayout>
               <Routes>
                 <Route path="" element={<AdminDashboard />} />

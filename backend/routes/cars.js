@@ -23,10 +23,10 @@ router.get('/used-cars', optionalAuth, getUsedCarsForSale);
 // Specific car ID route must come after specific routes
 router.get('/:id', optionalAuth, getCar);
 
-// Admin-only routes
-router.post('/', protect, authorize('admin'), createCar);
-router.put('/:id', protect, authorize('admin'), updateCar);
-router.delete('/:id', protect, authorize('admin'), deleteCar);
-router.put('/:id/availability', protect, authorize('admin'), toggleCarAvailability);
+// Car management routes (accessible by authenticated users; owners manage their cars, admin manages all)
+router.post('/', protect, createCar);
+router.put('/:id', protect, updateCar);
+router.delete('/:id', protect, deleteCar);
+router.put('/:id/availability', protect, toggleCarAvailability);
 
 export default router;

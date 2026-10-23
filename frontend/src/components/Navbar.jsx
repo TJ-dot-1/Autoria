@@ -151,7 +151,7 @@ const Navbar = () => {
 
               {/* List / Sell Car CTA */}
               <Link
-                to="/services/sell-your-car"
+                to={isAuthenticated ? "/admin/add-car" : "/login?mode=register&redirect=/admin/add-car"}
                 className="hidden xl:inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold text-[#6BCBFF] bg-[#2684FF]/10 hover:bg-[#2684FF]/20 border border-[#2684FF]/40 shadow-[0_0_12px_rgba(38,132,255,0.2)] transition-all"
               >
                 <FiPlusCircle className="w-3.5 h-3.5" />
@@ -291,7 +291,7 @@ const Navbar = () => {
             {/* Bottom drawer actions */}
             <div className="pt-6 border-t border-[rgba(107,203,255,0.12)] space-y-3">
               <Link
-                to="/services/sell-your-car"
+                to={isAuthenticated ? "/admin/add-car" : "/login?mode=register&redirect=/admin/add-car"}
                 onClick={() => setIsOpen(false)}
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#2684FF] to-[#1255CC] shadow-[0_0_20px_rgba(38,132,255,0.4)]"
               >

@@ -495,8 +495,8 @@ const importData = async () => {
 
     console.log('📝 Creating sample data...');
 
-    // Create users
-    const createdUsers = await User.insertMany(sampleUsers);
+    // Create users (using User.create so pre('save') bcrypt hashing executes)
+    const createdUsers = await User.create(sampleUsers);
     console.log(`✅ Created ${createdUsers.length} users`);
 
     // Create cars with the first user as addedBy

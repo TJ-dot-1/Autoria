@@ -242,7 +242,7 @@ export const createCar = async (req, res, next) => {
 
 // @desc    Update car
 // @route   PUT /api/cars/:id
-// @access  Private (Admin only)
+// @access  Private (Admin or Owner)
 export const updateCar = async (req, res, next) => {
   try {
     let car = await Car.findById(req.params.id);
@@ -251,6 +251,16 @@ export const updateCar = async (req, res, next) => {
       return res.status(404).json({
         success: false,
         message: 'Car not found'
+      });
+    }
+
+    // Check permission: admin or car owner
+    const isOwner = car.addedBy && req.user && car.addedBy.toString() === (req.user._id || req.user.id).toString();
+    const isAdmin = req.user && req.user.role === 'admin';
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to modify this vehicle'
       });
     }
 
@@ -281,7 +291,7 @@ export const updateCar = async (req, res, next) => {
 
 // @desc    Delete car
 // @route   DELETE /api/cars/:id
-// @access  Private (Admin only)
+// @access  Private (Admin or Owner)
 export const deleteCar = async (req, res, next) => {
   try {
     const car = await Car.findById(req.params.id);
@@ -290,6 +300,16 @@ export const deleteCar = async (req, res, next) => {
       return res.status(404).json({
         success: false,
         message: 'Car not found'
+      });
+    }
+
+    // Check permission: admin or car owner
+    const isOwner = car.addedBy && req.user && car.addedBy.toString() === (req.user._id || req.user.id).toString();
+    const isAdmin = req.user && req.user.role === 'admin';
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to delete this vehicle'
       });
     }
 
@@ -325,7 +345,7 @@ export const deleteCar = async (req, res, next) => {
 
 // @desc    Toggle car availability
 // @route   PUT /api/cars/:id/availability
-// @access  Private (Admin only)
+// @access  Private (Admin or Owner)
 export const toggleCarAvailability = async (req, res, next) => {
   try {
     const car = await Car.findById(req.params.id);
@@ -334,6 +354,16 @@ export const toggleCarAvailability = async (req, res, next) => {
       return res.status(404).json({
         success: false,
         message: 'Car not found'
+      });
+    }
+
+    // Check permission: admin or car owner
+    const isOwner = car.addedBy && req.user && car.addedBy.toString() === (req.user._id || req.user.id).toString();
+    const isAdmin = req.user && req.user.role === 'admin';
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to update this vehicle'
       });
     }
 

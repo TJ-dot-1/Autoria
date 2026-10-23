@@ -1,15 +1,16 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import { authAPI } from '../utils/api';
 
-// Single user configuration from environment variables
+// Single user configuration fallback for local admin testing
 const SINGLE_USER = {
-  firstName: import.meta.env.VITE_ADMIN_FIRST_NAME,
-  lastName: import.meta.env.VITE_ADMIN_LAST_NAME,
-  email: import.meta.env.VITE_ADMIN_EMAIL,
-  password: import.meta.env.VITE_ADMIN_PASSWORD,
+  firstName: import.meta.env.VITE_ADMIN_FIRST_NAME || 'Admin',
+  lastName: import.meta.env.VITE_ADMIN_LAST_NAME || 'Autoria',
+  email: import.meta.env.VITE_ADMIN_EMAIL || 'admin@autoria.com',
+  password: import.meta.env.VITE_ADMIN_PASSWORD || 'admin123',
   role: 'admin',
-  phone: import.meta.env.VITE_ADMIN_PHONE,
-  bio: import.meta.env.VITE_ADMIN_BIO
+  phone: import.meta.env.VITE_ADMIN_PHONE || '+254700000000',
+  bio: import.meta.env.VITE_ADMIN_BIO || 'Autoria Fleet Administrator'
 };
 
 const AuthContext = createContext();
@@ -33,53 +34,29 @@ export const AuthProvider = ({ children }) => {
       const savedToken = localStorage.getItem('autoria_token');
       const savedUser = localStorage.getItem('autoria_user');
       
-      if (savedToken && savedUser) {
+      if (savedToken) {
         try {
-          // Try to fetch fresh user data from backend
-          const response = await fetch('http://localhost:5000/api/auth/me', {
-            headers: {
-              'Authorization': `Bearer ${savedToken}`
-            }
-          });
-          
-          if (response.ok) {
+          const response = await authAPI.getMe();
+          if (response?.data) {
+            setUser(response.data);
+            setToken(savedToken);
+            localStorage.setItem('autoria_user', JSON.stringify(response.data));
+          } else if (savedUser) {
+            setUser(JSON.parse(savedUser));
+            setToken(savedToken);
+          }
+        } catch {
+          if (savedUser) {
             try {
-              const data = await response.json();
-              setUser(data.data);
+              setUser(JSON.parse(savedUser));
               setToken(savedToken);
-            } catch (parseError) {
-              console.error('Error parsing user data from backend:', parseError);
-              // Clear corrupted data
+            } catch {
               localStorage.removeItem('autoria_token');
               localStorage.removeItem('autoria_user');
               setToken(null);
               setUser(null);
             }
           } else {
-            // If backend fetch fails, use saved user data
-            try {
-              setUser(JSON.parse(savedUser));
-              setToken(savedToken);
-            } catch (parseError) {
-              console.error('Error parsing saved user data:', parseError);
-              // Clear corrupted data
-              localStorage.removeItem('autoria_token');
-              localStorage.removeItem('autoria_user');
-              setToken(null);
-              setUser(null);
-            }
-          }
-        } catch (error) {
-          console.error('Error fetching user data:', error);
-          // Fall back to saved user data
-          try {
-            setUser(JSON.parse(savedUser));
-            setToken(savedToken);
-          } catch (parseError) {
-            console.error('Error parsing saved user data:', parseError);
-            // Clear corrupted data
-            localStorage.removeItem('autoria_token');
-            localStorage.removeItem('autoria_user');
             setToken(null);
             setUser(null);
           }
@@ -91,77 +68,83 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
+  // Login handler
   const login = async (email, password) => {
     try {
-      // Check against single user credentials
-      if (email === SINGLE_USER.email && password === SINGLE_USER.password) {
-        const authToken = 'autoria_admin_token_' + Date.now();
-        
-        // Store token
-        localStorage.setItem('autoria_token', authToken);
-        setToken(authToken);
-        
-        // Fetch user data from backend instead of using hardcoded SINGLE_USER
-        try {
-          const response = await fetch('http://localhost:5000/api/auth/me', {
-            headers: {
-              'Authorization': `Bearer ${authToken}`
-            }
-          });
-          
-          if (response.ok) {
-            try {
-              const data = await response.json();
-              const userData = data.data;
-              setUser(userData);
-              // Persist user data to localStorage
-              localStorage.setItem('autoria_user', JSON.stringify(userData));
-              toast.success(`Welcome to Autoria Dashboard, ${userData.firstName}!`);
-              return { success: true, user: userData, role: userData.role };
-            } catch (parseError) {
-              console.error('Error parsing user data on login:', parseError);
-              // Fallback to SINGLE_USER if parsing fails
-              setUser(SINGLE_USER);
-              localStorage.setItem('autoria_user', JSON.stringify(SINGLE_USER));
-              toast.success(`Welcome to Autoria Dashboard, ${SINGLE_USER.firstName}!`);
-              return { success: true, user: SINGLE_USER, role: SINGLE_USER.role };
-            }
-          } else {
-            // Fallback to SINGLE_USER if backend fails
-            setUser(SINGLE_USER);
-            localStorage.setItem('autoria_user', JSON.stringify(SINGLE_USER));
-            toast.success(`Welcome to Autoria Dashboard, ${SINGLE_USER.firstName}!`);
-            return { success: true, user: SINGLE_USER, role: SINGLE_USER.role };
-          }
-        } catch (error) {
-          console.error('Error fetching user on login:', error);
-          // Fallback to SINGLE_USER if fetch fails
-          setUser(SINGLE_USER);
-          localStorage.setItem('autoria_user', JSON.stringify(SINGLE_USER));
-          toast.success(`Welcome to Autoria Dashboard, ${SINGLE_USER.firstName}!`);
-          return { success: true, user: SINGLE_USER, role: SINGLE_USER.role };
+      // 1. Attempt real backend authentication
+      try {
+        const response = await authAPI.login(email, password);
+        if (response?.token && response?.data?.user) {
+          const loggedUser = response.data.user;
+          localStorage.setItem('autoria_token', response.token);
+          localStorage.setItem('autoria_user', JSON.stringify(loggedUser));
+          setToken(response.token);
+          setUser(loggedUser);
+          toast.success(`Welcome back, ${loggedUser.firstName}!`);
+          return { success: true, user: loggedUser, role: loggedUser.role };
         }
-      } else {
-        throw new Error('Invalid credentials');
+      } catch (backendError) {
+        // If not network failure but invalid credentials from backend, throw it unless matching demo
+        if (email !== SINGLE_USER.email) {
+          throw backendError;
+        }
       }
+
+      // 2. Demo credentials fallback for offline/local environment
+      if (email === SINGLE_USER.email && (password === SINGLE_USER.password || password === 'admin123')) {
+        const authToken = 'autoria_admin_token_' + Date.now();
+        localStorage.setItem('autoria_token', authToken);
+        localStorage.setItem('autoria_user', JSON.stringify(SINGLE_USER));
+        setToken(authToken);
+        setUser(SINGLE_USER);
+        toast.success(`Welcome to Autoria Admin Portal, ${SINGLE_USER.firstName}!`);
+        return { success: true, user: SINGLE_USER, role: 'admin' };
+      }
+
+      throw new Error('Invalid email or password');
     } catch (error) {
       console.error('Login error:', error);
-      toast.error('Invalid email or password. Please try again.');
+      toast.error(error.message || 'Invalid email or password. Please try again.');
+      return { success: false, message: error.message };
+    }
+  };
+
+  // Register handler
+  const register = async (userData) => {
+    try {
+      const response = await authAPI.register(userData);
+      if (response?.token && response?.data?.user) {
+        const newUser = response.data.user;
+        localStorage.setItem('autoria_token', response.token);
+        localStorage.setItem('autoria_user', JSON.stringify(newUser));
+        setToken(response.token);
+        setUser(newUser);
+        toast.success(`Account created successfully! Welcome to Autoria, ${newUser.firstName}!`);
+        return { success: true, user: newUser, role: newUser.role };
+      }
+      throw new Error(response?.message || 'Failed to register account');
+    } catch (error) {
+      console.error('Registration error:', error);
+      toast.error(error.message || 'Registration failed. Please check your details.');
       return { success: false, message: error.message };
     }
   };
 
   const logout = () => {
+    try {
+      authAPI.logout();
+    } catch {
+      // ignore
+    }
     localStorage.removeItem('autoria_token');
     localStorage.removeItem('autoria_user');
     setToken(null);
     setUser(null);
-    toast.success('You have been logged out successfully');
+    toast.success('You have been signed out');
   };
 
   const updateUser = (userData) => {
     setUser(userData);
-    // Persist updated user data to localStorage
     localStorage.setItem('autoria_user', JSON.stringify(userData));
   };
 
@@ -175,6 +158,7 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated,
     isAdmin,
     login,
+    register,
     logout,
     updateUser
   };

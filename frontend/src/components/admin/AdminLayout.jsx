@@ -195,7 +195,9 @@ const AdminLayout = ({ children }) => {
                 className="w-full h-full rounded-lg object-contain p-1"
               />
             </div>
-            <span className="ml-3 text-xl font-bold text-[var(--text-primary)]">Autoria Admin</span>
+            <span className="ml-3 text-xl font-bold text-[var(--text-primary)]">
+              {user?.role === 'admin' ? 'Autoria Admin' : 'Seller Portal'}
+            </span>
           </Link>
           <button
             onClick={() => setSidebarOpen(false)}
@@ -224,7 +226,7 @@ const AdminLayout = ({ children }) => {
                 {getFullName(user)}
               </p>
               <p className="text-xs text-[var(--text-secondary)] capitalize">
-                {user?.role === 'admin' ? 'Administrator' : user?.role || 'User'}
+                {user?.role === 'admin' ? 'Administrator' : 'Vehicle Seller / Member'}
               </p>
             </div>
           </div>
@@ -275,48 +277,50 @@ const AdminLayout = ({ children }) => {
             })}
           </div>
 
-          {/* Additional Admin Links */}
-          <div className="pt-4 border-t border-[var(--border-color)] space-y-1">
-            <p className="px-3 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
-              Management
-            </p>
-            {additionalMenuLinks.map((item, index) => {
-              const isActive = location.pathname === item.path
-              return (
-                <Link
-                  key={index}
-                  to={item.path}
-                  className={`
-                    flex
-                    items-center
-                    px-3
-                    py-2.5
-                    text-sm
-                    font-medium
-                    rounded-lg
-                    transition-all
-                    duration-200
-                    ${isActive
-                      ? 'bg-gradient-to-r from-[#2684FF] to-[#1255CC] text-white shadow-[0_0_18px_rgba(38,132,255,0.35)]'
-                      : 'text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]'
-                    }
-                  `}
-                >
-                  <div className={`
-                    mr-3
-                    transition-colors
-                    ${isActive ? 'text-white' : 'text-[var(--text-secondary)]'}
-                  `}>
-                    <item.icon active={isActive} />
-                  </div>
-                  {item.name}
-                  {isActive && (
-                    <div className="ml-auto w-2 h-2 bg-white rounded-full"></div>
-                  )}
-                </Link>
-              )
-            })}
-          </div>
+          {/* Additional Admin Links (Admins Only) */}
+          {user?.role === 'admin' && (
+            <div className="pt-4 border-t border-[var(--border-color)] space-y-1">
+              <p className="px-3 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
+                Management
+              </p>
+              {additionalMenuLinks.map((item, index) => {
+                const isActive = location.pathname === item.path
+                return (
+                  <Link
+                    key={index}
+                    to={item.path}
+                    className={`
+                      flex
+                      items-center
+                      px-3
+                      py-2.5
+                      text-sm
+                      font-medium
+                      rounded-lg
+                      transition-all
+                      duration-200
+                      ${isActive
+                        ? 'bg-gradient-to-r from-[#2684FF] to-[#1255CC] text-white shadow-[0_0_18px_rgba(38,132,255,0.35)]'
+                        : 'text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]'
+                      }
+                    `}
+                  >
+                    <div className={`
+                      mr-3
+                      transition-colors
+                      ${isActive ? 'text-white' : 'text-[var(--text-secondary)]'}
+                    `}>
+                      <item.icon active={isActive} />
+                    </div>
+                    {item.name}
+                    {isActive && (
+                      <div className="ml-auto w-2 h-2 bg-white rounded-full"></div>
+                    )}
+                  </Link>
+                )
+              })}
+            </div>
+          )}
         </nav>
 
         {/* Logout */}

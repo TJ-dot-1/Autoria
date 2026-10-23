@@ -75,18 +75,28 @@ const SellYourCar = () => {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link
-              to={isAuthenticated ? "/admin/add-car" : "/login"}
+              to={isAuthenticated ? "/admin/add-car" : "/login?mode=register&redirect=/admin/add-car"}
               className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-xs font-bold text-white bg-gradient-to-r from-[#2684FF] to-[#1255CC] shadow-[0_0_25px_rgba(38,132,255,0.5)] transform hover:-translate-y-0.5 transition-all"
             >
-              <span>{isAuthenticated ? "Add Car to Fleet" : "Sign In to List Car"}</span>
+              <span>{isAuthenticated ? "List Your Car Now" : "Register to List Your Car"}</span>
               <FiArrowRight className="w-4 h-4" />
             </Link>
-            <a
-              href="mailto:contact@autoria.com"
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-xs font-semibold text-[#F5F8FF] bg-[#061426] border border-[rgba(107,203,255,0.25)] hover:border-[#6BCBFF] transition-all"
-            >
-              <span>Contact Seller Support</span>
-            </a>
+            {!isAuthenticated && (
+              <Link
+                to="/login?redirect=/admin/add-car"
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-xs font-semibold text-[#F5F8FF] bg-[#061426] border border-[rgba(107,203,255,0.25)] hover:border-[#6BCBFF] transition-all"
+              >
+                <span>Existing Seller Sign-In</span>
+              </Link>
+            )}
+            {isAuthenticated && (
+              <Link
+                to="/admin/manage-cars"
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-xs font-semibold text-[#F5F8FF] bg-[#061426] border border-[rgba(107,203,255,0.25)] hover:border-[#6BCBFF] transition-all"
+              >
+                <span>View My Fleet</span>
+              </Link>
+            )}
           </div>
         </div>
 

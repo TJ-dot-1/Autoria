@@ -1,6 +1,7 @@
 import express from 'express';
 import { body, validationResult } from 'express-validator';
 import {
+  register,
   login,
   logout,
   getMe,
@@ -15,6 +16,24 @@ import { protect } from '../middleware/auth.js';
 const router = express.Router();
 
 // Validation middleware
+const registerValidation = [
+  body('firstName')
+    .trim()
+    .notEmpty()
+    .withMessage('First name is required'),
+  body('lastName')
+    .trim()
+    .notEmpty()
+    .withMessage('Last name is required'),
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Please provide a valid email'),
+  body('password')
+    .isLength({ min: 6 })
+    .withMessage('Password must be at least 6 characters long')
+];
+
 const loginValidation = [
   body('email')
     .isEmail()
@@ -32,6 +51,11 @@ const resetPasswordValidation = [
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
     .withMessage('Password must contain at least one lowercase letter, one uppercase letter, and one number')
 ];
+
+// @desc    Register user
+// @route   POST /api/auth/register
+// @access  Public
+router.post('/register', registerValidation, register);
 
 // @desc    Login user
 // @route   POST /api/auth/login

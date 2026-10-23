@@ -21,7 +21,7 @@ const MobileBottomNav = () => {
   const navItems = [
     { label: 'Home', path: '/', icon: FiHome },
     { label: 'Search', path: '/cars', icon: FiSearch },
-    { label: 'Sell Car', path: '/services/sell-your-car', icon: FiPlusCircle },
+    { label: 'Sell Car', path: isAuthenticated ? '/admin/add-car' : '/login?mode=register&redirect=/admin/add-car', icon: FiPlusCircle },
     { 
       label: 'Garage', 
       path: '/my-inquiries', 

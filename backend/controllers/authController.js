@@ -3,6 +3,54 @@ import { validationResult } from 'express-validator';
 import User from '../models/User.js';
 import { sendTokenResponse } from '../middleware/auth.js';
 
+// @desc    Register a new user
+// @route   POST /api/auth/register
+// @access  Public
+export const register = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: errors.array()[0]?.msg || 'Validation failed',
+        errors: errors.array()
+      });
+    }
+
+    const { firstName, lastName, email, password, phone, role } = req.body;
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'An account with this email address already exists'
+      });
+    }
+
+    // Role assignment (regular users cannot assign themselves admin role directly)
+    const userRole = role === 'admin' ? 'user' : (role || 'user');
+
+    const user = await User.create({
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      email: email.toLowerCase().trim(),
+      password,
+      phone: phone ? phone.trim() : undefined,
+      role: userRole,
+      isActive: true
+    });
+
+    sendTokenResponse(user, 201, res);
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Server error during registration'
+    });
+  }
+};
+
 // @desc    Login user
 // @route   POST /api/auth/login
 // @access  Public
