@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiSearch, FiArrowRight, FiShield, FiCheckCircle, FiTrendingUp } from 'react-icons/fi';
+import { FiSearch, FiArrowRight } from 'react-icons/fi';
 
 const Hero = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -16,14 +16,8 @@ const Hero = () => {
     }
   };
 
-  const statBadges = [
-    { label: 'Verified Cars', value: '500+', icon: FiShield },
-    { label: 'Quality Inspected', value: '100%', icon: FiCheckCircle },
-    { label: 'Happy Drivers', value: '10K+', icon: FiTrendingUp },
-  ];
-
   return (
-    <section className="relative pt-24 pb-16 md:pt-32 md:pb-24 overflow-hidden bg-[#061426]">
+    <section className="relative pt-24 pb-8 md:pt-32 md:pb-12 overflow-hidden bg-[#061426]">
       {/* Background ambient light radial glows */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-r from-[#2684FF]/20 via-[#6BCBFF]/15 to-transparent blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute top-10 left-10 w-96 h-96 bg-[#2684FF]/10 blur-[100px] rounded-full pointer-events-none" />
@@ -161,33 +155,6 @@ const Hero = () => {
           </div>
         </motion.div>
 
-        {/* Stats Section with Glass Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto mt-10">
-          {statBadges.map((badge, idx) => {
-            const Icon = badge.icon;
-            return (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.4 + idx * 0.1 }}
-                className="flex items-center gap-4 p-4 rounded-2xl bg-[#0B1D33]/60 backdrop-blur-md border border-[rgba(107,203,255,0.14)] hover:border-[rgba(107,203,255,0.3)] hover:shadow-[0_0_20px_rgba(38,132,255,0.15)] transition-all"
-              >
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#2684FF]/20 to-[#6BCBFF]/10 border border-[#2684FF]/30 flex items-center justify-center text-[#6BCBFF] shadow-[0_0_12px_rgba(38,132,255,0.2)]">
-                  <Icon className="w-6 h-6" />
-                </div>
-                <div>
-                  <div className="text-2xl font-black text-white tracking-tight">
-                    {badge.value}
-                  </div>
-                  <div className="text-xs font-medium text-[#A8B7CC]">
-                    {badge.label}
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
       </div>
     </section>
   );
