@@ -10,24 +10,39 @@ import Settings from '../models/Settings.js';
 export const getDashboardStats = async (req, res, next) => {
   try {
     const period = req.query.period || '30d';
+    const days = (period === '7d' || period === 'week') 
+      ? 7 
+      : (period === '90d' || period === 'quarter') 
+      ? 90 
+      : (period === '365d' || period === 'year' || period === '1y') 
+      ? 365 
+      : 30;
     const startDate = new Date();
-    startDate.setDate(startDate.getDate() - 30);
+    startDate.setDate(startDate.getDate() - days);
 
     // Get basic counts
     const [
       totalUsers,
+      activeUsers,
       totalCars,
+      availableCars,
+      unavailableCars,
       totalBookings,
       activeBookings,
       completedBookings,
-      pendingBookings
+      pendingBookings,
+      cancelledBookings
     ] = await Promise.all([
       User.countDocuments(),
+      User.countDocuments({ isActive: true }),
       Car.countDocuments({ isActive: true }),
+      Car.countDocuments({ isActive: true, isAvailable: true }),
+      Car.countDocuments({ isActive: true, isAvailable: false }),
       Booking.countDocuments(),
       Booking.countDocuments({ status: 'Active' }),
       Booking.countDocuments({ status: 'Completed' }),
-      Booking.countDocuments({ status: 'Pending' })
+      Booking.countDocuments({ status: 'Pending' }),
+      Booking.countDocuments({ status: 'Cancelled' })
     ]);
 
     // Calculate revenue
@@ -47,28 +62,29 @@ export const getDashboardStats = async (req, res, next) => {
       }
     ]);
 
-    // Recent bookings
+    // Recent bookings with enriched customer and vehicle data
     const recentBookings = await Booking.find()
-      .populate('user', 'firstName lastName email')
-      .populate('car', 'brand model primaryImage')
+      .populate('user', 'firstName lastName email phone')
+      .populate('car', 'brand model primaryImage images pricePerDay salePrice location isAvailable category')
       .sort({ createdAt: -1 })
-      .limit(10);
+      .limit(15);
 
     const stats = {
       users: {
         total: totalUsers,
-        active: totalUsers // For now, all users are active
+        active: activeUsers || totalUsers
       },
       cars: {
         total: totalCars,
-        available: await Car.countDocuments({ isActive: true, isAvailable: true }),
-        unavailable: await Car.countDocuments({ isActive: true, isAvailable: false })
+        available: availableCars,
+        unavailable: unavailableCars
       },
       bookings: {
         total: totalBookings,
         active: activeBookings,
         completed: completedBookings,
-        pending: pendingBookings
+        pending: pendingBookings,
+        cancelled: cancelledBookings
       },
       revenue: {
         total: revenueData[0]?.totalRevenue || 0,
@@ -398,7 +414,13 @@ export const updateSettings = async (req, res, next) => {
 export const getPerformanceData = async (req, res, next) => {
   try {
     const period = req.query.period || '30d';
-    const days = period === '7d' ? 7 : period === '30d' ? 30 : 90;
+    const days = (period === '7d' || period === 'week') 
+      ? 7 
+      : (period === '90d' || period === 'quarter') 
+      ? 90 
+      : (period === '365d' || period === 'year' || period === '1y') 
+      ? 365 
+      : 30;
 
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
