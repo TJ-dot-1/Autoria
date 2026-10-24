@@ -37,26 +37,32 @@ const ManageCars = () => {
   // Filter and sort cars
   const filteredCars = cars
     .filter(car => {
-      const matchesSearch = car.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           car.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           car.location.toLowerCase().includes(searchQuery.toLowerCase())
+      const brandStr = car.brand || ''
+      const modelStr = car.model || ''
+      const locStr = car.location || ''
+      const matchesSearch = brandStr.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           modelStr.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           locStr.toLowerCase().includes(searchQuery.toLowerCase())
       
+      const isAvail = car.isAvailable !== false
       const matchesFilter = filterStatus === 'all' ||
-                           (filterStatus === 'available' && car.isAvaliable) ||
-                           (filterStatus === 'unavailable' && !car.isAvaliable)
+                           (filterStatus === 'available' && isAvail) ||
+                           (filterStatus === 'unavailable' && !isAvail)
       
       return matchesSearch && matchesFilter
     })
     .sort((a, b) => {
+      const aPrice = a.salePrice || (a.pricePerDay ? a.pricePerDay * 30 : 0)
+      const bPrice = b.salePrice || (b.pricePerDay ? b.pricePerDay * 30 : 0)
       switch (sortBy) {
         case 'name':
           return `${a.brand} ${a.model}`.localeCompare(`${b.brand} ${b.model}`)
         case 'price-low':
-          return a.pricePerDay - b.pricePerDay
+          return aPrice - bPrice
         case 'price-high':
-          return b.pricePerDay - a.pricePerDay
+          return bPrice - aPrice
         case 'year':
-          return b.year - a.year
+          return (b.year || 0) - (a.year || 0)
         default:
           return 0
       }
@@ -85,8 +91,8 @@ const ManageCars = () => {
   return (
     <div className="space-y-6">
       <Title 
-        title="Manage Cars" 
-        subtitle="Review, filter, edit, and maintain your active vehicle fleet"
+        title="Vehicle Inventory Listings" 
+        subtitle="Review, filter, edit, and maintain all cars listed for sale on the marketplace"
       />
 
       {/* Filters and Actions */}
@@ -140,7 +146,7 @@ const ManageCars = () => {
               <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
-              Add New Car
+              List a Vehicle
             </Link>
           </div>
         </div>
@@ -203,21 +209,10 @@ const ManageCars = () => {
                     </div>
 
                     <div className="text-right shrink-0">
-                      {car.salePrice ? (
-                        <>
-                          <p className="text-lg font-extrabold text-[#6BCBFF]">
-                            ${car.salePrice?.toLocaleString()}
-                          </p>
-                          <p className="text-[10px] text-[#A8B7CC]">Buy Now</p>
-                        </>
-                      ) : (
-                        <>
-                          <p className="text-lg font-extrabold text-[#6BCBFF]">
-                            ${car.pricePerDay}
-                          </p>
-                          <p className="text-[10px] text-[#A8B7CC]">per day</p>
-                        </>
-                      )}
+                      <p className="text-base sm:text-lg font-extrabold text-emerald-400">
+                        KES {(car.salePrice || (car.pricePerDay ? car.pricePerDay * 30 : 0)).toLocaleString()}
+                      </p>
+                      <p className="text-[10px] text-[#A8B7CC]">Asking Price</p>
                     </div>
                   </div>
 

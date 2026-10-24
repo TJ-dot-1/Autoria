@@ -123,22 +123,22 @@ const AdminLayout = ({ children }) => {
 
   const adminMenuLinks = [
     { 
-      name: "Dashboard", 
+      name: "Marketplace Overview", 
       path: "/admin/dashboard", 
       icon: DashboardIcon
     },
     { 
-      name: "Manage Cars", 
+      name: "Vehicle Listings", 
       path: "/admin/manage-cars", 
       icon: CarIcon
     },
     { 
-      name: "Add Car", 
+      name: "List a Vehicle", 
       path: "/admin/add-car", 
       icon: AddIcon
     },
     { 
-      name: "Manage Bookings", 
+      name: "Buyer Inquiries & Leads", 
       path: "/admin/bookings", 
       icon: ListIcon
     },

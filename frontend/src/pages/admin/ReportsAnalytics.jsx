@@ -230,7 +230,7 @@ const ReportsAnalytics = () => {
 
   const statsCards = [
     {
-      title: 'Total Revenue',
+      title: 'Gross Sales Revenue',
       value: formatCurrency(dashboardStats.revenue.total),
       change: '+24%',
       changeType: 'positive',
@@ -238,23 +238,23 @@ const ReportsAnalytics = () => {
       color: 'bg-green-500'
     },
     {
-      title: 'Total Bookings',
-      value: dashboardStats.bookings.total.toLocaleString(),
+      title: 'Total Deals Closed',
+      value: (dashboardStats.sales?.totalDeals || dashboardStats.bookings?.completed || 0).toLocaleString(),
       change: '+12%',
       changeType: 'positive',
       icon: BookingsIcon,
       color: 'bg-blue-500'
     },
     {
-      title: 'Car Utilization',
-      value: `${Math.round((dashboardStats.bookings.completed / Math.max(dashboardStats.cars.total, 1)) * 100)}%`,
+      title: 'Inventory Turnover',
+      value: `${Math.round(((dashboardStats.cars.unavailable || 0) / Math.max(dashboardStats.cars.total, 1)) * 100)}%`,
       change: '+8%',
       changeType: 'positive',
       icon: CarIcon,
       color: 'bg-purple-500'
     },
     {
-      title: 'Active Users',
+      title: 'Active Members',
       value: dashboardStats.users.active.toLocaleString(),
       change: '+15%',
       changeType: 'positive',
@@ -365,8 +365,8 @@ const ReportsAnalytics = () => {
           <div className="flex space-x-1">
             <TabButton id="overview" label="Overview" isActive={activeTab === 'overview'} onClick={setActiveTab} />
             <TabButton id="revenue" label="Revenue Analytics" isActive={activeTab === 'revenue'} onClick={setActiveTab} />
-            <TabButton id="bookings" label="Booking Trends" isActive={activeTab === 'bookings'} onClick={setActiveTab} />
-            <TabButton id="cars" label="Car Performance" isActive={activeTab === 'cars'} onClick={setActiveTab} />
+            <TabButton id="bookings" label="Sales Trends" isActive={activeTab === 'bookings'} onClick={setActiveTab} />
+            <TabButton id="cars" label="Vehicle Performance" isActive={activeTab === 'cars'} onClick={setActiveTab} />
             <TabButton id="users" label="User Analytics" isActive={activeTab === 'users'} onClick={setActiveTab} />
           </div>
         </div>
@@ -376,7 +376,7 @@ const ReportsAnalytics = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Recent Activity */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Bookings</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Sales Transactions &amp; Inquiries</h3>
                 <div className="space-y-3">
                   {recentBookings.map((booking) => (
                     <div key={booking._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -391,13 +391,13 @@ const ReportsAnalytics = () => {
                             {booking.car?.brand} {booking.car?.model}
                           </p>
                           <p className="text-sm text-gray-600">
-                            {booking.driver?.firstName} {booking.driver?.lastName}
+                            {booking.user?.firstName || booking.driver?.firstName} {booking.user?.lastName || booking.driver?.lastName}
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
                         <p className="font-medium text-gray-900">
-                          {formatCurrency(booking.pricing?.totalAmount || 0)}
+                          {formatCurrency(booking.pricing?.totalAmount || booking.car?.salePrice || 0)}
                         </p>
                         <span className={`text-xs px-2 py-1 rounded-full ${
                           booking.status === 'Completed' 
@@ -406,7 +406,7 @@ const ReportsAnalytics = () => {
                             ? 'bg-blue-100 text-blue-800'
                             : 'bg-yellow-100 text-yellow-800'
                         }`}>
-                          {booking.status}
+                          {booking.status === 'Completed' ? 'Sold' : booking.status === 'Active' ? 'In Negotiation' : 'New Offer'}
                         </span>
                       </div>
                     </div>
@@ -420,7 +420,7 @@ const ReportsAnalytics = () => {
                 <div className="space-y-4">
                   <div className="p-4 bg-blue-50 rounded-lg">
                     <div className="flex items-center justify-between">
-                      <span className="text-blue-800 font-medium">Average Booking Value</span>
+                      <span className="text-blue-800 font-medium">Average Transaction Value</span>
                       <span className="text-2xl font-bold text-blue-900">
                         {formatCurrency(dashboardStats.revenue.average)}
                       </span>
@@ -496,15 +496,15 @@ const ReportsAnalytics = () => {
 
           {activeTab === 'bookings' && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Booking Trends</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Sales &amp; Transaction Trends</h3>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bookings</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Revenue</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deals</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gross Volume</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Market Activity</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">

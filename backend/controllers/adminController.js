@@ -62,12 +62,77 @@ export const getDashboardStats = async (req, res, next) => {
       }
     ]);
 
-    // Recent bookings with enriched customer and vehicle data
-    const recentBookings = await Booking.find()
-      .populate('user', 'firstName lastName email phone')
-      .populate('car', 'brand model primaryImage images pricePerDay salePrice location isAvailable category')
-      .sort({ createdAt: -1 })
-      .limit(15);
+    // Query recent cars for marketplace activity feed
+    const [recentCars, recentUsers, recentSales, recentBookings] = await Promise.all([
+      Car.find({ isActive: true })
+        .populate('addedBy', 'firstName lastName email role')
+        .sort({ createdAt: -1 })
+        .limit(10),
+      User.find()
+        .sort({ createdAt: -1 })
+        .limit(5),
+      Booking.find({ status: 'Completed' })
+        .populate('car', 'brand model year salePrice primaryImage')
+        .populate('user', 'firstName lastName email')
+        .sort({ updatedAt: -1 })
+        .limit(5),
+      Booking.find()
+        .populate('user', 'firstName lastName email phone')
+        .populate('car', 'brand model year condition isForSale salePrice pricePerDay primaryImage images location isAvailable category')
+        .sort({ createdAt: -1 })
+        .limit(20)
+    ]);
+
+    // Build real-time car selling marketplace activities
+    const recentActivities = [];
+
+    recentCars.forEach((car) => {
+      const price = car.salePrice || (car.pricePerDay ? car.pricePerDay * 30 : 0);
+      recentActivities.push({
+        id: `car-${car._id}`,
+        type: 'car_listed',
+        action: 'Vehicle Listed for Sale',
+        title: `${car.year ? `${car.year} ` : ''}${car.brand} ${car.model}`,
+        description: `Listed at KES ${Number(price).toLocaleString()}`,
+        time: car.createdAt,
+        badge: car.condition || (car.isAvailable !== false ? 'Available' : 'Reserved'),
+        badgeColor: 'emerald',
+        image: car.primaryImage || (car.images?.[0]?.url) || '/hero_sports_car.jpg',
+        carId: car._id,
+        price: price,
+        seller: car.addedBy ? `${car.addedBy.firstName || ''} ${car.addedBy.lastName || ''}`.trim() : 'Showroom'
+      });
+    });
+
+    recentSales.forEach((sale) => {
+      recentActivities.push({
+        id: `sale-${sale._id}`,
+        type: 'car_sold',
+        action: 'Vehicle Sold / Deal Closed',
+        title: `${sale.car?.year ? `${sale.car.year} ` : ''}${sale.car?.brand || 'Vehicle'} ${sale.car?.model || ''}`,
+        description: `Closed deal with ${sale.user?.firstName || 'Buyer'} for KES ${Number(sale.pricing?.totalAmount || sale.car?.salePrice || 0).toLocaleString()}`,
+        time: sale.updatedAt || sale.createdAt,
+        badge: 'Sold',
+        badgeColor: 'blue',
+        image: sale.car?.primaryImage || '/hero_sports_car.jpg',
+        price: sale.pricing?.totalAmount || sale.car?.salePrice || 0
+      });
+    });
+
+    recentUsers.forEach((u) => {
+      recentActivities.push({
+        id: `user-${u._id}`,
+        type: 'user_joined',
+        action: 'Member Registered',
+        title: `${u.firstName || 'New'} ${u.lastName || 'User'}`,
+        description: `Joined Autoria community as ${u.role === 'admin' ? 'Administrator' : 'Buyer / Seller'}`,
+        time: u.createdAt,
+        badge: u.role === 'admin' ? 'Admin' : 'Member',
+        badgeColor: 'purple'
+      });
+    });
+
+    recentActivities.sort((a, b) => new Date(b.time) - new Date(a.time));
 
     const stats = {
       users: {
@@ -78,6 +143,20 @@ export const getDashboardStats = async (req, res, next) => {
         total: totalCars,
         available: availableCars,
         unavailable: unavailableCars
+      },
+      sales: {
+        totalDeals: completedBookings,
+        activeNegotiations: activeBookings,
+        inquiriesCount: totalBookings,
+        totalVolume: revenueData[0]?.totalRevenue || 0,
+        averagePrice: revenueData[0]?.avgBookingValue || 0
+      },
+      inquiries: {
+        total: totalBookings,
+        active: activeBookings,
+        completed: completedBookings,
+        pending: pendingBookings,
+        cancelled: cancelledBookings
       },
       bookings: {
         total: totalBookings,
@@ -90,6 +169,7 @@ export const getDashboardStats = async (req, res, next) => {
         total: revenueData[0]?.totalRevenue || 0,
         average: revenueData[0]?.avgBookingValue || 0
       },
+      recentActivities: recentActivities,
       recentBookings: recentBookings
     };
 
@@ -534,38 +614,55 @@ export const getPerformanceData = async (req, res, next) => {
       }
     ]);
 
-    // Get booking status distribution
-    const statusDistribution = await Booking.aggregate([
-      {
-        $match: {
-          createdAt: { $gte: startDate }
-        }
-      },
-      {
-        $group: {
-          _id: '$status',
-          count: { $sum: 1 }
-        }
-      }
+    // If topCars from closed deals has fewer than 5, supplement with premium showroom inventory
+    let finalTopCars = [...topCars];
+    if (finalTopCars.length < 5) {
+      const existingCarIds = finalTopCars.map(tc => tc._id);
+      const topInventoryCars = await Car.find({ 
+        isActive: true,
+        ...(existingCarIds.length > 0 ? { _id: { $nin: existingCarIds } } : {})
+      })
+        .sort({ salePrice: -1, createdAt: -1 })
+        .limit(5 - finalTopCars.length);
+
+      topInventoryCars.forEach((c) => {
+        const val = c.salePrice || (c.pricePerDay ? c.pricePerDay * 30 : 0);
+        finalTopCars.push({
+          car: `${c.year ? `${c.year} ` : ''}${c.brand} ${c.model}`,
+          bookings: 0,
+          inquiries: 0,
+          revenue: val,
+          image: c.primaryImage || (c.images?.[0]?.url) || null
+        });
+      });
+    }
+
+    // Get condition distribution (Foreign Used, Brand New, Local Used)
+    const conditionDist = await Car.aggregate([
+      { $match: { isActive: true } },
+      { $group: { _id: { $ifNull: ['$condition', 'Used'] }, count: { $sum: 1 } } }
     ]);
 
-    const bookingStatusData = {
-      completed: 0,
-      active: 0,
-      pending: 0,
-      cancelled: 0
+    const inventoryCondition = {
+      used: 0,
+      foreignUsed: 0,
+      brandNew: 0
     };
 
-    statusDistribution.forEach(status => {
-      bookingStatusData[status._id.toLowerCase()] = status.count;
+    conditionDist.forEach((item) => {
+      const key = String(item._id).toLowerCase();
+      if (key.includes('brand') || key.includes('new')) inventoryCondition.brandNew += item.count;
+      else if (key.includes('foreign') || key.includes('import')) inventoryCondition.foreignUsed += item.count;
+      else inventoryCondition.used += item.count;
     });
 
     res.status(200).json({
       success: true,
       data: {
         timeSeries: performanceData,
-        topCars,
-        bookingStatus: bookingStatusData
+        topCars: finalTopCars,
+        bookingStatus: bookingStatusData,
+        inventoryCondition
       }
     });
   } catch (error) {

@@ -12,27 +12,27 @@ const BookingDetailsModal = ({ booking, onClose }) => {
 
     if (hasActiveBooking) {
       return {
-        status: 'Booked',
-        color: 'text-red-600',
-        bg: 'bg-red-100',
-        icon: '🚫',
-        description: `In use until ${formatDate(booking.bookingPeriod?.endDate)}`
+        status: 'Under Offer / In Deal',
+        color: 'text-blue-600',
+        bg: 'bg-blue-100',
+        icon: '🤝',
+        description: `Active buyer negotiation`
       }
     } else if (carAvailable) {
       return {
-        status: 'Available',
+        status: 'Available for Sale',
         color: 'text-green-600',
         bg: 'bg-green-100',
         icon: '✅',
-        description: 'Ready for booking'
+        description: 'Ready in showroom'
       }
     } else {
       return {
-        status: 'Unavailable',
+        status: 'Sold / Reserved',
         color: 'text-orange-600',
         bg: 'bg-orange-100',
-        icon: '⏸️',
-        description: 'Temporarily unavailable'
+        icon: '🏷️',
+        description: 'Reserved or sold'
       }
     }
   }
@@ -83,8 +83,8 @@ const BookingDetailsModal = ({ booking, onClose }) => {
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Booking Details</h2>
-              <p className="text-sm text-gray-600 mt-1">Booking #{booking.bookingNumber || 'N/A'}</p>
+              <h2 className="text-2xl font-bold text-gray-900">Buyer Inquiry &amp; Offer Details</h2>
+              <p className="text-sm text-gray-600 mt-1">Lead #{booking.bookingNumber || booking._id?.slice(-6).toUpperCase() || 'N/A'}</p>
             </div>
             <button
               onClick={onClose}
@@ -102,25 +102,21 @@ const BookingDetailsModal = ({ booking, onClose }) => {
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h3 className="text-lg font-semibold mb-4 flex items-center">
                   <span className="mr-2">📋</span>
-                  Booking Information
+                  Deal Information
                 </h3>
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="font-medium">Status:</span>
+                    <span className="font-medium">Deal Stage:</span>
                     <span className={`px-3 py-1 rounded-full text-xs ${getStatusColor(booking.status)}`}>
-                      {booking.status}
+                      {booking.status === 'Completed' ? 'Sold' : booking.status === 'Active' ? 'In Negotiation' : booking.status === 'Pending' ? 'New Offer' : booking.status}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-medium">Total Amount:</span>
-                    <span className="font-semibold text-green-600">KSh {booking.pricing?.totalAmount?.toLocaleString() || '0'}</span>
+                    <span className="font-medium">Offer / Value:</span>
+                    <span className="font-semibold text-green-600">KSh {(booking.car?.salePrice || booking.pricing?.totalAmount || 0).toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-medium">Duration:</span>
-                    <span>{booking.pricing?.totalDays || 0} days</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-medium">Created:</span>
+                    <span className="font-medium">Inquiry Date:</span>
                     <span>{formatDate(booking.createdAt)}</span>
                   </div>
                 </div>
@@ -873,8 +869,8 @@ const ManageBookings = () => {
   return (
     <div className="space-y-6">
       <Title 
-        title="Manage Bookings" 
-        subtitle="View and manage all car rental bookings with enhanced availability tracking"
+        title="Buyer Inquiries &amp; Sales Leads" 
+        subtitle="View and manage prospective car buyer inquiries, purchase offers, and closed sales deals"
       />
 
       {/* Enhanced Controls */}
@@ -929,10 +925,10 @@ const ManageBookings = () => {
         {/* Enhanced Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           {[
-            { label: 'Total Bookings', value: bookings.length, color: 'bg-blue-500', icon: '📊' },
-            { label: 'Pending', value: bookings.filter(b => b.status === 'Pending').length, color: 'bg-yellow-500', icon: '⏳' },
-            { label: 'Confirmed', value: bookings.filter(b => b.status === 'Confirmed').length, color: 'bg-green-500', icon: '✅' },
-            { label: 'Completed', value: bookings.filter(b => b.status === 'Completed').length, color: 'bg-purple-500', icon: '🎉' }
+            { label: 'Total Inquiries', value: bookings.length, color: 'bg-blue-500', icon: '📊' },
+            { label: 'New Offers', value: bookings.filter(b => b.status === 'Pending').length, color: 'bg-yellow-500', icon: '⏳' },
+            { label: 'In Negotiation', value: bookings.filter(b => b.status === 'Active' || b.status === 'Confirmed').length, color: 'bg-emerald-500', icon: '🤝' },
+            { label: 'Deals Closed (Sold)', value: bookings.filter(b => b.status === 'Completed').length, color: 'bg-purple-500', icon: '🎉' }
           ].map((stat, index) => (
             <div key={index} className="bg-[var(--bg-secondary)] rounded-xl p-4 hover:bg-[var(--bg-primary)] transition-colors cursor-pointer">
               <div className="flex items-center">

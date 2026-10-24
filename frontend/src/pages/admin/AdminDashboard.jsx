@@ -1,63 +1,57 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import toast from 'react-hot-toast'
-import { useAuth } from '../../contexts/AuthContext'
-import { adminAPI, bookingsAPI, carsAPI } from '../../utils/api'
+import {
+  FiBox,
+  FiDollarSign,
+  FiUsers,
+  FiTrendingUp,
+  FiClock,
+  FiCheckCircle,
+  FiAlertCircle,
+  FiPlusCircle,
+  FiRefreshCw,
+  FiExternalLink,
+  FiServer,
+  FiDatabase,
+  FiCpu,
+  FiActivity,
+  FiSearch,
+  FiFilter,
+  FiChevronRight,
+  FiTag,
+  FiShield,
+  FiSliders,
+  FiCalendar,
+  FiCompass,
+  FiEye,
+  FiX,
+  FiLayers
+} from 'react-icons/fi'
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
-  BarElement,
-  Title,
+  Title as ChartTitle,
   Tooltip,
   Legend,
   ArcElement,
   Filler
 } from 'chart.js'
-import { Line, Bar, Doughnut } from 'react-chartjs-2'
-import {
-  FiTrendingUp,
-  FiDollarSign,
-  FiUsers,
-  FiBox,
-  FiCalendar,
-  FiPlusCircle,
-  FiCheckCircle,
-  FiClock,
-  FiActivity,
-  FiArrowRight,
-  FiSearch,
-  FiFilter,
-  FiRefreshCw,
-  FiExternalLink,
-  FiPhone,
-  FiMail,
-  FiEye,
-  FiAlertCircle,
-  FiServer,
-  FiDatabase,
-  FiCpu,
-  FiSettings,
-  FiSliders,
-  FiX,
-  FiCheck,
-  FiLayers,
-  FiChevronRight,
-  FiMessageSquare,
-  FiCompass,
-  FiXCircle
-} from 'react-icons/fi'
+import { Line, Doughnut } from 'react-chartjs-2'
+import { toast } from 'react-hot-toast'
+import { useAuth } from '../../contexts/AuthContext'
+import { adminAPI, carsAPI } from '../../utils/api'
 
+// Register ChartJS modules
 ChartJS.register(
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
-  BarElement,
-  Title,
+  ChartTitle,
   Tooltip,
   Legend,
   ArcElement,
@@ -67,19 +61,19 @@ ChartJS.register(
 const AdminDashboard = () => {
   const { user } = useAuth()
 
-  // State Management
+  // State Management (Car Selling Marketplace Focus)
   const [stats, setStats] = useState({
     users: { total: 0, active: 0 },
     cars: { total: 0, available: 0, unavailable: 0 },
-    bookings: { total: 0, active: 0, completed: 0, pending: 0, cancelled: 0 },
+    sales: { totalDeals: 0, activeNegotiations: 0, inquiriesCount: 0, totalVolume: 0, averagePrice: 0 },
     revenue: { total: 0, average: 0 },
-    recentBookings: []
+    recentActivities: []
   })
 
   const [performanceData, setPerformanceData] = useState({
     timeSeries: [],
     topCars: [],
-    bookingStatus: { completed: 0, active: 0, pending: 0, cancelled: 0 }
+    inventoryCondition: { brandNew: 0, foreignUsed: 0, used: 0 }
   })
 
   const [systemHealth, setSystemHealth] = useState(null)
@@ -89,23 +83,17 @@ const AdminDashboard = () => {
   const [timeRange, setTimeRange] = useState('30d')
   const [lastRefreshed, setLastRefreshed] = useState(new Date())
 
-  // Tabs: 'overview' | 'inquiries' | 'fleet' | 'diagnostics'
+  // Tabs: 'overview' | 'activity' | 'inventory' | 'diagnostics'
   const [activeTab, setActiveTab] = useState('overview')
 
-  // Inquiries Sub-filters
-  const [inquirySearch, setInquirySearch] = useState('')
-  const [inquiryStatusFilter, setInquiryStatusFilter] = useState('all')
+  // Activity Feed Sub-filters
+  const [activitySearch, setActivitySearch] = useState('')
+  const [activityTypeFilter, setActivityTypeFilter] = useState('all')
 
-  // Fleet Sub-filters
-  const [fleetSearch, setFleetSearch] = useState('')
-  const [fleetStatusFilter, setFleetStatusFilter] = useState('all')
+  // Inventory Sub-filters
+  const [inventorySearch, setInventorySearch] = useState('')
+  const [inventoryStatusFilter, setInventoryStatusFilter] = useState('all')
   const [togglingCarId, setTogglingCarId] = useState(null)
-
-  // Booking Modal
-  const [selectedBooking, setSelectedBooking] = useState(null)
-  const [modalStatus, setModalStatus] = useState('')
-  const [modalNote, setModalNote] = useState('')
-  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false)
 
   // API Host & Image Helper
   const API_HOST = (import.meta.env.VITE_API_URL || 'http://localhost:5000')
@@ -173,9 +161,9 @@ const AdminDashboard = () => {
           dashRes.value.data || {
             users: { total: 0, active: 0 },
             cars: { total: 0, available: 0, unavailable: 0 },
-            bookings: { total: 0, active: 0, completed: 0, pending: 0, cancelled: 0 },
+            sales: { totalDeals: 0, activeNegotiations: 0, inquiriesCount: 0, totalVolume: 0, averagePrice: 0 },
             revenue: { total: 0, average: 0 },
-            recentBookings: []
+            recentActivities: []
           }
         )
       }
@@ -186,7 +174,7 @@ const AdminDashboard = () => {
           perfRes.value.data || {
             timeSeries: [],
             topCars: [],
-            bookingStatus: { completed: 0, active: 0, pending: 0, cancelled: 0 }
+            inventoryCondition: { brandNew: 0, foreignUsed: 0, used: 0 }
           }
         )
       }
@@ -202,10 +190,10 @@ const AdminDashboard = () => {
       }
 
       setLastRefreshed(new Date())
-      if (isManual) toast.success('Dashboard synchronized with live platform')
+      if (isManual) toast.success('Marketplace data synchronized')
     } catch (error) {
-      console.error('Error fetching admin dashboard data:', error)
-      toast.error('Failed to refresh some dashboard data')
+      console.error('Error fetching admin marketplace data:', error)
+      toast.error('Failed to refresh some marketplace data')
     } finally {
       setIsLoading(false)
       setIsRefreshing(false)
@@ -216,18 +204,16 @@ const AdminDashboard = () => {
     fetchDashboardData()
   }, [timeRange])
 
-  // Toggle Car Availability Handler
+  // Toggle Car Availability (Available for sale vs Reserved/Sold)
   const handleToggleAvailability = async (carId, currentStatus) => {
     try {
       setTogglingCarId(carId)
       const res = await carsAPI.toggleAvailability(carId)
       if (res.success || res.data) {
-        toast.success(`Vehicle marked as ${!currentStatus ? 'Available' : 'Unavailable'}`)
-        // Update local fleet state immediately
+        toast.success(`Vehicle marked as ${!currentStatus ? 'Available for Sale' : 'Reserved / Sold'}`)
         setFleetCars((prev) =>
           prev.map((c) => (c._id === carId ? { ...c, isAvailable: !currentStatus } : c))
         )
-        // Refresh stats
         setStats((prev) => ({
           ...prev,
           cars: {
@@ -238,204 +224,144 @@ const AdminDashboard = () => {
         }))
       }
     } catch (err) {
-      toast.error(err.message || 'Failed to toggle vehicle availability')
+      toast.error(err.message || 'Failed to update vehicle status')
     } finally {
       setTogglingCarId(null)
     }
   }
 
-  // Quick Booking Status Updater
-  const handleQuickStatusUpdate = async (bookingId, newStatus) => {
-    try {
-      const res = await bookingsAPI.updateStatus(bookingId, newStatus, `Updated via Admin Quick Actions to ${newStatus}`)
-      if (res.success || res.data) {
-        toast.success(`Booking status changed to ${newStatus}`)
-        // Update recentBookings in stats
-        setStats((prev) => ({
-          ...prev,
-          recentBookings: prev.recentBookings.map((b) =>
-            b._id === bookingId ? { ...b, status: newStatus } : b
-          )
-        }))
-        if (selectedBooking && selectedBooking._id === bookingId) {
-          setSelectedBooking((prev) => ({ ...prev, status: newStatus }))
-        }
+  // Derive Marketplace Activities Feed (combining backend activities with showroom cars fallback)
+  const displayActivities = useMemo(() => {
+    if (stats.recentActivities && stats.recentActivities.length > 0) {
+      return stats.recentActivities
+    }
+    return fleetCars.slice(0, 15).map((car) => {
+      const isAvail = car.isAvailable !== false
+      const price = car.salePrice || (car.pricePerDay ? car.pricePerDay * 30 : 0)
+      return {
+        id: `car-${car._id}`,
+        type: isAvail ? 'car_listed' : 'car_sold',
+        action: isAvail ? 'Vehicle Listed for Sale' : 'Vehicle Marked as Sold',
+        title: `${car.year ? `${car.year} ` : ''}${car.brand} ${car.model}`,
+        description: isAvail ? `Showroom stock at ${formatCurrency(price)}` : 'Closed transaction / Sold',
+        time: car.createdAt || new Date().toISOString(),
+        badge: car.condition || (isAvail ? 'Available' : 'Sold'),
+        badgeColor: isAvail ? 'emerald' : 'blue',
+        image: getCarImage(car),
+        carId: car._id,
+        price: price,
+        seller: car.addedBy?.firstName ? `${car.addedBy.firstName} ${car.addedBy.lastName || ''}` : 'Showroom'
       }
-    } catch (err) {
-      toast.error(err.message || `Failed to update status to ${newStatus}`)
-    }
-  }
+    })
+  }, [stats.recentActivities, fleetCars])
 
-  // Save Booking Status from Modal
-  const handleModalStatusSave = async () => {
-    if (!selectedBooking) return
-    try {
-      setIsUpdatingStatus(true)
-      const res = await bookingsAPI.updateStatus(selectedBooking._id, modalStatus, modalNote)
-      if (res.success || res.data) {
-        toast.success('Booking status and administrative note updated')
-        setStats((prev) => ({
-          ...prev,
-          recentBookings: prev.recentBookings.map((b) =>
-            b._id === selectedBooking._id ? { ...b, status: modalStatus } : b
-          )
-        }))
-        setSelectedBooking(null)
-        setModalNote('')
-      }
-    } catch (err) {
-      toast.error(err.message || 'Failed to update booking status')
-    } finally {
-      setIsUpdatingStatus(false)
-    }
-  }
+  // Filtered Activities
+  const filteredActivities = useMemo(() => {
+    return displayActivities.filter((act) => {
+      const matchesSearch =
+        !activitySearch ||
+        act.title?.toLowerCase().includes(activitySearch.toLowerCase()) ||
+        act.description?.toLowerCase().includes(activitySearch.toLowerCase()) ||
+        act.action?.toLowerCase().includes(activitySearch.toLowerCase())
 
-  // Greeting helper
-  const getGreeting = () => {
-    const hour = new Date().getHours()
-    if (hour < 12) return 'Good Morning'
-    if (hour < 17) return 'Good Afternoon'
-    return 'Good Evening'
-  }
+      const matchesType =
+        activityTypeFilter === 'all' ||
+        (activityTypeFilter === 'listings' && act.type === 'car_listed') ||
+        (activityTypeFilter === 'sales' && act.type === 'car_sold') ||
+        (activityTypeFilter === 'members' && act.type === 'user_joined')
 
-  // Filtered Inquiries
-  const filteredInquiries = useMemo(() => {
-    let list = stats.recentBookings || []
-    if (inquiryStatusFilter !== 'all') {
-      list = list.filter((b) => (b.status || '').toLowerCase() === inquiryStatusFilter.toLowerCase())
-    }
-    if (inquirySearch.trim()) {
-      const q = inquirySearch.toLowerCase()
-      list = list.filter((b) => {
-        const carName = `${b.car?.brand || ''} ${b.car?.model || ''}`.toLowerCase()
-        const userName = `${b.user?.firstName || ''} ${b.user?.lastName || ''}`.toLowerCase()
-        const userEmail = (b.user?.email || '').toLowerCase()
-        const userPhone = (b.user?.phone || '').toLowerCase()
-        const bookingNum = (b.bookingNumber || b._id || '').toLowerCase()
-        return (
-          carName.includes(q) ||
-          userName.includes(q) ||
-          userEmail.includes(q) ||
-          userPhone.includes(q) ||
-          bookingNum.includes(q)
-        )
+      return matchesSearch && matchesType
+    })
+  }, [displayActivities, activitySearch, activityTypeFilter])
+
+  // Filtered Showroom Inventory
+  const filteredInventory = useMemo(() => {
+    return fleetCars.filter((car) => {
+      const isAvailable = car.isAvailable !== false
+      const matchesSearch =
+        !inventorySearch ||
+        `${car.brand} ${car.model} ${car.year} ${car.location}`
+          .toLowerCase()
+          .includes(inventorySearch.toLowerCase())
+
+      const matchesStatus =
+        inventoryStatusFilter === 'all' ||
+        (inventoryStatusFilter === 'available' && isAvailable) ||
+        (inventoryStatusFilter === 'unavailable' && !isAvailable)
+
+      return matchesSearch && matchesStatus
+    })
+  }, [fleetCars, inventorySearch, inventoryStatusFilter])
+
+  // Calculated Inventory Condition Breakdown for Doughnut Chart
+  const conditionCounts = useMemo(() => {
+    let foreignUsed = performanceData.inventoryCondition?.foreignUsed || 0
+    let brandNew = performanceData.inventoryCondition?.brandNew || 0
+    let used = performanceData.inventoryCondition?.used || 0
+
+    if (foreignUsed === 0 && brandNew === 0 && used === 0 && fleetCars.length > 0) {
+      fleetCars.forEach((c) => {
+        const cond = (c.condition || '').toLowerCase()
+        if (cond.includes('new')) brandNew++
+        else if (cond.includes('foreign') || cond.includes('import')) foreignUsed++
+        else used++
       })
     }
-    return list
-  }, [stats.recentBookings, inquiryStatusFilter, inquirySearch])
 
-  // Filtered Fleet
-  const filteredFleet = useMemo(() => {
-    let list = fleetCars || []
-    if (fleetStatusFilter === 'available') {
-      list = list.filter((c) => c.isAvailable !== false)
-    } else if (fleetStatusFilter === 'unavailable') {
-      list = list.filter((c) => c.isAvailable === false)
+    if (foreignUsed === 0 && brandNew === 0 && used === 0) {
+      used = stats.cars.total || 1
     }
-    if (fleetSearch.trim()) {
-      const q = fleetSearch.toLowerCase()
-      list = list.filter((c) => {
-        const title = `${c.brand || ''} ${c.model || ''} ${c.year || ''}`.toLowerCase()
-        const loc = (c.location || '').toLowerCase()
-        const cat = (c.category || '').toLowerCase()
-        return title.includes(q) || loc.includes(q) || cat.includes(q)
-      })
-    }
-    return list
-  }, [fleetCars, fleetStatusFilter, fleetSearch])
 
-  // Status Color & Badge Helper
-  const getStatusBadge = (status) => {
-    switch (status?.toLowerCase()) {
-      case 'confirmed':
-        return {
-          bg: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400',
-          dot: 'bg-emerald-400',
-          label: 'Confirmed'
-        }
-      case 'active':
-        return {
-          bg: 'bg-blue-500/15 border-blue-500/30 text-[#6BCBFF]',
-          dot: 'bg-[#2684FF]',
-          label: 'Active'
-        }
-      case 'pending':
-        return {
-          bg: 'bg-amber-500/15 border-amber-500/30 text-amber-300',
-          dot: 'bg-amber-400 animate-pulse',
-          label: 'Pending Review'
-        }
-      case 'completed':
-        return {
-          bg: 'bg-teal-500/15 border-teal-500/30 text-teal-300',
-          dot: 'bg-teal-400',
-          label: 'Completed'
-        }
-      case 'cancelled':
-        return {
-          bg: 'bg-rose-500/15 border-rose-500/30 text-rose-400',
-          dot: 'bg-rose-400',
-          label: 'Cancelled'
-        }
-      default:
-        return {
-          bg: 'bg-slate-500/15 border-slate-500/30 text-slate-300',
-          dot: 'bg-slate-400',
-          label: status || 'Unknown'
-        }
-    }
-  }
+    return { foreignUsed, brandNew, used }
+  }, [performanceData.inventoryCondition, fleetCars, stats.cars.total])
 
-  // Key KPI Metrics Cards Configuration
+  // Key KPI Metrics Cards Configuration (Selling Car Marketplace Focus)
   const kpiCards = [
     {
       id: 'fleet',
-      title: 'Total Fleet Inventory',
+      title: 'Listed Vehicles for Sale',
       value: stats.cars.total,
-      subtitle: `${stats.cars.available} Ready for Booking • ${stats.cars.unavailable} Reserved`,
-      badge: `${stats.cars.total > 0 ? Math.round((stats.cars.available / stats.cars.total) * 100) : 0}% Available`,
+      subtitle: `${stats.cars.available} Available in Showroom • ${stats.cars.unavailable} Reserved/Sold`,
+      badge: `${stats.cars.total > 0 ? Math.round((stats.cars.available / stats.cars.total) * 100) : 0}% In Stock`,
       badgeColor: 'text-[#6BCBFF] bg-[#2684FF]/20 border-[#2684FF]/30',
       icon: FiBox,
       iconGrad: 'from-[#2684FF] to-[#1255CC]',
       borderColor: 'border-[rgba(107,203,255,0.2)]',
       glow: 'shadow-[0_0_25px_rgba(38,132,255,0.25)]',
-      actionTab: 'fleet'
+      actionTab: 'inventory'
     },
     {
-      id: 'inquiries',
-      title: 'Pending Inquiries',
-      value: stats.bookings.pending,
-      subtitle: `${stats.bookings.completed} Successfully Closed`,
-      badge: stats.bookings.pending > 0 ? 'Requires Action' : 'All Cleared',
-      badgeColor:
-        stats.bookings.pending > 0
-          ? 'text-amber-300 bg-amber-500/20 border-amber-500/30 animate-pulse'
-          : 'text-emerald-300 bg-emerald-500/20 border-emerald-500/30',
-      icon: FiClock,
-      iconGrad: 'from-amber-500 to-orange-600',
-      borderColor: stats.bookings.pending > 0 ? 'border-amber-500/40' : 'border-[rgba(107,203,255,0.2)]',
-      glow: stats.bookings.pending > 0 ? 'shadow-[0_0_25px_rgba(245,158,11,0.25)]' : '',
-      actionTab: 'inquiries'
-    },
-    {
-      id: 'active',
-      title: 'Active Bookings / Drives',
-      value: stats.bookings.active,
-      subtitle: `${stats.bookings.total} Lifetime Bookings`,
-      badge: 'In Progress',
+      id: 'available-stock',
+      title: 'Active Showroom Stock',
+      value: stats.cars.available,
+      subtitle: 'Vehicles ready for buyer viewing & purchase',
+      badge: 'Ready for Sale',
       badgeColor: 'text-emerald-300 bg-emerald-500/20 border-emerald-500/30',
-      icon: FiActivity,
+      icon: FiCheckCircle,
       iconGrad: 'from-emerald-500 to-teal-700',
       borderColor: 'border-emerald-500/30',
       glow: 'shadow-[0_0_25px_rgba(16,185,129,0.2)]',
-      actionTab: 'inquiries'
+      actionTab: 'inventory'
     },
     {
-      id: 'revenue',
-      title: 'Gross Platform Volume',
+      id: 'cars-sold',
+      title: 'Vehicles Sold / Closed Deals',
+      value: stats.cars.unavailable || stats.sales?.totalDeals || 0,
+      subtitle: 'Successfully transacted cars on marketplace',
+      badge: 'Completed Sales',
+      badgeColor: 'text-cyan-300 bg-cyan-500/20 border-cyan-500/30',
+      icon: FiTag,
+      iconGrad: 'from-cyan-500 to-blue-700',
+      borderColor: 'border-cyan-500/30',
+      glow: 'shadow-[0_0_25px_rgba(6,182,212,0.2)]',
+      actionTab: 'activity'
+    },
+    {
+      id: 'sales-volume',
+      title: 'Gross Marketplace Sales Volume',
       value: formatCurrency(stats.revenue.total),
-      subtitle: `Avg: ${formatCurrency(stats.revenue.average)} per completed booking`,
-      badge: 'KES Verified',
+      subtitle: `Average Deal: ${formatCurrency(stats.revenue.average)} per vehicle`,
+      badge: 'KES Volume',
       badgeColor: 'text-purple-300 bg-purple-500/20 border-purple-500/30',
       icon: FiDollarSign,
       iconGrad: 'from-purple-600 to-indigo-700',
@@ -444,24 +370,24 @@ const AdminDashboard = () => {
       actionTab: 'overview'
     },
     {
-      id: 'completed',
-      title: 'Completed Deals',
-      value: stats.bookings.completed,
-      subtitle: 'Fulfilled reservations & inquiries',
-      badge: `${stats.bookings.total > 0 ? Math.round((stats.bookings.completed / stats.bookings.total) * 100) : 0}% Closed`,
-      badgeColor: 'text-teal-300 bg-teal-500/20 border-teal-500/30',
-      icon: FiCheckCircle,
-      iconGrad: 'from-teal-500 to-cyan-700',
-      borderColor: 'border-teal-500/30',
-      glow: 'shadow-[0_0_25px_rgba(20,184,166,0.2)]',
-      actionTab: 'inquiries'
+      id: 'avg-price',
+      title: 'Average Vehicle Price',
+      value: formatCurrency(stats.revenue.average || (stats.cars.total > 0 ? stats.revenue.total / stats.cars.total : 0)),
+      subtitle: 'Current market average across listings',
+      badge: 'Market Average',
+      badgeColor: 'text-amber-300 bg-amber-500/20 border-amber-500/30',
+      icon: FiActivity,
+      iconGrad: 'from-amber-500 to-orange-600',
+      borderColor: 'border-amber-500/30',
+      glow: 'shadow-[0_0_25px_rgba(245,158,11,0.2)]',
+      actionTab: 'overview'
     },
     {
       id: 'users',
-      title: 'Registered Users',
+      title: 'Registered Sellers & Dealerships',
       value: stats.users.total,
-      subtitle: `${stats.users.active} Active Members & Sellers`,
-      badge: 'Autoria Core',
+      subtitle: `${stats.users.active} Active Community Members`,
+      badge: 'Autoria Network',
       badgeColor: 'text-blue-300 bg-blue-500/20 border-blue-500/30',
       icon: FiUsers,
       iconGrad: 'from-blue-600 to-cyan-600',
@@ -497,9 +423,9 @@ const AdminDashboard = () => {
         callbacks: {
           label: (context) => {
             if (context.datasetIndex === 0) {
-              return ` Revenue: ${formatCurrency(context.parsed.y)}`
+              return ` Sales Volume: ${formatCurrency(context.parsed.y)}`
             }
-            return ` Inquiries: ${context.parsed.y}`
+            return ` Deals / Activity: ${context.parsed.y}`
           }
         }
       }
@@ -526,188 +452,149 @@ const AdminDashboard = () => {
         type: 'linear',
         position: 'right',
         grid: { drawOnChartArea: false },
-        ticks: { color: '#22c55e', precision: 0 }
+        ticks: { color: '#6BCBFF', stepSize: 1 }
       }
     }
   }
 
+  if (isLoading && !stats.cars.total) {
+    return (
+      <div className="min-h-screen bg-[#061426] text-white flex flex-col items-center justify-center p-6">
+        <div className="relative">
+          <div className="w-16 h-16 rounded-full border-4 border-[#2684FF]/20 border-t-[#6BCBFF] animate-spin" />
+          <FiBox className="w-6 h-6 text-[#6BCBFF] absolute inset-0 m-auto animate-pulse" />
+        </div>
+        <p className="mt-4 text-sm font-bold text-[#A8B7CC] tracking-wide">
+          Loading Car Marketplace Console...
+        </p>
+      </div>
+    )
+  }
+
   return (
-    <div className="space-y-6">
-      {/* 1. Cinematic Executive Command Header */}
-      <div className="relative rounded-3xl overflow-hidden p-6 sm:p-8 bg-gradient-to-r from-[#0B1D33] via-[#0E2644] to-[#0B1D33] border border-[rgba(107,203,255,0.22)] shadow-[0_15px_40px_rgba(0,0,0,0.6),0_0_25px_rgba(38,132,255,0.2)]">
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div className="flex items-start sm:items-center gap-4">
-            {/* Admin Avatar */}
-            <div className="relative shrink-0">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-[#2684FF] via-[#1255CC] to-purple-600 p-0.5 shadow-[0_0_25px_rgba(38,132,255,0.4)]">
-                <div className="w-full h-full rounded-2xl bg-[#0B1D33] flex items-center justify-center text-xl sm:text-2xl font-black text-[#6BCBFF]">
-                  {user?.firstName ? user.firstName[0].toUpperCase() : 'A'}
-                </div>
-              </div>
-              <span
-                className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-[#0B1D33] flex items-center justify-center shadow-[0_0_8px_#10B981]"
-                title="System Synchronized"
+    <div className="min-h-screen bg-[#061426] text-[#F5F8FF] p-4 sm:p-6 lg:p-8 space-y-8 font-sans">
+      {/* 1. Header Command Bar */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[rgba(107,203,255,0.15)]">
+        <div>
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#2684FF]/20 text-[#6BCBFF] border border-[#2684FF]/30">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#6BCBFF] mr-1.5 animate-pulse" />
+              Automotive Marketplace Admin
+            </span>
+            <span className="text-xs text-[#6B7D96] hidden sm:inline">
+              Kenya Premier Car Sales Platform
+            </span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            Marketplace Executive Dashboard
+          </h1>
+          <p className="text-xs sm:text-sm text-[#A8B7CC] mt-0.5">
+            Live inventory overview, sales performance, and vehicle trading activity
+          </p>
+        </div>
+
+        {/* Global Controls & Time Range Filter */}
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Time Range Selector */}
+          <div className="flex items-center rounded-xl bg-[#0B1D33] p-1 border border-[rgba(107,203,255,0.15)]">
+            {[
+              { id: '7d', label: '7D' },
+              { id: '30d', label: '30D' },
+              { id: '90d', label: '90D' },
+              { id: '365d', label: '1Y' }
+            ].map((period) => (
+              <button
+                key={period.id}
+                onClick={() => setTimeRange(period.id)}
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                  timeRange === period.id
+                    ? 'bg-gradient-to-r from-[#2684FF] to-[#1255CC] text-white shadow-[0_0_12px_rgba(38,132,255,0.4)]'
+                    : 'text-[#A8B7CC] hover:text-white hover:bg-white/5'
+                }`}
               >
-                <FiCheckCircle className="w-3 h-3 text-white" />
-              </span>
-            </div>
-
-            {/* Title & Metadata */}
-            <div>
-              <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                  <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
-                  <span>Platform Command Center</span>
-                </span>
-                <span className="inline-flex items-center gap-1.5 text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  <span>Live Production Fleet</span>
-                </span>
-              </div>
-
-              <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                {getGreeting()}, {user?.firstName || 'Administrator'}!
-              </h1>
-              <p className="text-xs sm:text-sm text-[#A8B7CC] mt-1 flex flex-wrap items-center gap-3">
-                <span>Manage vehicle inventory, inquiries, financial analytics, and platform health</span>
-                <span className="text-[#6B7D96] hidden sm:inline">•</span>
-                <span className="text-[#6B7D96] hidden sm:inline">
-                  Last synced: {lastRefreshed.toLocaleTimeString()}
-                </span>
-              </p>
-            </div>
+                {period.label}
+              </button>
+            ))}
           </div>
 
-          {/* Header Controls & Actions */}
-          <div className="flex flex-wrap items-center gap-3">
-            {/* Time Period Filter Pills */}
-            <div className="flex items-center p-1 rounded-2xl bg-[#061426]/90 border border-[rgba(107,203,255,0.2)]">
-              {[
-                { id: '7d', label: '7 Days' },
-                { id: '30d', label: '30 Days' },
-                { id: '90d', label: '90 Days' }
-              ].map((pill) => (
-                <button
-                  key={pill.id}
-                  onClick={() => setTimeRange(pill.id)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                    timeRange === pill.id
-                      ? 'bg-gradient-to-r from-[#2684FF] to-[#1255CC] text-white shadow-[0_0_12px_rgba(38,132,255,0.5)]'
-                      : 'text-[#A8B7CC] hover:text-white'
-                  }`}
-                >
-                  {pill.label}
-                </button>
-              ))}
-            </div>
+          {/* Sync Button */}
+          <button
+            onClick={() => fetchDashboardData(true)}
+            disabled={isRefreshing}
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-[#0B1D33] border border-[rgba(107,203,255,0.2)] hover:border-[#6BCBFF] hover:bg-[#0E243E] transition-all disabled:opacity-50"
+            title="Synchronize live marketplace data"
+          >
+            <FiRefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-[#6BCBFF]' : ''}`} />
+            <span className="hidden sm:inline">Sync</span>
+          </button>
 
-            {/* Refresh Button */}
-            <button
-              onClick={() => fetchDashboardData(true)}
-              disabled={isRefreshing || isLoading}
-              title="Refresh all metrics"
-              className="p-3 rounded-2xl bg-[#061426] hover:bg-white/10 border border-[rgba(107,203,255,0.2)] text-[#A8B7CC] hover:text-white transition-all disabled:opacity-50"
-            >
-              <FiRefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-[#6BCBFF]' : ''}`} />
-            </button>
-
-            {/* Add Car Shortcut */}
-            <Link
-              to="/admin/add-car"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold text-white bg-gradient-to-r from-[#2684FF] to-[#1255CC] hover:from-[#3B92FF] hover:to-[#1F63D6] shadow-[0_0_20px_rgba(38,132,255,0.4)] transition-all transform hover:-translate-y-0.5"
-            >
-              <FiPlusCircle className="w-4 h-4" />
-              <span>Add Vehicle</span>
-            </Link>
-          </div>
+          {/* Post New Car Button */}
+          <Link
+            to="/admin/add-car"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#2684FF] to-[#1255CC] hover:from-[#3B92FF] hover:to-[#1F63D6] shadow-[0_0_20px_rgba(38,132,255,0.35)] transition-all"
+          >
+            <FiPlusCircle className="w-4 h-4" />
+            <span>List a Vehicle</span>
+          </Link>
         </div>
       </div>
 
-      {/* 2. Urgent Notification Alert (If Pending Inquiries > 0) */}
-      {stats.bookings.pending > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl p-4 sm:p-5 bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-amber-500/15 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-[0_0_20px_rgba(245,158,11,0.15)]"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
-              <FiAlertCircle className="w-5 h-5 animate-pulse" />
-            </div>
-            <div>
-              <h4 className="text-sm font-bold text-amber-200">
-                Action Required: {stats.bookings.pending} Customer{' '}
-                {stats.bookings.pending === 1 ? 'Inquiry' : 'Inquiries'} Awaiting Review
-              </h4>
-              <p className="text-xs text-[#A8B7CC] mt-0.5">
-                New customers have requested vehicle viewings, financing, or bookings. Review and confirm to lock in the deals.
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={() => {
-              setActiveTab('inquiries')
-              setInquiryStatusFilter('pending')
-            }}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 shadow-[0_0_15px_rgba(245,158,11,0.4)] transition-all shrink-0"
-          >
-            <span>Review Pending Inquiries</span>
-            <FiArrowRight className="w-3.5 h-3.5" />
-          </button>
-        </motion.div>
-      )}
-
-      {/* 3. High-Impact KPI Metrics Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* 2. Key Marketplace Metrics Grid (6 KPI Cards) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         {kpiCards.map((card) => {
           const Icon = card.icon
           return (
             <motion.div
               key={card.id}
-              whileHover={{ y: -3 }}
-              transition={{ duration: 0.2 }}
+              whileHover={{ y: -3, transition: { duration: 0.2 } }}
               onClick={() => setActiveTab(card.actionTab)}
-              className={`p-5 rounded-2xl bg-[#0B1D33]/85 border ${card.borderColor} ${card.glow} hover:border-[#6BCBFF]/50 cursor-pointer transition-all duration-300 relative overflow-hidden group`}
+              className={`p-4 rounded-2xl bg-[#0B1D33]/85 backdrop-blur-md border ${card.borderColor} ${card.glow} cursor-pointer transition-all flex flex-col justify-between group`}
             >
               <div className="flex items-center justify-between mb-3">
                 <div
-                  className={`w-11 h-11 rounded-xl bg-gradient-to-br ${card.iconGrad} flex items-center justify-center text-white shadow-md`}
+                  className={`w-10 h-10 rounded-xl bg-gradient-to-br ${card.iconGrad} flex items-center justify-center text-white shadow-md`}
                 >
                   <Icon className="w-5 h-5" />
                 </div>
                 <span
-                  className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${card.badgeColor}`}
+                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${card.badgeColor}`}
                 >
                   {card.badge}
                 </span>
               </div>
 
-              <div className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-1 group-hover:text-[#6BCBFF] transition-colors">
-                {card.value}
+              <div>
+                <div className="text-xl sm:text-2xl font-black text-white tracking-tight mb-1 group-hover:text-[#6BCBFF] transition-colors truncate">
+                  {card.value}
+                </div>
+                <p className="text-xs font-bold text-[#F5F8FF] truncate">{card.title}</p>
+                <p className="text-[11px] text-[#A8B7CC] mt-0.5 line-clamp-1">{card.subtitle}</p>
               </div>
-              <p className="text-sm font-bold text-[#F5F8FF]">{card.title}</p>
-              <p className="text-xs text-[#A8B7CC] mt-0.5">{card.subtitle}</p>
 
-              <div className="mt-3 flex items-center text-xs font-semibold text-[#6BCBFF] opacity-0 group-hover:opacity-100 transition-opacity">
-                <span>View details</span>
-                <FiChevronRight className="w-3.5 h-3.5 ml-1" />
+              <div className="mt-3 flex items-center text-[11px] font-semibold text-[#6BCBFF] opacity-0 group-hover:opacity-100 transition-opacity">
+                <span>View</span>
+                <FiChevronRight className="w-3 h-3 ml-0.5" />
               </div>
             </motion.div>
           )
         })}
       </div>
 
-      {/* 4. Multi-View Dashboard Tabs */}
+      {/* 3. Multi-View Dashboard Tabs */}
       <div className="flex items-center gap-2 border-b border-[rgba(107,203,255,0.15)] pb-1 overflow-x-auto scrollbar-none">
         {[
-          { id: 'overview', label: 'Executive Overview', icon: FiCompass },
+          { id: 'overview', label: 'Executive Sales Overview', icon: FiCompass },
           {
-            id: 'inquiries',
-            label: `Inquiries & Bookings (${stats.recentBookings?.length || 0})`,
-            icon: FiCalendar
+            id: 'activity',
+            label: `Live Marketplace Activity (${displayActivities.length})`,
+            icon: FiActivity
           },
-          { id: 'fleet', label: `Fleet Status & Controls (${fleetCars.length})`, icon: FiBox },
-          { id: 'diagnostics', label: 'System Diagnostics & Health', icon: FiServer }
+          {
+            id: 'inventory',
+            label: `Showroom Inventory (${fleetCars.length})`,
+            icon: FiBox
+          },
+          { id: 'diagnostics', label: 'System Telemetry & Health', icon: FiServer }
         ].map((tab) => {
           const Icon = tab.icon
           const isActive = activeTab === tab.id
@@ -728,9 +615,9 @@ const AdminDashboard = () => {
         })}
       </div>
 
-      {/* 5. TAB CONTENT PANELS */}
+      {/* 4. TAB CONTENT PANELS */}
       <AnimatePresence mode="wait">
-        {/* TAB 1: EXECUTIVE OVERVIEW */}
+        {/* TAB 1: EXECUTIVE SALES OVERVIEW */}
         {activeTab === 'overview' && (
           <motion.div
             key="tab-overview"
@@ -742,20 +629,20 @@ const AdminDashboard = () => {
           >
             {/* Visual Analytics Charts Row */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Main Line Chart: Revenue & Booking Trend */}
+              {/* Sales Volume & Inventory Trajectory */}
               <div className="lg:col-span-2 p-6 rounded-2xl bg-[#0B1D33]/80 border border-[rgba(107,203,255,0.16)] shadow-lg">
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h3 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
                       <FiTrendingUp className="text-[#6BCBFF]" />
-                      <span>Revenue &amp; Booking Trajectory</span>
+                      <span>Marketplace Sales Volume (KES) &amp; Transactions</span>
                     </h3>
                     <p className="text-xs text-[#A8B7CC]">
-                      Gross completed deal volume (KES) vs confirmed reservations over {timeRange}
+                      Gross completed deal volume (KES) and vehicle trading activity over {timeRange}
                     </p>
                   </div>
                   <div className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#2684FF]/20 text-[#6BCBFF] border border-[#2684FF]/30">
-                    {timeRange === '7d' ? 'Last 7 Days' : timeRange === '90d' ? 'Last 90 Days' : 'Last 30 Days'}
+                    {timeRange === '7d' ? 'Last 7 Days' : timeRange === '90d' ? 'Last 90 Days' : timeRange === '365d' ? 'Last 1 Year' : 'Last 30 Days'}
                   </div>
                 </div>
 
@@ -768,7 +655,7 @@ const AdminDashboard = () => {
                         ),
                         datasets: [
                           {
-                            label: 'Revenue (KES)',
+                            label: 'Sales Volume (KES)',
                             data: performanceData.timeSeries.map((item) => item.revenue),
                             borderColor: '#8B5CF6',
                             backgroundColor: 'rgba(139, 92, 246, 0.12)',
@@ -779,7 +666,7 @@ const AdminDashboard = () => {
                             pointHoverRadius: 6
                           },
                           {
-                            label: 'Bookings',
+                            label: 'Marketplace Deals & Inquiries',
                             data: performanceData.timeSeries.map((item) => item.bookings),
                             borderColor: '#22c55e',
                             backgroundColor: 'rgba(34, 197, 94, 0.12)',
@@ -796,41 +683,39 @@ const AdminDashboard = () => {
                     <div className="h-full flex items-center justify-center text-center text-[#A8B7CC]">
                       <div>
                         <FiTrendingUp className="w-8 h-8 mx-auto text-[#6B7D96] mb-2" />
-                        <p className="text-sm">No transaction trajectory data available for this timeframe</p>
+                        <p className="text-sm">No sales trajectory data recorded yet for this timeframe</p>
                       </div>
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* Status Doughnut Chart */}
+              {/* Showroom Inventory Condition Breakdown */}
               <div className="p-6 rounded-2xl bg-[#0B1D33]/80 border border-[rgba(107,203,255,0.16)] shadow-lg flex flex-col justify-between">
                 <div>
                   <h3 className="text-base sm:text-lg font-bold text-white flex items-center gap-2 mb-1">
                     <FiLayers className="text-emerald-400" />
-                    <span>Inquiry Status Mix</span>
+                    <span>Showroom Inventory Breakdown</span>
                   </h3>
-                  <p className="text-xs text-[#A8B7CC] mb-4">Breakdown of customer lifecycle deals</p>
+                  <p className="text-xs text-[#A8B7CC] mb-4">Stock distribution by vehicle condition and origin</p>
 
                   <div className="h-52 relative flex items-center justify-center">
                     <Doughnut
                       data={{
-                        labels: ['Completed', 'Active', 'Pending', 'Cancelled'],
+                        labels: ['Foreign Used (Imports)', 'Brand New Showroom', 'Local Pre-Owned'],
                         datasets: [
                           {
                             data: [
-                              performanceData.bookingStatus.completed || 0,
-                              performanceData.bookingStatus.active || 0,
-                              performanceData.bookingStatus.pending || 0,
-                              performanceData.bookingStatus.cancelled || 0
+                              conditionCounts.foreignUsed,
+                              conditionCounts.brandNew,
+                              conditionCounts.used
                             ],
                             backgroundColor: [
-                              'rgba(34, 197, 94, 0.85)',
                               'rgba(38, 132, 255, 0.85)',
-                              'rgba(245, 158, 11, 0.85)',
-                              'rgba(239, 68, 68, 0.85)'
+                              'rgba(34, 197, 94, 0.85)',
+                              'rgba(168, 85, 247, 0.85)'
                             ],
-                            borderColor: ['#22c55e', '#2684FF', '#f59e0b', '#ef4444'],
+                            borderColor: ['#2684FF', '#22c55e', '#a855f7'],
                             borderWidth: 2
                           }
                         ]
@@ -852,56 +737,51 @@ const AdminDashboard = () => {
                       }}
                     />
                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                      <span className="text-2xl font-black text-white">{stats.bookings.total}</span>
-                      <span className="text-[11px] text-[#A8B7CC] uppercase tracking-wider">Total Deals</span>
+                      <span className="text-2xl font-black text-white">{stats.cars.total}</span>
+                      <span className="text-[11px] text-[#A8B7CC] uppercase tracking-wider">Total Cars</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Legend badges */}
-                <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-[rgba(107,203,255,0.12)]">
-                  <div className="flex items-center gap-2 text-xs">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                    <span className="text-[#A8B7CC]">Completed:</span>
-                    <span className="font-bold text-white ml-auto">{performanceData.bookingStatus.completed || 0}</span>
-                  </div>
+                <div className="space-y-2 mt-4 pt-4 border-t border-[rgba(107,203,255,0.12)]">
                   <div className="flex items-center gap-2 text-xs">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#2684FF]" />
-                    <span className="text-[#A8B7CC]">Active:</span>
-                    <span className="font-bold text-white ml-auto">{performanceData.bookingStatus.active || 0}</span>
+                    <span className="text-[#A8B7CC]">Foreign Used (Imports):</span>
+                    <span className="font-bold text-white ml-auto">{conditionCounts.foreignUsed}</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs">
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                    <span className="text-[#A8B7CC]">Pending:</span>
-                    <span className="font-bold text-white ml-auto">{performanceData.bookingStatus.pending || 0}</span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                    <span className="text-[#A8B7CC]">Brand New Showroom:</span>
+                    <span className="font-bold text-white ml-auto">{conditionCounts.brandNew}</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs">
-                    <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-                    <span className="text-[#A8B7CC]">Cancelled:</span>
-                    <span className="font-bold text-white ml-auto">{performanceData.bookingStatus.cancelled || 0}</span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-purple-500" />
+                    <span className="text-[#A8B7CC]">Local Pre-Owned:</span>
+                    <span className="font-bold text-white ml-auto">{conditionCounts.used}</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Top Performing Cars & Quick Operations */}
+            {/* Top In-Demand Vehicle Models & Marketplace Operations */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Top Performing Vehicles Leaderboard */}
+              {/* Top Models Leaderboard */}
               <div className="lg:col-span-2 p-6 rounded-2xl bg-[#0B1D33]/80 border border-[rgba(107,203,255,0.16)] shadow-lg">
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h3 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
                       <FiBox className="text-purple-400" />
-                      <span>Top Performing Fleet Models</span>
+                      <span>Top In-Demand Vehicle Models</span>
                     </h3>
-                    <p className="text-xs text-[#A8B7CC]">Highest revenue generating vehicles on Autoria</p>
+                    <p className="text-xs text-[#A8B7CC]">Highest transaction volume and inventory presence on Autoria</p>
                   </div>
                   <Link
                     to="/admin/manage-cars"
                     className="text-xs font-bold text-[#6BCBFF] hover:underline flex items-center gap-1"
                   >
-                    <span>Manage all cars</span>
-                    <FiArrowRight className="w-3.5 h-3.5" />
+                    <span>Full Inventory</span>
+                    <FiChevronRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
 
@@ -918,7 +798,13 @@ const AdminDashboard = () => {
                           </span>
                           <div className="w-12 h-10 rounded-lg overflow-hidden bg-slate-800 shrink-0 border border-white/10">
                             <img
-                              src={carItem.image ? (carItem.image.startsWith('http') ? carItem.image : `${API_HOST}${carItem.image.startsWith('/') ? carItem.image : `/${carItem.image}`}`) : '/hero_sports_car.jpg'}
+                              src={
+                                carItem.image
+                                  ? carItem.image.startsWith('http')
+                                    ? carItem.image
+                                    : `${API_HOST}${carItem.image.startsWith('/') ? carItem.image : `/${carItem.image}`}`
+                                  : '/hero_sports_car.jpg'
+                              }
                               alt={carItem.car}
                               className="w-full h-full object-cover"
                               onError={(e) => {
@@ -928,12 +814,12 @@ const AdminDashboard = () => {
                           </div>
                           <div>
                             <h4 className="text-sm font-bold text-white">{carItem.car}</h4>
-                            <p className="text-xs text-[#A8B7CC]">{carItem.bookings} Successful Bookings</p>
+                            <p className="text-xs text-[#A8B7CC]">Marketplace Verified Listing</p>
                           </div>
                         </div>
                         <div className="text-right">
                           <div className="text-sm font-black text-emerald-400">{formatCurrency(carItem.revenue)}</div>
-                          <span className="text-[10px] text-[#A8B7CC]">Total Revenue</span>
+                          <span className="text-[10px] text-[#A8B7CC]">Asking / Transaction Price</span>
                         </div>
                       </div>
                     ))}
@@ -941,62 +827,55 @@ const AdminDashboard = () => {
                 ) : (
                   <div className="py-12 text-center text-[#A8B7CC]">
                     <FiBox className="w-8 h-8 mx-auto text-[#6B7D96] mb-2" />
-                    <p className="text-sm">No car performance metrics recorded yet for this period</p>
+                    <p className="text-sm">No vehicle performance metrics recorded yet for this period</p>
                   </div>
                 )}
               </div>
 
-              {/* Quick Admin Actions & Direct Navigation */}
+              {/* Quick Marketplace Operations */}
               <div className="p-6 rounded-2xl bg-[#0B1D33]/80 border border-[rgba(107,203,255,0.16)] shadow-lg flex flex-col justify-between">
                 <div>
                   <h3 className="text-base sm:text-lg font-bold text-white flex items-center gap-2 mb-1">
                     <FiSliders className="text-[#6BCBFF]" />
-                    <span>Quick Management</span>
+                    <span>Marketplace Operations</span>
                   </h3>
-                  <p className="text-xs text-[#A8B7CC] mb-4">Direct shortcuts to administrative workflows</p>
+                  <p className="text-xs text-[#A8B7CC] mb-4">Direct shortcuts to sales &amp; inventory management</p>
 
                   <div className="space-y-2.5">
                     {[
                       {
-                        title: 'Add New Vehicle',
-                        desc: 'List & price a new car',
+                        title: 'List a Vehicle for Sale',
+                        desc: 'Post new or pre-owned car with photos & price',
                         link: '/admin/add-car',
                         icon: FiPlusCircle,
                         color: 'from-[#2684FF] to-[#1255CC]'
                       },
                       {
-                        title: 'Manage Vehicle Fleet',
-                        desc: 'Full CRUD, specs & rates',
+                        title: 'Vehicle Inventory Listings',
+                        desc: 'Manage all listed cars & prices in KES',
                         link: '/admin/manage-cars',
                         icon: FiBox,
                         color: 'from-purple-600 to-indigo-700'
                       },
                       {
-                        title: 'All Customer Inquiries',
-                        desc: 'Reservations, bookings & viewings',
-                        link: '/admin/bookings',
-                        icon: FiCalendar,
-                        color: 'from-emerald-500 to-teal-700'
-                      },
-                      {
-                        title: 'User Management',
-                        desc: 'Platform members & permissions',
+                        title: 'Seller & Dealership Accounts',
+                        desc: 'Registered members & verification',
                         link: '/admin/users',
                         icon: FiUsers,
                         color: 'from-blue-600 to-cyan-600'
                       },
                       {
-                        title: 'Analytics & Financials',
-                        desc: 'Custom period reports & charts',
+                        title: 'Sales Analytics & Reports',
+                        desc: 'Deal revenue & marketplace trends',
                         link: '/admin/reports',
                         icon: FiTrendingUp,
                         color: 'from-amber-500 to-orange-600'
                       },
                       {
-                        title: 'System Settings',
-                        desc: 'Fees, notifications & portal keys',
+                        title: 'Marketplace Settings',
+                        desc: 'Platform fees, currency & portal config',
                         link: '/admin/settings',
-                        icon: FiSettings,
+                        icon: FiSliders,
                         color: 'from-slate-600 to-slate-800'
                       }
                     ].map((item, idx) => {
@@ -1029,10 +908,10 @@ const AdminDashboard = () => {
           </motion.div>
         )}
 
-        {/* TAB 2: INQUIRIES & BOOKING PIPELINE */}
-        {activeTab === 'inquiries' && (
+        {/* TAB 2: LIVE MARKETPLACE ACTIVITY FEED */}
+        {activeTab === 'activity' && (
           <motion.div
-            key="tab-inquiries"
+            key="tab-activity"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
@@ -1046,28 +925,26 @@ const AdminDashboard = () => {
                 <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B7D96] w-4 h-4" />
                 <input
                   type="text"
-                  value={inquirySearch}
-                  onChange={(e) => setInquirySearch(e.target.value)}
-                  placeholder="Search by customer name, email, phone, car, or ID..."
+                  value={activitySearch}
+                  onChange={(e) => setActivitySearch(e.target.value)}
+                  placeholder="Search marketplace activities by vehicle model, action, seller..."
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#061426] border border-[rgba(107,203,255,0.2)] text-white placeholder-[#6B7D96] text-xs sm:text-sm focus:outline-none focus:border-[#6BCBFF] transition-all"
                 />
               </div>
 
-              {/* Status Filter Pills */}
+              {/* Activity Filter Pills */}
               <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
                 {[
-                  { id: 'all', label: 'All Inquiries' },
-                  { id: 'pending', label: 'Pending' },
-                  { id: 'confirmed', label: 'Confirmed' },
-                  { id: 'active', label: 'Active' },
-                  { id: 'completed', label: 'Completed' },
-                  { id: 'cancelled', label: 'Cancelled' }
+                  { id: 'all', label: 'All Activities' },
+                  { id: 'listings', label: 'Vehicle Listings' },
+                  { id: 'sales', label: 'Cars Sold' },
+                  { id: 'members', label: 'New Members' }
                 ].map((st) => (
                   <button
                     key={st.id}
-                    onClick={() => setInquiryStatusFilter(st.id)}
+                    onClick={() => setActivityTypeFilter(st.id)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
-                      inquiryStatusFilter === st.id
+                      activityTypeFilter === st.id
                         ? 'bg-gradient-to-r from-[#2684FF] to-[#1255CC] text-white border-transparent shadow-[0_0_12px_rgba(38,132,255,0.4)]'
                         : 'bg-[#061426] text-[#A8B7CC] border-[rgba(107,203,255,0.15)] hover:text-white'
                     }`}
@@ -1078,148 +955,84 @@ const AdminDashboard = () => {
               </div>
             </div>
 
-            {/* Inquiries Cards / Table List */}
-            {filteredInquiries.length > 0 ? (
+            {/* Live Activity Stream Cards */}
+            {filteredActivities.length > 0 ? (
               <div className="space-y-3">
-                {filteredInquiries.map((booking) => {
-                  const badge = getStatusBadge(booking.status)
+                {filteredActivities.map((act) => {
+                  const isCar = act.type === 'car_listed' || act.type === 'car_sold'
+                  const isSold = act.type === 'car_sold'
+
                   return (
                     <div
-                      key={booking._id}
-                      className="p-5 rounded-2xl bg-[#0B1D33]/85 border border-[rgba(107,203,255,0.16)] hover:border-[#6BCBFF]/40 shadow-md transition-all flex flex-col lg:flex-row lg:items-center justify-between gap-5 group"
+                      key={act.id}
+                      className="p-4 sm:p-5 rounded-2xl bg-[#0B1D33]/85 border border-[rgba(107,203,255,0.16)] hover:border-[#6BCBFF]/40 shadow-md transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 group"
                     >
-                      {/* Left: Vehicle & Customer */}
-                      <div className="flex items-start sm:items-center gap-4">
-                        <div className="w-16 h-14 sm:w-20 sm:h-16 rounded-xl overflow-hidden bg-slate-900 border border-white/10 shrink-0">
-                          <img
-                            src={getCarImage(booking.car)}
-                            alt={`${booking.car?.brand} ${booking.car?.model}`}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            onError={(e) => {
-                              e.target.src = '/hero_sports_car.jpg'
-                            }}
-                          />
-                        </div>
+                      {/* Left: Thumbnail & Details */}
+                      <div className="flex items-center gap-4">
+                        {isCar && (
+                          <div className="w-16 h-14 sm:w-20 sm:h-16 rounded-xl overflow-hidden bg-slate-900 border border-white/10 shrink-0">
+                            <img
+                              src={act.image || '/hero_sports_car.jpg'}
+                              alt={act.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              onError={(e) => {
+                                e.target.src = '/hero_sports_car.jpg'
+                              }}
+                            />
+                          </div>
+                        )}
+
+                        {!isCar && (
+                          <div className="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/30 flex items-center justify-center shrink-0">
+                            <FiUsers className="w-6 h-6" />
+                          </div>
+                        )}
 
                         <div>
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-[11px] font-bold text-[#6BCBFF] bg-[#2684FF]/20 px-2 py-0.5 rounded-md border border-[#2684FF]/30">
-                              #{booking.bookingNumber || booking._id?.slice(-6).toUpperCase()}
+                            <span
+                              className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${
+                                isSold
+                                  ? 'bg-blue-500/20 text-blue-300 border-blue-500/30'
+                                  : act.type === 'car_listed'
+                                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                                  : 'bg-purple-500/20 text-purple-300 border-purple-500/30'
+                              }`}
+                            >
+                              {act.action}
                             </span>
                             <span className="text-xs text-[#6B7D96]">
-                              {formatDate(booking.createdAt, true)}
+                              {formatDate(act.time, true)}
                             </span>
                           </div>
 
-                          <h4 className="text-base font-bold text-white">
-                            {booking.car?.brand || 'Autoria'} {booking.car?.model || 'Vehicle'}
-                          </h4>
+                          <h4 className="text-base font-bold text-white">{act.title}</h4>
+                          <p className="text-xs text-[#A8B7CC] mt-0.5">{act.description}</p>
+                        </div>
+                      </div>
 
-                          <div className="flex flex-wrap items-center gap-3 text-xs text-[#A8B7CC] mt-1">
-                            <span className="font-semibold text-white">
-                              {booking.user?.firstName || 'Guest'} {booking.user?.lastName || 'Client'}
+                      {/* Right: Price & Quick Action */}
+                      <div className="flex items-center justify-between sm:justify-end gap-4 border-t sm:border-t-0 pt-2 sm:pt-0 border-white/5">
+                        {act.price && (
+                          <div className="text-left sm:text-right">
+                            <div className="text-sm font-black text-emerald-400">
+                              {formatCurrency(act.price)}
+                            </div>
+                            <span className="text-[10px] text-[#A8B7CC]">
+                              {isSold ? 'Sold Price' : 'Asking Price'}
                             </span>
-                            {booking.user?.phone && (
-                              <a
-                                href={`tel:${booking.user.phone}`}
-                                className="flex items-center gap-1 text-emerald-400 hover:underline"
-                              >
-                                <FiPhone className="w-3 h-3" />
-                                <span>{booking.user.phone}</span>
-                              </a>
-                            )}
-                            {booking.user?.email && (
-                              <a
-                                href={`mailto:${booking.user.email}`}
-                                className="flex items-center gap-1 text-[#6BCBFF] hover:underline"
-                              >
-                                <FiMail className="w-3 h-3" />
-                                <span>{booking.user.email}</span>
-                              </a>
-                            )}
                           </div>
-                        </div>
-                      </div>
-
-                      {/* Middle: Booking Dates & Pricing */}
-                      <div className="flex flex-wrap sm:flex-nowrap items-center gap-6 lg:border-x lg:border-[rgba(107,203,255,0.12)] lg:px-6">
-                        <div>
-                          <div className="text-[11px] text-[#A8B7CC]">Duration Window</div>
-                          <div className="text-xs font-semibold text-white mt-0.5">
-                            {formatDate(booking.bookingPeriod?.startDate)} →{' '}
-                            {formatDate(booking.bookingPeriod?.endDate)}
-                          </div>
-                        </div>
-
-                        <div>
-                          <div className="text-[11px] text-[#A8B7CC]">Agreed Value</div>
-                          <div className="text-sm font-black text-emerald-400 mt-0.5">
-                            {formatCurrency(booking.pricing?.totalAmount || 0)}
-                          </div>
-                        </div>
-
-                        <div>
-                          <div className="text-[11px] text-[#A8B7CC] mb-1">Status</div>
-                          <span
-                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${badge.bg}`}
-                          >
-                            <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />
-                            <span>{badge.label}</span>
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Right: Quick Action Controls */}
-                      <div className="flex items-center gap-2 shrink-0">
-                        {/* Quick Confirm button if Pending */}
-                        {booking.status === 'Pending' && (
-                          <button
-                            onClick={() => handleQuickStatusUpdate(booking._id, 'Confirmed')}
-                            className="px-3 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 transition-colors shadow-sm"
-                            title="Confirm this inquiry"
-                          >
-                            Confirm
-                          </button>
                         )}
 
-                        {/* Quick Complete if Confirmed/Active */}
-                        {['Confirmed', 'Active'].includes(booking.status) && (
-                          <button
-                            onClick={() => handleQuickStatusUpdate(booking._id, 'Completed')}
-                            className="px-3 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 transition-colors shadow-sm"
-                            title="Mark inquiry deal as Completed"
-                          >
-                            Complete
-                          </button>
-                        )}
-
-                        {/* View Details Modal Button */}
-                        <button
-                          onClick={() => {
-                            setSelectedBooking(booking)
-                            setModalStatus(booking.status || 'Pending')
-                          }}
-                          className="px-3 py-2 rounded-xl text-xs font-bold text-[#6BCBFF] bg-[#2684FF]/20 hover:bg-[#2684FF]/30 border border-[#2684FF]/30 transition-all flex items-center gap-1.5"
-                        >
-                          <FiEye className="w-3.5 h-3.5" />
-                          <span>Details</span>
-                        </button>
-
-                        {/* WhatsApp Shortcut */}
-                        {booking.user?.phone && (
-                          <a
-                            href={`https://wa.me/${booking.user.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
-                              `Hello ${booking.user.firstName || ''}, regarding your vehicle inquiry on Autoria for ${
-                                booking.car?.brand || 'the vehicle'
-                              } ${booking.car?.model || ''}...`
-                            )}`}
+                        {act.carId && (
+                          <Link
+                            to={`/cars/${act.carId}`}
                             target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30 transition-all"
-                            title="Open WhatsApp chat with client"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-[#6BCBFF] bg-[#2684FF]/20 hover:bg-[#2684FF]/30 border border-[#2684FF]/30 transition-all"
                           >
-                            <FiMessageSquare className="w-4 h-4" />
-                          </a>
+                            <span>View Listing</span>
+                            <FiExternalLink className="w-3 h-3" />
+                          </Link>
                         )}
                       </div>
                     </div>
@@ -1228,48 +1041,46 @@ const AdminDashboard = () => {
               </div>
             ) : (
               <div className="py-16 text-center rounded-2xl bg-[#0B1D33]/60 border border-[rgba(107,203,255,0.12)]">
-                <FiCalendar className="w-10 h-10 mx-auto text-[#6B7D96] mb-3" />
-                <h4 className="text-base font-bold text-white">No inquiries match your filter</h4>
-                <p className="text-xs text-[#A8B7CC] mt-1">
-                  Try adjusting your search terms or status filter.
-                </p>
+                <FiActivity className="w-10 h-10 mx-auto text-[#6B7D96] mb-3" />
+                <h4 className="text-base font-bold text-white">No marketplace activities found</h4>
+                <p className="text-xs text-[#A8B7CC] mt-1">Adjust search filters or list a new vehicle for sale.</p>
               </div>
             )}
           </motion.div>
         )}
 
-        {/* TAB 3: FLEET STATUS & CONTROLS */}
-        {activeTab === 'fleet' && (
+        {/* TAB 3: SHOWROOM INVENTORY MANAGER */}
+        {activeTab === 'inventory' && (
           <motion.div
-            key="tab-fleet"
+            key="tab-inventory"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
             className="space-y-4"
           >
-            {/* Filter and Quick Add Fleet */}
+            {/* Filter Bar */}
             <div className="p-4 rounded-2xl bg-[#0B1D33]/90 border border-[rgba(107,203,255,0.16)] shadow-lg flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
               <div className="relative flex-1">
                 <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B7D96] w-4 h-4" />
                 <input
                   type="text"
-                  value={fleetSearch}
-                  onChange={(e) => setFleetSearch(e.target.value)}
-                  placeholder="Filter vehicles by brand, model, category, or location..."
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#061426] border border-[rgba(107,203,255,0.2)] text-white placeholder-[#6B7D96] text-xs sm:text-sm focus:outline-none focus:border-[#6BCBFF] transition-all"
+                  value={inventorySearch}
+                  onChange={(e) => setInventorySearch(e.target.value)}
+                  placeholder="Filter showroom inventory by brand, model, location, or year..."
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#061426] border border-[rgba(107,203,255,0.2)] text-white placeholder-[#6B7D96] text-xs sm:text-sm focus:outline-none focus:border-[#6BCBFF]"
                 />
               </div>
 
               <div className="flex items-center gap-2">
                 <select
-                  value={fleetStatusFilter}
-                  onChange={(e) => setFleetStatusFilter(e.target.value)}
+                  value={inventoryStatusFilter}
+                  onChange={(e) => setInventoryStatusFilter(e.target.value)}
                   className="px-3 py-2.5 rounded-xl bg-[#061426] border border-[rgba(107,203,255,0.2)] text-white text-xs font-bold focus:outline-none focus:border-[#6BCBFF]"
                 >
-                  <option value="all">All Inventory ({fleetCars.length})</option>
-                  <option value="available">Available for Booking</option>
-                  <option value="unavailable">Reserved / Unavailable</option>
+                  <option value="all">All Vehicles ({fleetCars.length})</option>
+                  <option value="available">Available in Showroom</option>
+                  <option value="unavailable">Reserved / Sold</option>
                 </select>
 
                 <Link
@@ -1277,17 +1088,18 @@ const AdminDashboard = () => {
                   className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#2684FF] to-[#1255CC] hover:from-[#3B92FF] hover:to-[#1F63D6] shadow-[0_0_15px_rgba(38,132,255,0.3)] transition-all whitespace-nowrap"
                 >
                   <FiPlusCircle className="w-3.5 h-3.5" />
-                  <span>New Car</span>
+                  <span>List Vehicle</span>
                 </Link>
               </div>
             </div>
 
-            {/* Vehicles Grid with One-Click Availability Switch */}
-            {filteredFleet.length > 0 ? (
+            {/* Vehicle Sales Cards with Real-time Status Switch */}
+            {filteredInventory.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredFleet.map((car) => {
+                {filteredInventory.map((car) => {
                   const isAvailable = car.isAvailable !== false
                   const isToggling = togglingCarId === car._id
+                  const salePrice = car.salePrice || (car.pricePerDay ? car.pricePerDay * 30 : 0)
 
                   return (
                     <div
@@ -1306,6 +1118,7 @@ const AdminDashboard = () => {
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-[#0B1D33] via-transparent to-transparent" />
 
+                        {/* Availability Status Badge */}
                         <div className="absolute top-3 left-3">
                           <span
                             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border backdrop-blur-md ${
@@ -1315,15 +1128,14 @@ const AdminDashboard = () => {
                             }`}
                           >
                             <span className="w-1.5 h-1.5 rounded-full bg-white" />
-                            <span>{isAvailable ? 'Available' : 'Reserved'}</span>
+                            <span>{isAvailable ? 'Available for Sale' : 'Reserved / Sold'}</span>
                           </span>
                         </div>
 
-                        {car.location && (
-                          <div className="absolute top-3 right-3 text-[11px] font-semibold text-white bg-black/60 px-2 py-0.5 rounded-full border border-white/20 backdrop-blur-sm">
-                            {car.location}
-                          </div>
-                        )}
+                        {/* Condition Badge */}
+                        <div className="absolute top-3 right-3 text-[11px] font-bold text-white bg-black/60 px-2.5 py-0.5 rounded-full border border-white/20 backdrop-blur-sm">
+                          {car.condition || 'Used'} • {car.year}
+                        </div>
                       </div>
 
                       {/* Content Body */}
@@ -1333,7 +1145,9 @@ const AdminDashboard = () => {
                             <span className="text-xs font-bold text-[#6BCBFF] uppercase tracking-wider">
                               {car.category || car.type || 'Sedan'}
                             </span>
-                            <span className="text-xs text-[#A8B7CC]">{car.year}</span>
+                            {car.location && (
+                              <span className="text-xs text-[#A8B7CC]">{car.location}</span>
+                            )}
                           </div>
 
                           <h4 className="text-base font-bold text-white mb-2">
@@ -1341,16 +1155,16 @@ const AdminDashboard = () => {
                           </h4>
 
                           <div className="flex items-baseline gap-2 mb-4">
-                            <span className="text-lg font-black text-white">
-                              {formatCurrency(car.pricePerDay || car.salePrice || 0)}
+                            <span className="text-lg font-black text-emerald-400">
+                              {formatCurrency(salePrice)}
                             </span>
-                            <span className="text-xs text-[#A8B7CC]">/ day</span>
+                            <span className="text-xs text-[#A8B7CC]">asking price</span>
                           </div>
                         </div>
 
                         {/* Controls Bottom Bar */}
                         <div className="pt-3 border-t border-[rgba(107,203,255,0.12)] flex items-center justify-between gap-2">
-                          {/* Live Toggle Switch */}
+                          {/* Live Availability Toggle Switch */}
                           <button
                             onClick={() => handleToggleAvailability(car._id, isAvailable)}
                             disabled={isToggling}
@@ -1359,14 +1173,14 @@ const AdminDashboard = () => {
                                 ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/30'
                                 : 'bg-slate-700/50 text-[#A8B7CC] border-slate-600 hover:text-white'
                             }`}
-                            title="Toggle whether customers can book this vehicle"
+                            title="Toggle whether car is currently listed for sale"
                           >
                             <span
                               className={`w-2 h-2 rounded-full ${
                                 isAvailable ? 'bg-emerald-400 animate-pulse' : 'bg-slate-400'
                               }`}
                             />
-                            <span>{isToggling ? 'Updating...' : isAvailable ? 'Active' : 'Disabled'}</span>
+                            <span>{isToggling ? 'Updating...' : isAvailable ? 'Active Listing' : 'Marked Sold'}</span>
                           </button>
 
                           <div className="flex items-center gap-2">
@@ -1380,7 +1194,7 @@ const AdminDashboard = () => {
                               to={`/cars/${car._id}`}
                               target="_blank"
                               className="p-2 rounded-xl text-[#A8B7CC] hover:text-white bg-white/5 hover:bg-white/10 transition-colors"
-                              title="View Public Listing"
+                              title="View Public Sales Listing"
                             >
                               <FiExternalLink className="w-3.5 h-3.5" />
                             </Link>
@@ -1394,14 +1208,14 @@ const AdminDashboard = () => {
             ) : (
               <div className="py-16 text-center rounded-2xl bg-[#0B1D33]/60 border border-[rgba(107,203,255,0.12)]">
                 <FiBox className="w-10 h-10 mx-auto text-[#6B7D96] mb-3" />
-                <h4 className="text-base font-bold text-white">No vehicles found</h4>
-                <p className="text-xs text-[#A8B7CC] mt-1">Adjust search filters or add a new vehicle to the fleet.</p>
+                <h4 className="text-base font-bold text-white">No vehicles found in showroom</h4>
+                <p className="text-xs text-[#A8B7CC] mt-1">Adjust search filters or list a new vehicle for sale.</p>
               </div>
             )}
           </motion.div>
         )}
 
-        {/* TAB 4: SYSTEM DIAGNOSTICS & PLATFORM HEALTH */}
+        {/* TAB 4: SYSTEM TELEMETRY & DIAGNOSTICS */}
         {activeTab === 'diagnostics' && (
           <motion.div
             key="tab-diagnostics"
@@ -1425,7 +1239,7 @@ const AdminDashboard = () => {
                 </div>
                 <div className="text-xl font-black text-white mb-0.5">MongoDB Cluster</div>
                 <p className="text-xs text-[#A8B7CC]">
-                  Status:{' '}
+                  Database:{' '}
                   <span className="text-emerald-400 font-semibold">
                     {systemHealth?.database?.status || 'Connected'}
                   </span>
@@ -1443,11 +1257,11 @@ const AdminDashboard = () => {
                   </span>
                 </div>
                 <div className="text-xl font-black text-white mb-0.5">
-                  {systemHealth?.memory?.used ? `${Math.round(systemHealth.memory.used)} MB` : '124 MB'}
+                  {systemHealth?.memory?.used ? `${Math.round(systemHealth.memory.used)} MB` : '128 MB'}
                 </div>
                 <p className="text-xs text-[#A8B7CC]">
                   Total Allocated:{' '}
-                  {systemHealth?.memory?.total ? `${Math.round(systemHealth.memory.total)} MB` : '248 MB'}
+                  {systemHealth?.memory?.total ? `${Math.round(systemHealth.memory.total)} MB` : '256 MB'}
                 </p>
               </div>
 
@@ -1477,7 +1291,7 @@ const AdminDashboard = () => {
                     {systemHealth?.environment || 'Production'}
                   </span>
                 </div>
-                <div className="text-xl font-black text-white mb-0.5">Autoria Backend</div>
+                <div className="text-xl font-black text-white mb-0.5">Autoria Marketplace API</div>
                 <p className="text-xs text-[#A8B7CC]">Express + Mongoose ODM</p>
               </div>
             </div>
@@ -1488,9 +1302,9 @@ const AdminDashboard = () => {
                 <div>
                   <h3 className="text-base font-bold text-white flex items-center gap-2">
                     <FiServer className="text-[#6BCBFF]" />
-                    <span>Real-time Operational Metrics</span>
+                    <span>Live Telemetry &amp; Gateway Connection</span>
                   </h3>
-                  <p className="text-xs text-[#A8B7CC]">System telemetry and network connectivity</p>
+                  <p className="text-xs text-[#A8B7CC]">Backend services and cloud infrastructure status</p>
                 </div>
                 <button
                   onClick={() => fetchDashboardData(true)}
@@ -1517,190 +1331,6 @@ const AdminDashboard = () => {
               </div>
             </div>
           </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* 6. BOOKING / INQUIRY DETAILS MODAL */}
-      <AnimatePresence>
-        {selectedBooking && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="w-full max-w-2xl rounded-3xl bg-[#0B1D33] border border-[rgba(107,203,255,0.25)] shadow-[0_25px_60px_rgba(0,0,0,0.8),0_0_30px_rgba(38,132,255,0.2)] overflow-hidden flex flex-col max-h-[90vh]"
-            >
-              {/* Modal Header */}
-              <div className="p-6 border-b border-[rgba(107,203,255,0.15)] flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-bold text-[#6BCBFF] bg-[#2684FF]/20 px-2 py-0.5 rounded-md border border-[#2684FF]/30">
-                      Inquiry #{selectedBooking.bookingNumber || selectedBooking._id?.slice(-6).toUpperCase()}
-                    </span>
-                    <span className="text-xs text-[#6B7D96]">
-                      {formatDate(selectedBooking.createdAt, true)}
-                    </span>
-                  </div>
-                  <h3 className="text-xl font-black text-white">
-                    {selectedBooking.car?.brand} {selectedBooking.car?.model}
-                  </h3>
-                </div>
-
-                <button
-                  onClick={() => setSelectedBooking(null)}
-                  className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-[#A8B7CC] hover:text-white transition-colors"
-                >
-                  <FiX className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Modal Body */}
-              <div className="p-6 overflow-y-auto space-y-6">
-                {/* Vehicle Thumbnail & Specs */}
-                <div className="p-4 rounded-2xl bg-[#061426] border border-white/5 flex items-center gap-4">
-                  <div className="w-24 h-18 rounded-xl overflow-hidden bg-slate-900 border border-white/10 shrink-0">
-                    <img
-                      src={getCarImage(selectedBooking.car)}
-                      alt={`${selectedBooking.car?.brand} ${selectedBooking.car?.model}`}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.src = '/hero_sports_car.jpg'
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <h4 className="text-base font-bold text-white">
-                      {selectedBooking.car?.brand} {selectedBooking.car?.model}
-                    </h4>
-                    <p className="text-xs text-[#A8B7CC]">
-                      Category: {selectedBooking.car?.category || 'Premium Vehicle'}
-                    </p>
-                    <div className="text-sm font-black text-emerald-400 mt-1">
-                      {formatCurrency(selectedBooking.pricing?.totalAmount || 0)}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Customer Information Card */}
-                <div className="p-4 rounded-2xl bg-[#061426] border border-white/5 space-y-3">
-                  <h4 className="text-xs font-bold text-[#6BCBFF] uppercase tracking-wider">
-                    Customer Information
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                    <div>
-                      <span className="text-[#A8B7CC]">Name:</span>
-                      <p className="text-sm font-bold text-white mt-0.5">
-                        {selectedBooking.user?.firstName || 'Guest'} {selectedBooking.user?.lastName || ''}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-[#A8B7CC]">Phone:</span>
-                      <p className="text-sm font-bold text-white mt-0.5">
-                        {selectedBooking.user?.phone || 'Not provided'}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-[#A8B7CC]">Email:</span>
-                      <p className="text-sm font-bold text-white mt-0.5">
-                        {selectedBooking.user?.email || 'N/A'}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-[#A8B7CC]">Booking Dates:</span>
-                      <p className="text-sm font-bold text-white mt-0.5">
-                        {formatDate(selectedBooking.bookingPeriod?.startDate)} →{' '}
-                        {formatDate(selectedBooking.bookingPeriod?.endDate)}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Contact Buttons */}
-                  <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-white/5">
-                    {selectedBooking.user?.phone && (
-                      <>
-                        <a
-                          href={`tel:${selectedBooking.user.phone}`}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/30 transition-all"
-                        >
-                          <FiPhone className="w-3.5 h-3.5" />
-                          <span>Call Client</span>
-                        </a>
-                        <a
-                          href={`https://wa.me/${selectedBooking.user.phone.replace(/[^0-9]/g, '')}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600/30 text-emerald-200 border border-emerald-500/40 hover:bg-emerald-600/40 transition-all"
-                        >
-                          <FiMessageSquare className="w-3.5 h-3.5" />
-                          <span>WhatsApp</span>
-                        </a>
-                      </>
-                    )}
-                    {selectedBooking.user?.email && (
-                      <a
-                        href={`mailto:${selectedBooking.user.email}`}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#2684FF]/20 text-[#6BCBFF] border border-[#2684FF]/30 hover:bg-[#2684FF]/30 transition-all"
-                      >
-                        <FiMail className="w-3.5 h-3.5" />
-                        <span>Email Client</span>
-                      </a>
-                    )}
-                  </div>
-                </div>
-
-                {/* Status Update Form */}
-                <div className="p-4 rounded-2xl bg-[#061426] border border-white/5 space-y-3">
-                  <h4 className="text-xs font-bold text-[#6BCBFF] uppercase tracking-wider">
-                    Change Lifecycle Status
-                  </h4>
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-xs text-[#A8B7CC] mb-1">Status</label>
-                      <select
-                        value={modalStatus}
-                        onChange={(e) => setModalStatus(e.target.value)}
-                        className="w-full px-3 py-2.5 rounded-xl bg-[#0B1D33] border border-[rgba(107,203,255,0.2)] text-white text-xs font-bold focus:outline-none focus:border-[#6BCBFF]"
-                      >
-                        <option value="Pending">Pending Review</option>
-                        <option value="Confirmed">Confirmed</option>
-                        <option value="Active">Active (In-Progress)</option>
-                        <option value="Completed">Completed (Fulfilled)</option>
-                        <option value="Cancelled">Cancelled</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs text-[#A8B7CC] mb-1">Administrative Note</label>
-                      <textarea
-                        rows={2}
-                        value={modalNote}
-                        onChange={(e) => setModalNote(e.target.value)}
-                        placeholder="Optional internal note (e.g. 'Customer confirmed down payment, scheduled delivery')..."
-                        className="w-full px-3 py-2 rounded-xl bg-[#0B1D33] border border-[rgba(107,203,255,0.2)] text-white placeholder-[#6B7D96] text-xs focus:outline-none focus:border-[#6BCBFF]"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Modal Footer */}
-              <div className="p-5 border-t border-[rgba(107,203,255,0.15)] flex items-center justify-end gap-3 bg-[#0B1D33]">
-                <button
-                  onClick={() => setSelectedBooking(null)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-[#A8B7CC] hover:text-white transition-colors"
-                >
-                  Close
-                </button>
-                <button
-                  onClick={handleModalStatusSave}
-                  disabled={isUpdatingStatus}
-                  className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#2684FF] to-[#1255CC] hover:from-[#3B92FF] hover:to-[#1F63D6] shadow-[0_0_15px_rgba(38,132,255,0.4)] transition-all disabled:opacity-50"
-                >
-                  {isUpdatingStatus ? 'Updating...' : 'Save Changes'}
-                </button>
-              </div>
-            </motion.div>
-          </div>
         )}
       </AnimatePresence>
     </div>
