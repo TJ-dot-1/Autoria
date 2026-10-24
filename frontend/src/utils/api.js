@@ -100,6 +100,14 @@ export const carsAPI = {
     return handleResponse(response);
   },
 
+  getMyCars: async () => {
+    const response = await fetch(`${API_BASE_URL}/cars/my-cars`, {
+      headers: getAuthHeaders()
+    });
+
+    return handleResponse(response);
+  },
+
   getById: async (id) => {
     const response = await fetch(`${API_BASE_URL}/cars/${id}`, {
       headers: getAuthHeaders()

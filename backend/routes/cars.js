@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   getCars,
+  getMyCars,
   getCar,
   createCar,
   updateCar,
@@ -15,11 +16,14 @@ import { optionalAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Public routes (accessible without authentication)
-router.get('/', optionalAuth, getCars);
+// Specific routes before :id
+router.get('/my-cars', protect, getMyCars);
 router.get('/available', getAvailableCars);
 router.get('/new-cars', optionalAuth, getNewCarsForSale);
 router.get('/used-cars', optionalAuth, getUsedCarsForSale);
+
+// Public car catalog routes
+router.get('/', optionalAuth, getCars);
 // Specific car ID route must come after specific routes
 router.get('/:id', optionalAuth, getCar);
 

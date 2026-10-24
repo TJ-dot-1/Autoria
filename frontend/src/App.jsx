@@ -97,7 +97,11 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/cars/:id" element={<CarDetails />} />
-              <Route path="/my-inquiries" element={<MyBookings />} />
+              <Route path="/my-inquiries" element={
+                <ProtectedRoute>
+                  <MyBookings />
+                </ProtectedRoute>
+              } />
               <Route path="/cars" element={<Cars />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/services" element={<Services />} />
@@ -109,7 +113,7 @@ const App = () => {
                 </ProtectedRoute>
               } />
 
-              {/* Direct user car listing routes */}
+              {/* Direct user car listing routes - protected for authenticated sellers */}
               <Route path="/sell-car" element={
                 <ProtectedRoute>
                   <AdminLayout>
@@ -154,9 +158,9 @@ const App = () => {
           </div>
         } />
 
-        {/* Admin and Seller portal routes with admin layout */}
+        {/* Admin portal routes - STRICTLY PROTECTED: ADMINS ONLY */}
         <Route path="/admin/*" element={
-          <ProtectedRoute>
+          <ProtectedRoute adminOnly={true}>
             <AdminLayout>
               <Routes>
                 <Route path="" element={<AdminDashboard />} />
@@ -165,27 +169,18 @@ const App = () => {
                 <Route path="add-car" element={<AddCar />} />
                 <Route path="edit-car/:id" element={<AddCar />} />
                 <Route path="bookings" element={<ManageBookings />} />
-                <Route path="users" element={<ProtectedRoute adminOnly><ManageUsers /></ProtectedRoute>} />
-                <Route path="reports" element={<ProtectedRoute adminOnly><ReportsAnalytics /></ProtectedRoute>} />
-                <Route path="settings" element={<ProtectedRoute adminOnly><AdminSettings /></ProtectedRoute>} />
+                <Route path="users" element={<ManageUsers />} />
+                <Route path="reports" element={<ReportsAnalytics />} />
+                <Route path="settings" element={<AdminSettings />} />
               </Routes>
             </AdminLayout>
           </ProtectedRoute>
         } />
 
-        {/* Owner routes (using admin layout) */}
+        {/* Legacy owner alias redirect to user dashboard */}
         <Route path="/owner/*" element={
           <ProtectedRoute>
-            <AdminLayout>
-              <Routes>
-                <Route path="" element={<AdminDashboard />} />
-                <Route path="dashboard" element={<AdminDashboard />} />
-                <Route path="manage-cars" element={<ManageCars />} />
-                <Route path="add-car" element={<AddCar />} />
-                <Route path="edit-car/:id" element={<AddCar />} />
-                <Route path="manage-bookings" element={<ManageBookings />} />
-              </Routes>
-            </AdminLayout>
+            <Dashboard />
           </ProtectedRoute>
         } />
       </Routes>

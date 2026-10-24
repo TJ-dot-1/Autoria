@@ -214,9 +214,33 @@ export const getAvailableCars = async (req, res, next) => {
   }
 };
 
+// @desc    Get logged in user's listed cars
+// @route   GET /api/cars/my-cars
+// @access  Private
+export const getMyCars = async (req, res, next) => {
+  try {
+    const userId = req.user._id || req.user.id;
+    const cars = await Car.find({ addedBy: userId, isActive: true })
+      .populate('addedBy', 'firstName lastName email')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: cars.length,
+      data: cars
+    });
+  } catch (error) {
+    console.error('Get my cars error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error fetching user cars'
+    });
+  }
+};
+
 // @desc    Create new car
 // @route   POST /api/cars
-// @access  Private (Admin only)
+// @access  Private (Authenticated users)
 export const createCar = async (req, res, next) => {
   try {
     const carData = {

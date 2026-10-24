@@ -2,17 +2,6 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { authAPI } from '../utils/api';
 
-// Single user configuration fallback for local admin testing
-const SINGLE_USER = {
-  firstName: import.meta.env.VITE_ADMIN_FIRST_NAME || 'Admin',
-  lastName: import.meta.env.VITE_ADMIN_LAST_NAME || 'Autoria',
-  email: import.meta.env.VITE_ADMIN_EMAIL || 'admin@autoria.com',
-  password: import.meta.env.VITE_ADMIN_PASSWORD || 'admin123',
-  role: 'admin',
-  phone: import.meta.env.VITE_ADMIN_PHONE || '+254700000000',
-  bio: import.meta.env.VITE_ADMIN_BIO || 'Autoria Fleet Administrator'
-};
-
 const AuthContext = createContext();
 
 export const useAuth = () => {
@@ -68,40 +57,21 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
-  // Login handler
+  // Login handler - strictly authenticates against real backend
   const login = async (email, password) => {
     try {
-      // 1. Attempt real backend authentication
-      try {
-        const response = await authAPI.login(email, password);
-        if (response?.token && response?.data?.user) {
-          const loggedUser = response.data.user;
-          localStorage.setItem('autoria_token', response.token);
-          localStorage.setItem('autoria_user', JSON.stringify(loggedUser));
-          setToken(response.token);
-          setUser(loggedUser);
-          toast.success(`Welcome back, ${loggedUser.firstName}!`);
-          return { success: true, user: loggedUser, role: loggedUser.role };
-        }
-      } catch (backendError) {
-        // If not network failure but invalid credentials from backend, throw it unless matching demo
-        if (email !== SINGLE_USER.email) {
-          throw backendError;
-        }
+      const response = await authAPI.login(email, password);
+      if (response?.token && response?.data?.user) {
+        const loggedUser = response.data.user;
+        localStorage.setItem('autoria_token', response.token);
+        localStorage.setItem('autoria_user', JSON.stringify(loggedUser));
+        setToken(response.token);
+        setUser(loggedUser);
+        toast.success(`Welcome back, ${loggedUser.firstName}!`);
+        return { success: true, user: loggedUser, role: loggedUser.role };
       }
 
-      // 2. Demo credentials fallback for offline/local environment
-      if (email === SINGLE_USER.email && (password === SINGLE_USER.password || password === 'admin123')) {
-        const authToken = 'autoria_admin_token_' + Date.now();
-        localStorage.setItem('autoria_token', authToken);
-        localStorage.setItem('autoria_user', JSON.stringify(SINGLE_USER));
-        setToken(authToken);
-        setUser(SINGLE_USER);
-        toast.success(`Welcome to Autoria Admin Portal, ${SINGLE_USER.firstName}!`);
-        return { success: true, user: SINGLE_USER, role: 'admin' };
-      }
-
-      throw new Error('Invalid email or password');
+      throw new Error(response?.message || 'Invalid email or password');
     } catch (error) {
       console.error('Login error:', error);
       toast.error(error.message || 'Invalid email or password. Please try again.');

@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Title from '../../components/Title'
 import { carsAPI } from '../../utils/api'
+import { useAuth } from '../../contexts/AuthContext'
 
 const ManageCars = () => {
+  const { user, isAdmin } = useAuth()
   const [searchQuery, setSearchQuery] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
   const [sortBy, setSortBy] = useState('name')
@@ -18,11 +20,7 @@ const ManageCars = () => {
   const fetchCars = async () => {
     try {
       setLoading(true)
-      console.log('Fetching cars...')
-      const response = await carsAPI.getAll()
-      console.log('API Response:', response)
-      console.log('Response data:', response.data)
-      console.log('Cars array:', response.data || [])
+      const response = isAdmin ? await carsAPI.getAll() : await carsAPI.getMyCars()
       setCars(response.data || [])
       setError(null)
       console.log('Cars set successfully:', (response.data || []).length, 'cars')

@@ -144,6 +144,24 @@ const AdminLayout = ({ children }) => {
     },
   ]
 
+  const sellerMenuLinks = [
+    { 
+      name: "My Dashboard", 
+      path: "/dashboard", 
+      icon: DashboardIcon
+    },
+    { 
+      name: "List a Vehicle", 
+      path: "/sell-car", 
+      icon: AddIcon
+    },
+    { 
+      name: "My Inquiries", 
+      path: "/my-inquiries", 
+      icon: ListIcon
+    },
+  ]
+
   const additionalMenuLinks = [
     {
       name: "User Management",
@@ -161,6 +179,8 @@ const AdminLayout = ({ children }) => {
       icon: SettingsIcon
     }
   ]
+
+  const activeMenuLinks = user?.role === 'admin' ? adminMenuLinks : sellerMenuLinks
 
   return (
     <div className="admin-container flex h-screen bg-[var(--bg-secondary)]">
@@ -237,9 +257,9 @@ const AdminLayout = ({ children }) => {
           {/* Main Navigation */}
           <div className="space-y-1">
             <p className="px-3 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
-              Main
+              {user?.role === 'admin' ? 'Main' : 'Seller Portal'}
             </p>
-            {adminMenuLinks.map((item, index) => {
+            {activeMenuLinks.map((item, index) => {
               const isActive = location.pathname === item.path
               return (
                 <Link
@@ -355,7 +375,7 @@ const AdminLayout = ({ children }) => {
 
               <div>
                 <h1 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]">
-                  {adminMenuLinks.concat(additionalMenuLinks).find(item => item.path === location.pathname)?.name || 'Dashboard'}
+                  {activeMenuLinks.concat(additionalMenuLinks).find(item => item.path === location.pathname)?.name || 'Dashboard'}
                 </h1>
               </div>
             </div>

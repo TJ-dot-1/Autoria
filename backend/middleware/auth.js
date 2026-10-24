@@ -23,51 +23,24 @@ export const protect = async (req, res, next) => {
     }
 
     try {
-        let user;
+      // Verify real JWT token
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      
+      // Get user from database
+      const user = await User.findById(decoded.id).select('-password');
+      
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          message: 'Token is valid but user no longer exists'
+        });
+      }
 
-        // Check if it's a fake token for development (starts with 'autoria_admin_token_')
-        if (token.startsWith('autoria_admin_token_')) {
-          // For development: ensure an actual admin user exists in the database so
-          // that controller actions (e.g. findByIdAndUpdate) succeed instead of
-          // returning "User not found". Try to find an admin by email and create
-          // one if missing.
-          const adminEmail = 'admin@autoria.com';
-          let adminUser = await User.findOne({ email: adminEmail }).select('-password');
-          if (!adminUser) {
-            // Create a default admin user for development/testing
-            const created = await User.create({
-              firstName: 'Admin',
-              lastName: 'User',
-              email: adminEmail,
-              password: 'autonomia',
-              role: 'admin',
-              isActive: true
-            });
-            // Remove password before attaching to request
-            adminUser = await User.findById(created._id).select('-password');
-          }
-
-          user = adminUser;
-        } else {
-        // Verify real JWT token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
-        // Get user from database
-        user = await User.findById(decoded.id).select('-password');
-        
-        if (!user) {
-          return res.status(401).json({
-            success: false,
-            message: 'Token is valid but user no longer exists'
-          });
-        }
-
-        if (!user.isActive) {
-          return res.status(401).json({
-            success: false,
-            message: 'Account has been deactivated'
-          });
-        }
+      if (!user.isActive) {
+        return res.status(401).json({
+          success: false,
+          message: 'Account has been deactivated'
+        });
       }
 
       req.user = user;
@@ -129,51 +102,24 @@ export const authenticateAdmin = async (req, res, next) => {
     }
 
     try {
-      let user;
+      // Verify real JWT token
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      // Check if it's a fake token for development (starts with 'autoria_admin_token_')
-      if (token.startsWith('autoria_admin_token_')) {
-        // For development: ensure an actual admin user exists in the database so
-        // that controller actions (e.g. findByIdAndUpdate) succeed instead of
-        // returning "User not found". Try to find an admin by email and create
-        // one if missing.
-        const adminEmail = 'admin@autoria.com';
-        let adminUser = await User.findOne({ email: adminEmail }).select('-password');
-        if (!adminUser) {
-          // Create a default admin user for development/testing
-          const created = await User.create({
-            firstName: 'Admin',
-            lastName: 'User',
-            email: adminEmail,
-            password: 'autonomia',
-            role: 'admin',
-            isActive: true
-          });
-          // Remove password before attaching to request
-          adminUser = await User.findById(created._id).select('-password');
-        }
+      // Get user from database
+      const user = await User.findById(decoded.id).select('-password');
 
-        user = adminUser;
-      } else {
-        // Verify real JWT token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          message: 'Token is valid but user no longer exists'
+        });
+      }
 
-        // Get user from database
-        user = await User.findById(decoded.id).select('-password');
-
-        if (!user) {
-          return res.status(401).json({
-            success: false,
-            message: 'Token is valid but user no longer exists'
-          });
-        }
-
-        if (!user.isActive) {
-          return res.status(401).json({
-            success: false,
-            message: 'Account has been deactivated'
-          });
-        }
+      if (!user.isActive) {
+        return res.status(401).json({
+          success: false,
+          message: 'Account has been deactivated'
+        });
       }
 
       // Check if user has admin role

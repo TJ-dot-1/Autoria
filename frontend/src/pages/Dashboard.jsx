@@ -88,14 +88,21 @@ const Dashboard = () => {
 
       // 1. Load Cars
       try {
-        const carsRes = await carsAPI.getAll({ limit: 100 });
-        const allCars = carsRes?.data || [];
-        // Filter cars added by this user (or show all if admin)
-        const userCars = allCars.filter(car => {
-          const addedById = typeof car.addedBy === 'object' ? car.addedBy?._id : car.addedBy;
-          return addedById === user?._id || addedById === user?.id;
-        });
-        setMyCars(user?.role === 'admin' && userCars.length === 0 ? allCars.slice(0, 8) : userCars);
+        let userCars = [];
+        if (user?.role === 'admin') {
+          const carsRes = await carsAPI.getAll({ limit: 100 });
+          const allCars = carsRes?.data || [];
+          const ownCars = allCars.filter(car => {
+            const addedById = typeof car.addedBy === 'object' ? car.addedBy?._id : car.addedBy;
+            return addedById === user?._id || addedById === user?.id;
+          });
+          userCars = ownCars.length > 0 ? ownCars : allCars;
+        } else {
+          // Non-admin / regular user: strictly fetch ONLY the cars listed by this user
+          const res = await carsAPI.getMyCars();
+          userCars = res?.data || [];
+        }
+        setMyCars(userCars);
       } catch (err) {
         console.warn('Cars load warning:', err.message);
       }
